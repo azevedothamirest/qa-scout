@@ -1,0 +1,17 @@
+{
+  "name": "qa-scout",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Companheiro de teste exploratório baseado em sessões",
+  "scripts": {
+    "start": "http-server . -p 4173 -c-1",
+    "test": "playwright test",
+    "test:report": "playwright show-report"
+  },
+  "author": "Thamires Azevedo",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "1.56.0",
+    "http-server": "14.1.1"
+  }
+}
