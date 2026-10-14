@@ -12,8 +12,10 @@ module.exports = defineConfig({
     trace: 'on-first-retry',
   },
   projects: [
-    { name: 'desktop', use: { ...devices['Desktop Chrome'] } },
-    { name: 'celular', use: { ...devices['Pixel 7'] } },
+    { name: 'desktop', use: { ...devices['Desktop Chrome'] }, testIgnore: /extensao/ },
+    { name: 'celular', use: { ...devices['Pixel 7'] }, testIgnore: /extensao/ },
+    // Carrega a extensão de verdade num Chromium com perfil próprio (ver tests/extensao.spec.js).
+    { name: 'extensao', testMatch: /extensao/ },
   ],
   webServer: {
     command: 'npx http-server . -p 4173 -s -c-1',

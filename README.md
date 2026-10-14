@@ -25,6 +25,18 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - **Relatório** em Markdown para colar no Jira, GitHub, Notion ou Slack, e exportação em PDF pelo navegador.
 - **Histórico com busca** por área, charter ou conteúdo das notas.
 
+## Extensão do Chrome (em construção)
+
+O mesmo app roda como painel lateral do Chrome e registra a exploração sozinho:
+
+- Durante a sessão, clique em **Acompanhar a aba atual** na página do sistema em teste. Abas abertas a partir dela entram junto.
+- Cliques, campos preenchidos e páginas abertas viram **observações automáticas a revisar**, com o minuto da sessão.
+- A cada clique sai um print com o ponto clicado marcado (no máximo 1 por segundo).
+- Você confirma, edita (texto e tipo) ou exclui cada uma. Só as confirmadas entram no relatório.
+- O valor digitado nos campos nunca é lido nem guardado. Sessão pausada não registra nada.
+
+Para instalar em modo desenvolvedor: abra `chrome://extensions`, ligue o **Modo do desenvolvedor**, clique em **Carregar sem compactação** e escolha a pasta do projeto.
+
 ## Privacidade
 
 Tudo fica salvo no navegador de quem usa (`localStorage`). Não há servidor, conta ou envio de dados.

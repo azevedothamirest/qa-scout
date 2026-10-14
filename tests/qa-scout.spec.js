@@ -110,3 +110,48 @@ test.describe('Debriefing', () => {
     await expect(page.locator('#md-out')).toHaveValue(/Teste 80%/);
   });
 });
+
+test.describe('Baralho de heurísticas', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.getByRole('button', { name: 'Heurísticas', exact: true }).click();
+  });
+
+  test('Puxar outra carta diferente da atual', async ({ page }) => {
+    const antes = await page.locator('.carta h3').textContent();
+    await page.getByRole('button', { name: /Puxar outra carta/ }).click();
+    await expect(page.locator('.carta h3')).not.toHaveText(antes || '');
+    await expect(page.locator('.desafio')).toContainText('Faz isso agora');
+  });
+
+  test('Puxar só cartas da categoria escolhida', async ({ page }) => {
+    await page.getByRole('group', { name: 'Categoria' }).getByRole('button', { name: 'Dados' }).click();
+    for (let i = 0; i < 4; i++) {
+      await expect(page.locator('.carta .cat')).toHaveText('Dados');
+      await page.getByRole('button', { name: /Puxar outra carta/ }).click();
+    }
+  });
+
+  test('Começar sessão com a carta sugerida no campo "com"', async ({ page }) => {
+    const titulo = await page.locator('.carta h3').textContent();
+    await page.getByRole('button', { name: 'Começar sessão com esta carta' }).click();
+    await expect(page.getByLabel('com', { exact: true })).toHaveValue(new RegExp(`heurística “${titulo}”`));
+  });
+
+  test('Anotar a carta como ideia durante a sessão', async ({ page }) => {
+    await page.getByRole('button', { name: 'Nova sessão' }).click();
+    await page.getByLabel('Explorar').fill('o login');
+    await page.getByLabel('para descobrir').fill('falhas de sessão');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await page.getByRole('button', { name: 'Heurísticas', exact: true }).click();
+    const titulo = await page.locator('.carta h3').textContent();
+    await page.getByRole('button', { name: 'Anotar como ideia na sessão' }).click();
+    await page.getByRole('button', { name: 'Em campo' }).click();
+    await expect(page.locator('.note.t-ide')).toContainText(`Heurística “${titulo}”`);
+  });
+
+  test('Abrir uma carta pela lista completa', async ({ page }) => {
+    await page.getByRole('button', { name: 'Ver todas' }).click();
+    await page.locator('.hcard', { hasText: 'Permissões' }).click();
+    await expect(page.locator('.carta h3')).toHaveText('Permissões');
+  });
+});
