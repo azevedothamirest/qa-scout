@@ -5,9 +5,13 @@ let ultimoPrint = 0;
 
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
 
+// No modo "navegador de teste" (aberto pelo comando qa-scout), toda aba de site é acompanhada.
 async function estado() {
   const { abas = [], capturando = false } = await chrome.storage.session.get(['abas', 'capturando']);
-  return { abas, capturando };
+  const { 'qascout.modo': modo } = await chrome.storage.local.get('qascout.modo');
+  const todas = modo === 'navegador';
+  const acompanha = tab => todas ? /^(https?|file):/.test(tab.url || '') : abas.includes(tab.id);
+  return { abas, capturando, todas, acompanha };
 }
 
 async function injeta(tabId) {
@@ -43,8 +47,8 @@ chrome.runtime.onMessage.addListener((msg, sender, responder) => {
 });
 
 async function registra(msg, tab) {
-  const { abas, capturando } = await estado();
-  if (!capturando || !abas.includes(tab.id)) return;
+  const { capturando, acompanha } = await estado();
+  if (!capturando || !acompanha(tab)) return;
   const ev = { tipo: msg.tipo, desc: msg.desc, url: msg.url, titulo: msg.titulo, ts: msg.ts };
   if (msg.tipo === 'clique' && tab.active && Date.now() - ultimoPrint >= INTERVALO_PRINT) {
     ultimoPrint = Date.now();
@@ -68,8 +72,8 @@ chrome.tabs.onCreated.addListener(async tab => {
 // A cada página carregada numa aba acompanhada: injeta de novo e registra a navegação.
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (info.status !== 'complete') return;
-  const { abas, capturando } = await estado();
-  if (!abas.includes(tabId)) return;
+  const { capturando, acompanha } = await estado();
+  if (!acompanha(tab)) return;
   await injeta(tabId);
   if (capturando) await guardaEvento({ tipo: 'pagina', desc: `Abriu a página “${(tab.title || '').slice(0, 80)}”`, url: tab.url, titulo: tab.title, ts: Date.now() });
 });

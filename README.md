@@ -25,6 +25,18 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - **Relatório** em Markdown para colar no Jira, GitHub, Notion ou Slack, e exportação em PDF pelo navegador.
 - **Histórico com busca** por área, charter ou conteúdo das notas.
 
+## Navegador de teste: um comando e pronto
+
+Sem instalar extensão nem passar pela Chrome Web Store. Com o Node instalado:
+
+```bash
+npx github:azevedothamirest/qa-scout https://endereco-do-sistema-em-teste
+```
+
+Ou, com o projeto clonado: `npm install` e depois `npm run navegador -- https://endereco-do-sistema-em-teste`.
+
+Abre um navegador de teste separado, com o painel do QA Scout numa janela à esquerda e o sistema à direita. Nele, **todas as abas são acompanhadas**: comece a sessão e explore, os cliques viram observações com print. Seu Chrome do dia a dia não é tocado. O perfil fica em `~/.qa-scout/perfil` e guarda os logins entre uma sessão e outra. Na primeira vez, o comando baixa o Chromium sozinho.
+
 ## Extensão do Chrome (em construção)
 
 O mesmo app roda como painel lateral do Chrome e registra a exploração sozinho:

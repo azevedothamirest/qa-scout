@@ -323,8 +323,10 @@ function noteHtml(n){
 }
 
 /* ---------- captura automática (só na extensão) ---------- */
-let abasInfo = [];
+let abasInfo = [], modoNavegador = false;
 function capturaHtml(s){
+  if(modoNavegador) return `<div class="eyebrow">Captura automática · navegador de teste</div>
+    <p class="hint" style="margin:6px 0 0">${s.status==='running'?'Todas as abas deste navegador são acompanhadas: cliques, campos preenchidos e páginas abertas viram observações a revisar, com print.':'Sessão pausada: nada está sendo registrado.'} O que você digita nunca é guardado.</p>`;
   return `<div class="eyebrow">Captura automática</div>
     <p class="hint" style="margin:6px 0 0">${s.status==='running'?'Cliques, campos preenchidos e páginas abertas nas abas abaixo viram observações a revisar, com print.':'Sessão pausada: nada está sendo registrado.'} O que você digita nunca é guardado.</p>
     <div class="abas">${abasInfo.length?abasInfo.map(a=>`<div class="aba"><i></i><span title="${esc(a.url)}">${esc(a.title||a.url)}</span><button class="link-btn" data-parar="${a.id}">Parar</button></div>`).join(''):'<p class="hint" style="margin:0">Nenhuma aba acompanhada ainda.</p>'}</div>
@@ -694,7 +696,7 @@ document.addEventListener('change',e=>{ if(e.target.id==='file-in'){ [...e.targe
 function afterRender(){}
 async function init(){
   if(EXT){
-    try{ const r=await chrome.storage.local.get(KEY); if(r[KEY]) state=r[KEY]; }catch(e){}
+    try{ const r=await chrome.storage.local.get([KEY,'qascout.modo']); if(r[KEY]) state=r[KEY]; modoNavegador = r['qascout.modo']==='navegador'; }catch(e){}
     chrome.storage.onChanged.addListener((mud,area)=>{
       if(area==='local' && Object.keys(mud).some(k=>k.startsWith(EV_PREFIX) && mud[k].newValue)) drenar();
       if(area==='session' && mud.abas) atualizaAbas();
