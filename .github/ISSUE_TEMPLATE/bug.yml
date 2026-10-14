@@ -1,0 +1,52 @@
+name: Reportar um bug
+description: Algo não funcionou como deveria.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: jeito
+    attributes:
+      label: Onde aconteceu?
+      options:
+        - Navegador de teste (npx qa-scout)
+        - Extensão do Chrome
+        - Versão web
+    validations:
+      required: true
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passos para reproduzir
+      placeholder: |
+        1. Comecei uma sessão de 30 min
+        2. Cliquei em ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Resultado esperado
+    validations:
+      required: true
+  - type: textarea
+    id: obtido
+    attributes:
+      label: Resultado obtido
+      description: Prints ajudam muito. Cuidado para não expor dados reais.
+    validations:
+      required: true
+  - type: input
+    id: ambiente
+    attributes:
+      label: Ambiente
+      placeholder: Ex.: Windows 11, Node 22, Chrome 141
+  - type: dropdown
+    id: severidade
+    attributes:
+      label: Severidade, na sua visão
+      options:
+        - Crítica (impede de usar)
+        - Alta (atrapalha muito, tem contorno)
+        - Média
+        - Baixa (cosmético)

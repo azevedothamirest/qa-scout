@@ -1,0 +1,27 @@
+name: Sugerir uma ideia
+description: Funcionalidade nova, heurística para o baralho ou integração.
+title: "[Ideia] "
+labels: ["ideia"]
+body:
+  - type: dropdown
+    id: tipo
+    attributes:
+      label: Tipo de ideia
+      options:
+        - Funcionalidade
+        - Heurística nova para o baralho
+        - Integração (Jira, Slack, etc.)
+        - Outra
+    validations:
+      required: true
+  - type: textarea
+    id: problema
+    attributes:
+      label: Qual problema isso resolve?
+      description: Conte a situação do dia a dia em que você sentiu falta.
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Como você imagina que funcionaria?

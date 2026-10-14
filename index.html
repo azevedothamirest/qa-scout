@@ -195,6 +195,9 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 .captura.pausada .aba i{background:var(--muted)}
 .revisar{border:1px solid var(--marker);background:var(--marker-soft);border-radius:var(--r-sm);padding:12px 14px;margin:0 0 18px}
 .revisar h3{font-size:15px;margin:0 0 4px}
+.rodape{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;padding:28px 16px 36px;font-size:13.5px;color:var(--muted)}
+.rodape a{color:var(--accent);font-weight:600;text-decoration:none}
+.rodape a:hover{text-decoration:underline}
 .t-bug{--c:var(--t-bug)}.t-duv{--c:var(--t-duv)}.t-ide{--c:var(--t-ide)}.t-ris{--c:var(--t-ris)}.t-obs{--c:var(--t-obs)}
 .log-wrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:4px 18px}
 
@@ -315,6 +318,11 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 </header>
 
 <main id="app"></main>
+<footer class="rodape no-print">
+  <span>QA Scout está em beta aberto.</span>
+  <a href="https://github.com/azevedothamirest/qa-scout/blob/main/docs/tutorial.md" target="_blank" rel="noopener">Como usar ↗</a>
+  <a href="https://github.com/azevedothamirest/qa-scout/issues/new/choose" target="_blank" rel="noopener">Dar feedback ↗</a>
+</footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="app.js"></script>

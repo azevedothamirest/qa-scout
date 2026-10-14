@@ -8,6 +8,8 @@ QA Scout é um companheiro de teste exploratório baseado em sessões (SBTM). Vo
 
 ![Testes e2e](https://github.com/azevedothamirest/qa-scout/actions/workflows/ci.yml/badge.svg)
 
+> **Beta aberto.** Primeira vez? Siga o [tutorial](docs/tutorial.md) (uns 10 minutos). Usou? [Conte como foi](https://github.com/azevedothamirest/qa-scout/issues/new/choose): bugs, ideias e críticas são muito bem-vindos.
+
 ## Por que existe
 
 Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais interessantes, mas deixa pouco rastro. O QA Scout dá estrutura sem virar roteiro, e transforma a sessão em evidência que Produto e Dev conseguem ler.

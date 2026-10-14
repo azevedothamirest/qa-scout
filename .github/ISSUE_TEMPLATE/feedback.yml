@@ -1,0 +1,44 @@
+name: Contar como foi usar
+description: O que ajudou, o que atrapalhou e o que faltou na sua sessão com o QA Scout.
+title: "[Feedback] "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: Obrigada por testar o QA Scout! Responda só o que fizer sentido para você.
+  - type: dropdown
+    id: jeito
+    attributes:
+      label: Como você usou?
+      options:
+        - Navegador de teste (npx qa-scout)
+        - Extensão do Chrome
+        - Versão web
+    validations:
+      required: true
+  - type: textarea
+    id: contexto
+    attributes:
+      label: O que você explorou?
+      description: Tipo de sistema e duração da sessão. Sem dados confidenciais.
+      placeholder: Ex.: checkout de e-commerce, sessão de 60 min
+  - type: textarea
+    id: ajudou
+    attributes:
+      label: O que ajudou?
+  - type: textarea
+    id: atrapalhou
+    attributes:
+      label: O que atrapalhou ou confundiu?
+  - type: textarea
+    id: faltou
+    attributes:
+      label: O que faltou para você usar no dia a dia?
+  - type: dropdown
+    id: usaria
+    attributes:
+      label: Você usaria de novo?
+      options:
+        - Sim, já no próximo exploratório
+        - Talvez, se melhorar o que eu disse acima
+        - Não

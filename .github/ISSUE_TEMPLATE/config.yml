@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Tutorial do QA Scout
+    url: https://github.com/azevedothamirest/qa-scout/blob/main/docs/tutorial.md
+    about: Passo a passo para instalar e fazer a primeira sessão.
