@@ -2,10 +2,8 @@
   "manifest_version": 3,
   "name": "QA Scout",
   "version": "0.2.0",
-  "description": "Companheiro de teste exploratório baseado em sessões. Registra cliques e prints das abas que você marcar.",
-  "action": { "default_title": "Abrir o QA Scout" },
-  "side_panel": { "default_path": "index.html" },
+  "description": "Captura do navegador de teste do QA Scout: registra cliques e prints durante a sessão.",
   "background": { "service_worker": "extensao/background.js" },
-  "permissions": ["sidePanel", "storage", "unlimitedStorage", "tabs", "scripting"],
+  "permissions": ["storage", "unlimitedStorage", "tabs", "scripting"],
   "host_permissions": ["<all_urls>"]
 }

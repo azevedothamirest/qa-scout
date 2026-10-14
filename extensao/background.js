@@ -1,17 +1,11 @@
-// Service worker da extensão. Guarda quais abas estão sendo acompanhadas, tira os prints
-// e deixa cada evento numa chave própria do storage para o painel transformar em nota.
+// Service worker do navegador de teste (aberto pelo comando qa-scout). Acompanha toda aba de site,
+// tira os prints e deixa cada evento numa chave própria do storage para o painel transformar em nota.
 const INTERVALO_PRINT = 1000;
 let ultimoPrint = 0;
 
-chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
-
-// No modo "navegador de teste" (aberto pelo comando qa-scout), toda aba de site é acompanhada.
 async function estado() {
-  const { abas = [], capturando = false } = await chrome.storage.session.get(['abas', 'capturando']);
-  const { 'qascout.modo': modo } = await chrome.storage.local.get('qascout.modo');
-  const todas = modo === 'navegador';
-  const acompanha = tab => todas ? /^(https?|file):/.test(tab.url || '') : abas.includes(tab.id);
-  return { abas, capturando, todas, acompanha };
+  const { capturando = false } = await chrome.storage.session.get('capturando');
+  return { capturando, acompanha: tab => /^(https?|file):/.test(tab.url || '') };
 }
 
 async function injeta(tabId) {
@@ -26,20 +20,6 @@ async function guardaEvento(ev) {
 
 chrome.runtime.onMessage.addListener((msg, sender, responder) => {
   if (msg && msg.qaScout && sender.tab) { registra(msg, sender.tab); return; }
-  if (msg && msg.cmd === 'acompanhar') {
-    (async () => {
-      const { abas } = await estado();
-      const ok = await injeta(msg.tabId);
-      if (ok && !abas.includes(msg.tabId)) abas.push(msg.tabId);
-      await chrome.storage.session.set({ abas });
-      responder({ ok });
-    })();
-    return true;
-  }
-  if (msg && msg.cmd === 'parar') {
-    estado().then(({ abas }) => chrome.storage.session.set({ abas: abas.filter(id => id !== msg.tabId) })).then(() => responder({ ok: true }));
-    return true;
-  }
   if (msg && msg.cmd === 'capturando') {
     chrome.storage.session.set({ capturando: !!msg.valor }).then(() => responder({ ok: true }));
     return true;
@@ -60,25 +40,11 @@ async function registra(msg, tab) {
   await guardaEvento(ev);
 }
 
-// Abas abertas a partir de uma aba acompanhada entram junto.
-chrome.tabs.onCreated.addListener(async tab => {
-  const { abas } = await estado();
-  if (tab.openerTabId && abas.includes(tab.openerTabId) && !abas.includes(tab.id)) {
-    abas.push(tab.id);
-    await chrome.storage.session.set({ abas });
-  }
-});
-
-// A cada página carregada numa aba acompanhada: injeta de novo e registra a navegação.
+// A cada página carregada: injeta de novo e registra a navegação.
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (info.status !== 'complete') return;
   const { capturando, acompanha } = await estado();
   if (!acompanha(tab)) return;
   await injeta(tabId);
   if (capturando) await guardaEvento({ tipo: 'pagina', desc: `Abriu a página “${(tab.title || '').slice(0, 80)}”`, url: tab.url, titulo: tab.title, ts: Date.now() });
-});
-
-chrome.tabs.onRemoved.addListener(async tabId => {
-  const { abas } = await estado();
-  if (abas.includes(tabId)) await chrome.storage.session.set({ abas: abas.filter(id => id !== tabId) });
 });

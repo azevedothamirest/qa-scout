@@ -1,4 +1,4 @@
-// Roda só nas abas marcadas pela testadora. Descreve o que foi clicado ou preenchido,
+// Roda nas abas de site do navegador de teste. Descreve o que foi clicado ou preenchido,
 // sem nunca ler o valor digitado nos campos.
 (() => {
   if (window.__qaScout) return;

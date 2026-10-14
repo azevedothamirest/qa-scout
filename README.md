@@ -24,7 +24,9 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
   - Prints colados com `Ctrl+V` ou anexados, comprimidos automaticamente.
 - **Heurísticas:** 18 cartas com tours inspirados em James Whittaker e casos do dia a dia brasileiro (CPF com máscara, acentos, valores em reais, fuso).
 - **Debriefing:** divisão do tempo em Teste, Bug e Setup (TBS), áreas cobertas e próximas sessões.
-- **Relatório** em Markdown para colar no Jira, GitHub, Notion ou Slack, e exportação em PDF pelo navegador.
+- **Captura automática** no navegador de teste: cliques, campos preenchidos e páginas abertas viram observações com print. Você confirma, edita (texto e tipo) ou exclui cada uma; só as revisadas entram no relatório.
+- **Relatório** em Markdown para colar no Jira, GitHub, Notion ou Slack, **Copiar só os bugs** para abrir os tickets, e exportação em PDF pelo navegador.
+- **Tema claro e escuro**, com botão para alternar.
 - **Histórico com busca** por área, charter ou conteúdo das notas.
 
 ## Navegador de teste: um comando e pronto
@@ -37,23 +39,11 @@ npx github:azevedothamirest/qa-scout https://endereco-do-sistema-em-teste
 
 Ou, com o projeto clonado: `npm install` e depois `npm run navegador -- https://endereco-do-sistema-em-teste`.
 
-Abre um navegador de teste separado, com o painel do QA Scout numa janela à esquerda e o sistema à direita. Nele, **todas as abas são acompanhadas**: comece a sessão e explore, os cliques viram observações com print. Seu Chrome do dia a dia não é tocado. O perfil fica em `~/.qa-scout/perfil` e guarda os logins entre uma sessão e outra. Na primeira vez, o comando baixa o Chromium sozinho.
-
-## Extensão do Chrome (em construção)
-
-O mesmo app roda como painel lateral do Chrome e registra a exploração sozinho:
-
-- Durante a sessão, clique em **Acompanhar a aba atual** na página do sistema em teste. Abas abertas a partir dela entram junto.
-- Cliques, campos preenchidos e páginas abertas viram **observações automáticas a revisar**, com o minuto da sessão.
-- A cada clique sai um print com o ponto clicado marcado (no máximo 1 por segundo).
-- Você confirma, edita (texto e tipo) ou exclui cada uma. Só as confirmadas entram no relatório.
-- O valor digitado nos campos nunca é lido nem guardado. Sessão pausada não registra nada.
-
-Para instalar em modo desenvolvedor: abra `chrome://extensions`, ligue o **Modo do desenvolvedor**, clique em **Carregar sem compactação** e escolha a pasta do projeto.
+Abre um navegador de teste separado, com o painel do QA Scout numa janela à esquerda e o sistema à direita. Nele, **todas as abas são acompanhadas**: comece a sessão e explore, os cliques viram observações com print (no máximo 1 por segundo, com o ponto clicado marcado). O valor digitado nos campos nunca é lido nem guardado, e sessão pausada não registra nada. Seu Chrome do dia a dia não é tocado. O perfil fica em `~/.qa-scout/perfil` e guarda os logins entre uma sessão e outra. Na primeira vez, o comando baixa o Chromium sozinho.
 
 ## Privacidade
 
-Tudo fica salvo no navegador de quem usa (`localStorage`). Não há servidor, conta ou envio de dados.
+Tudo fica salvo no navegador de quem usa: `localStorage` na versão web e o armazenamento local do navegador de teste. Não há servidor, conta ou envio de dados.
 
 ## Rodando localmente
 
@@ -62,11 +52,11 @@ npm install
 npm start          # http://localhost:4173
 ```
 
-O app é um único `index.html`, sem build.
+O app é `index.html` (HTML e CSS) e `app.js` (JavaScript puro), sem framework e sem build. A captura do navegador de teste fica em `extensao/`, carregada pelo comando `qa-scout`.
 
 ## Testes
 
-A suíte e2e usa **Playwright** e roda em dois perfis, desktop e celular (Pixel 7), a cada push pelo GitHub Actions.
+A suíte e2e usa **Playwright** e roda a cada push pelo GitHub Actions, em três perfis: desktop, celular (Pixel 7) e navegador de teste (Chromium real com a captura carregada).
 
 ```bash
 npx playwright install chromium
@@ -74,7 +64,7 @@ npm test
 npm run test:report
 ```
 
-Cobertura atual: histórico e busca, validação do charter, registro de notas por atalho e por comando, pausa do cronômetro, persistência após recarregar, geração do relatório em Markdown e regra da divisão TBS somando 100%.
+Cobertura atual: histórico e busca, validação do charter, registro de notas por atalho e por comando, pausa do cronômetro, persistência após recarregar, geração do relatório em Markdown, regra da divisão TBS somando 100%, captura automática de cliques, campos e páginas (sem guardar o valor digitado), revisão das notas automáticas e abertura do navegador de teste com um comando.
 
 ## Próximos passos
 
@@ -85,7 +75,7 @@ Cobertura atual: histórico e busca, validação do charter, registro de notas p
 
 ## English
 
-QA Scout is a session-based exploratory testing companion: write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Data stays in your browser. Tested end to end with Playwright on desktop and mobile.
+QA Scout is a session-based exploratory testing companion: write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Run `npx github:azevedothamirest/qa-scout <url>` to open a dedicated test browser where clicks, filled fields and visited pages become screenshot-backed observations for you to review. Data stays on your machine. Tested end to end with Playwright on desktop, mobile and the test browser.
 
 ---
 

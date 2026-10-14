@@ -32,16 +32,11 @@ async function iniciarSessao(painel) {
   await painel.getByRole('button', { name: 'Iniciar sessão' }).click();
 }
 
-// No navegador real, a testadora clica em "Acompanhar a aba atual" com a loja em primeiro plano.
-// Aqui o painel é uma aba, então o comando vai direto para o service worker com o id da loja.
+// Toda aba de site é acompanhada: basta abrir a loja depois de iniciar a sessão.
+// A abertura da loja já gera uma nota automática "Abriu a página".
 async function acompanharLoja(context, painel) {
   const loja = await context.newPage();
   await loja.goto(LOJA);
-  const r = await painel.evaluate(async url => {
-    const [tab] = await chrome.tabs.query({ url });
-    return chrome.runtime.sendMessage({ cmd: 'acompanhar', tabId: tab.id });
-  }, LOJA);
-  expect(r.ok).toBe(true);
   await loja.bringToFront();
   return loja;
 }
@@ -56,7 +51,7 @@ test.describe('Captura automática', () => {
     await expect(nota).toBeVisible();
     await expect(nota.locator('.tag-auto')).toHaveText('auto · a revisar');
     await expect(nota.locator('.imgs img')).toHaveCount(1);
-    await expect(painel.getByRole('button', { name: 'a revisar 1' })).toBeVisible();
+    await expect(painel.getByRole('button', { name: 'a revisar 2' })).toBeVisible();
   });
 
   test('Registrar campo preenchido sem guardar o valor digitado', async ({ context, painel }) => {
@@ -82,7 +77,7 @@ test.describe('Captura automática', () => {
     await expect(painel.locator('.note')).toHaveCount(0);
   });
 
-  test('Registrar a nova página ao navegar na aba acompanhada', async ({ context, painel }) => {
+  test('Registrar a nova página ao navegar no sistema em teste', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('link', { name: 'Ir para o passo 2' }).click();
@@ -126,12 +121,12 @@ test.describe('Revisão das notas automáticas', () => {
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
     await painel.bringToFront();
-    await expect(painel.locator('.note.pendente')).toHaveCount(1);
+    await expect(painel.locator('.note.pendente')).toHaveCount(2);
     await painel.getByRole('button', { name: 'Encerrar' }).click();
     await painel.getByRole('button', { name: 'Sim, encerrar' }).click();
-    await expect(painel.getByText('1 nota automática para revisar')).toBeVisible();
+    await expect(painel.getByText('2 notas automáticas para revisar')).toBeVisible();
     await expect(painel.locator('#md-out')).not.toHaveValue(/Pagar com Pix/);
-    await painel.locator('#revisar').getByRole('button', { name: 'Confirmar' }).click();
+    await painel.locator('#revisar .note', { hasText: 'Pagar com Pix' }).getByRole('button', { name: 'Confirmar' }).click();
     await expect(painel.locator('#md-out')).toHaveValue(/Pagar com Pix/);
   });
 });

@@ -9,11 +9,11 @@ Companheiro de teste exploratório baseado em sessões (SBTM), criado por Thamir
 ## Como o projeto está montado
 
 - O app é `index.html` (HTML + CSS) + `app.js` (JS puro), sem framework e sem build. O JS saiu do HTML porque o Manifest V3 proíbe script inline em páginas de extensão. Nada de `onclick=` nem `<script>` inline.
-- A mesma base é o site (GitHub Pages) e o painel lateral da extensão do Chrome (`manifest.json` na raiz). `EXT` em `app.js` diz se está rodando na extensão; a captura automática só existe lá.
-- Extensão: `extensao/background.js` (service worker) guarda as abas acompanhadas e o flag `capturando` em `chrome.storage.session`, tira prints com `captureVisibleTab` (no máximo 1/s) e grava cada evento numa chave `qascout.ev.*` do `chrome.storage.local`. `extensao/content.js` só é injetado nas abas marcadas e descreve cliques e campos sem ler valores. O painel drena as chaves `qascout.ev.*` e cria notas `{type:'obs', auto:true, pending:true}`.
-- Comando `qa-scout` (`bin/qa-scout.js`, também `npm run navegador`): abre um Chromium do Playwright com perfil próprio em `~/.qa-scout/perfil` e a extensão carregada, grava `qascout.modo = 'navegador'` no `chrome.storage.local` (todas as abas de site são acompanhadas, sem o botão "Acompanhar") e abre o painel numa janela popup de 440 px à esquerda. Usa o Chromium do Playwright porque o Chrome estável não carrega mais extensão por linha de comando. `abrir()` é exportada para os testes.
+- A mesma base é o site (GitHub Pages) e o painel do navegador de teste. O navegador de teste carrega uma extensão interna (`manifest.json` na raiz + `extensao/`), que não é distribuída como extensão do Chrome. `EXT` em `app.js` diz se está rodando nela; a captura automática só existe lá.
+- Extensão interna: `extensao/background.js` (service worker) acompanha toda aba de site (`http`, `https`, `file`), guarda o flag `capturando` em `chrome.storage.session`, tira prints com `captureVisibleTab` (no máximo 1/s) e grava cada evento numa chave `qascout.ev.*` do `chrome.storage.local`. `extensao/content.js` é injetado nas abas de site e descreve cliques e campos sem ler valores. O painel drena as chaves `qascout.ev.*` e cria notas `{type:'obs', auto:true, pending:true}`.
+- Comando `qa-scout` (`bin/qa-scout.js`, também `npm run navegador`): abre um Chromium do Playwright com perfil próprio em `~/.qa-scout/perfil` e a extensão carregada e abre o painel numa janela popup de 440 px à esquerda. Usa o Chromium do Playwright porque o Chrome estável não carrega mais extensão por linha de comando. `abrir()` é exportada para os testes.
 - Notas com `pending:true` não contam nos totais nem entram no Markdown até serem confirmadas ou editadas.
-- Dados ficam só no navegador, na chave `qascout.v1`: `localStorage` no site, `chrome.storage.local` (com `unlimitedStorage`) na extensão. Sem servidor, sem conta, sem envio de dados. Toda leitura e escrita fica em try/catch; se o storage estiver bloqueado, o app funciona em memória e avisa uma vez.
+- Dados ficam só no navegador, na chave `qascout.v1`: `localStorage` no site, `chrome.storage.local` (com `unlimitedStorage`) no navegador de teste. Sem servidor, sem conta, sem envio de dados. Toda leitura e escrita fica em try/catch; se o storage estiver bloqueado, o app funciona em memória e avisa uma vez.
 - Prints são comprimidos para JPEG (lado máximo 1100px, qualidade 0.72) antes de salvar, para não estourar a cota do `localStorage`.
 - Fontes: Bricolage Grotesque (títulos), Instrument Sans (texto), IBM Plex Mono (cronômetro, dados, rótulos). Paleta verde-pinho com âmbar, tema claro e escuro por tokens CSS em `:root`. Identidade de caderno de campo e curvas de nível.
 - O app também roda dentro de um artifact do Claude.ai; por isso o botão "Salvar em PDF" só aparece quando `window.self === window.top`.
@@ -23,7 +23,7 @@ Companheiro de teste exploratório baseado em sessões (SBTM), criado por Thamir
 ```bash
 npm install
 npm start      # http://localhost:4173
-npm test       # Playwright: "desktop", "celular" (Pixel 7) e "extensao" (carrega a extensão num Chromium real)
+npm test       # Playwright: "desktop", "celular" (Pixel 7) e "extensao" (carrega a extensão interna num Chromium real)
 ```
 
 ## Convenções de teste
