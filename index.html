@@ -195,6 +195,72 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 .captura.pausada .aba i{background:var(--muted)}
 .revisar{border:1px solid var(--marker);background:var(--marker-soft);border-radius:var(--r-sm);padding:12px 14px;margin:0 0 18px}
 .revisar h3{font-size:15px;margin:0 0 4px}
+/* abertura: logo girando como moeda e o site revelado por um círculo que se abre */
+.abertura{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;text-align:center;background:var(--paper);cursor:pointer;clip-path:circle(150% at 50% 42%)}
+.abertura::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 42%,transparent 0 23px,var(--contour) 23px 24px);opacity:0;animation:ab-curvas 1.6s .3s ease forwards;pointer-events:none}
+.abertura>*{position:relative}
+.abertura-moeda{width:132px;height:132px;perspective:700px;margin-bottom:22px}
+.abertura-moeda svg{width:100%;height:100%;border-radius:50%;background:var(--surface);box-shadow:0 0 0 6px var(--accent-soft),0 26px 60px rgba(0,0,0,.22);animation:ab-entra .6s cubic-bezier(.2,.9,.3,1.3) both,ab-gira 3.4s .5s cubic-bezier(.25,.1,.2,1) both}
+.abertura-nome{font-family:var(--f-display);font-size:clamp(38px,8vw,64px);font-weight:800;letter-spacing:-.035em;line-height:1.05;color:var(--ink);animation:ab-sobe .7s 1.3s ease both}
+.abertura-frase{font-size:clamp(16px,3vw,20px);color:var(--accent);font-weight:600;animation:ab-sobe .7s 1.8s ease both}
+.abertura-pular{position:absolute;bottom:28px;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;animation:ab-sobe .6s 2.4s ease both}
+.abertura.saindo{animation:ab-abre .9s cubic-bezier(.7,0,.2,1) forwards;pointer-events:none}
+.abertura.saindo .abertura-moeda svg{animation:ab-sai .9s ease forwards}
+@keyframes ab-entra{from{transform:scale(.3);opacity:0}}
+@keyframes ab-gira{from{transform:rotateY(0)}to{transform:rotateY(1440deg)}}
+@keyframes ab-sobe{from{transform:translateY(14px);opacity:0}}
+@keyframes ab-curvas{to{opacity:.9}}
+@keyframes ab-abre{to{clip-path:circle(0% at 50% 42%)}}
+@keyframes ab-sai{to{transform:scale(1.6) rotate(25deg);opacity:0}}
+body.com-abertura{overflow:hidden}
+@media (prefers-reduced-motion:reduce){.abertura,.abertura *,.abertura::before{animation:none!important}.abertura::before{opacity:.9}.abertura.saindo{opacity:0;transition:opacity .3s}}
+@media print{.abertura{display:none}}
+/* como funciona (início) */
+.passos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;counter-reset:passo}
+.passo{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 18px 18px 64px;counter-increment:passo}
+.passo::before{content:counter(passo);position:absolute;left:18px;top:18px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:700 15px var(--f-mono);background:var(--accent-soft);color:var(--accent)}
+.passo h3{font-size:16px;margin:0 0 4px}
+.passo p{margin:0;color:var(--muted);font-size:14px}
+.passo small{display:block;margin-top:8px;font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--marker)}
+.captura-promo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 20px;align-items:center;background:var(--ink);color:var(--surface);border-radius:var(--r);padding:20px 22px}
+.captura-promo h3{font-size:17px;margin:0 0 4px;color:inherit}
+.captura-promo p{margin:0;opacity:.75;font-size:14px}
+.captura-promo code{display:block;margin-top:10px;font:13px var(--f-mono);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:9px 12px;overflow-x:auto;white-space:nowrap}
+.captura-promo .btn{background:var(--surface);color:var(--ink);border-color:var(--surface)}
+@media (max-width:760px){.passos{grid-template-columns:1fr}.captura-promo{grid-template-columns:minmax(0,1fr)}}
+/* método */
+.metodo-hero{padding:8px 0 4px;max-width:70ch}
+.metodo-hero h1{font-size:clamp(30px,4.4vw,46px);line-height:1.05;font-weight:800;letter-spacing:-.03em;margin:10px 0 12px}
+.metodo-hero h1 em{font-style:normal;color:var(--accent)}
+.metodo-hero p{color:var(--muted);font-size:16.5px;margin:0}
+.trilha{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.trilha a{display:block;padding:16px 14px;border-right:1px solid var(--line);text-decoration:none;color:inherit;transition:background .15s}
+.trilha a:last-child{border-right:0}
+.trilha a:hover{background:var(--accent-soft)}
+.trilha b{display:block;font:600 11px var(--f-mono);color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.trilha span{display:block;font-weight:700;margin-top:4px;font-size:15px}
+.trilha small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+@media (max-width:820px){.trilha{grid-template-columns:1fr}.trilha a{border-right:0;border-bottom:1px solid var(--line)}.trilha a:last-child{border-bottom:0}}
+.met{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:26px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:28px;scroll-margin-top:90px}
+.met h2{font-size:24px;margin:6px 0 10px;letter-spacing:-.02em}
+.met p{color:var(--muted);margin:0 0 10px;font-size:15px}
+.met p b{color:var(--ink)}
+.met .origem{font-family:var(--f-mono);font-size:11.5px;color:var(--marker);text-transform:uppercase;letter-spacing:.06em}
+.met .no-app{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;align-self:start}
+.met .no-app h3{font-size:14px;margin:0 0 8px;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--accent)}
+.met .no-app ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14.5px}
+.met .exemplo{border-left:3px solid var(--accent);padding:6px 0 6px 14px;margin:12px 0 0;font-size:15px}
+.proof{display:grid;gap:8px;margin-top:6px}
+.proof div{display:grid;grid-template-columns:34px minmax(0,1fr);gap:10px;align-items:start;font-size:14.5px}
+.proof b{font:700 16px var(--f-mono);color:var(--accent);text-align:center;background:var(--accent-soft);border-radius:8px;padding:3px 0}
+.tbs-demo{display:flex;height:12px;border-radius:99px;overflow:hidden;margin:10px 0 6px}
+@media (max-width:820px){.met{grid-template-columns:1fr;padding:22px}}
+.leituras{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.leituras div{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.leituras b{display:block;font-size:15px}
+.leituras span{color:var(--muted);font-size:13.5px}
+.ajuda{border:0;background:transparent;color:var(--accent);font-weight:600;font-size:13px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:480px){.tabs .tab{white-space:nowrap;padding-left:9px;padding-right:9px;font-size:13px}}
 .rodape{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;padding:28px 16px 36px;font-size:13.5px;color:var(--muted)}
 .rodape a{color:var(--accent);font-weight:600;text-decoration:none}
 .rodape a:hover{text-decoration:underline}
@@ -301,7 +367,15 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 }
 </style>
 </head>
-<body>
+<body class="com-abertura">
+<div class="abertura" id="abertura" role="presentation">
+  <div class="abertura-moeda">
+    <svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="14" cy="14" r="7.5" fill="none" stroke="var(--accent)" stroke-width="1.2" opacity=".5"/><path d="M14 4.5 L17 14 L14 23.5 L11 14 Z" fill="var(--accent)"/><path d="M14 14 L17 14 L14 23.5 Z" fill="var(--marker)"/></svg>
+  </div>
+  <div class="abertura-nome">QA Scout</div>
+  <div class="abertura-frase">Exploratório que deixa rastro.</div>
+  <div class="abertura-pular">clique ou Esc para pular</div>
+</div>
 
 <header class="top">
   <div class="top-in">
@@ -313,6 +387,7 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
       <button class="tab" data-go="home" id="tab-home">Sessões</button>
       <button class="tab" data-go="active" id="tab-active">Em campo</button>
       <button class="tab" data-go="deck" id="tab-deck">Heurísticas</button>
+      <button class="tab" data-go="metodo" id="tab-metodo">Método</button>
     </nav>
   </div>
 </header>

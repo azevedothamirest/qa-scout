@@ -131,13 +131,20 @@ async function copy(text, okMsg, fallbackEl){
 
 /* ---------- roteamento ---------- */
 let view = 'home', viewArg = null;
-function go(v,arg=null){ view=v; viewArg=arg; render(); window.scrollTo({top:0}); }
+function go(v,arg=null){
+  view=v; viewArg=arg; render();
+  const alvo = v==='metodo' && arg ? document.getElementById('m-'+arg) : null;
+  if(alvo) alvo.scrollIntoView({block:'start'}); else window.scrollTo({top:0});
+}
+// Concordância dos avisos: "Bug registrado", "Dúvida registrada".
+const FEM = {duv:true, ide:true, obs:true};
+function registrado(k){ return `${TYPES[k].label} ${FEM[k]?'registrada':'registrado'}`; }
 
 function render(){
   const active = getActive();
-  ['home','active','deck'].forEach(k=>{
+  ['home','active','deck','metodo'].forEach(k=>{
     const b=$('#tab-'+k);
-    const cur = (k==='home' && (view==='home'||view==='report')) || (k==='active' && (view==='active'||view==='new')) || (k==='deck' && view==='deck');
+    const cur = (k==='home' && (view==='home'||view==='report')) || (k==='active' && (view==='active'||view==='new')) || k===view;
     b.setAttribute('aria-current', cur ? 'page':'false');
   });
   $('#tab-active').innerHTML = active ? '<span class="live"></span>Em campo' : 'Nova sessão';
@@ -149,6 +156,7 @@ function render(){
   else if(view==='active'){ if(!active){ view='new'; app.innerHTML = viewNew(); } else { app.innerHTML = viewSession(active); startTick(); } }
   else if(view==='report') app.innerHTML = viewReport(state.sessions.find(s=>s.id===viewArg));
   else if(view==='deck') app.innerHTML = viewDeck();
+  else if(view==='metodo') app.innerHTML = viewMetodo();
   afterRender();
 }
 
@@ -182,6 +190,19 @@ function viewHome(){
         <div class="stat"><b style="color:var(--t-duv)">${duv}</b><span>dúvidas levantadas</span></div>
       </div>
     </div>
+    <div>
+      <div class="section-head" style="margin-bottom:12px"><div><div class="eyebrow">Como funciona</div><h2>Uma sessão em 3 passos</h2></div><button class="link-btn" data-go="metodo">Entenda o método →</button></div>
+      <div class="passos">
+        <div class="passo"><h3>Escreva o charter</h3><p>Uma missão curta: o que explorar, com o quê e para descobrir o quê.</p><small>Elisabeth Hendrickson</small></div>
+        <div class="passo"><h3>Explore com tempo marcado</h3><p>30, 60 ou 90 minutos sem interrupção. Anote bugs, dúvidas, ideias e riscos na hora.</p><small>SBTM · James e Jon Bach</small></div>
+        <div class="passo"><h3>Faça o debriefing</h3><p>Revise as notas, divida o tempo entre teste, bug e setup e leve o relatório para o time.</p><small>PROOF e métricas TBS</small></div>
+      </div>
+    </div>
+    ${!EXT ? `<div class="captura-promo">
+      <div><h3>Quer que ele anote sozinho?</h3><p>Rode o comando abaixo: abre um navegador de teste em que cada clique vira observação com print.</p>
+      <code>npx github:azevedothamirest/qa-scout https://seu-sistema</code></div>
+      <a class="btn" href="https://github.com/azevedothamirest/qa-scout/blob/main/docs/tutorial.md" target="_blank" rel="noopener">Ver tutorial ↗</a>
+    </div>` : ''}
     <div class="section-head">
       <div><div class="eyebrow">Histórico</div><h2>Sessões anteriores</h2></div>
       <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar por área, charter ou nota" value="${esc(query)}" aria-label="Buscar sessões"></label>
@@ -208,7 +229,10 @@ function rowHtml(s){
 function viewNew(){
   const d = state.draft || {explorar:'',com:'',descobrir:'',area:'',ambiente:'',testadora:'',plannedMin:60};
   return `<section class="view">
-    <div><div class="eyebrow">Nova sessão · passo 1 de 1</div><h2 style="font-size:28px;margin-top:6px">Escreva o charter da sessão</h2></div>
+    <div class="section-head">
+      <div><div class="eyebrow">Nova sessão</div><h2 style="font-size:28px;margin-top:6px">Escreva o charter da sessão</h2></div>
+      <div style="display:flex;gap:14px;align-items:center"><button class="ajuda" type="button" data-go="metodo" data-arg="charter">Por que charter?</button><button class="btn" type="button" data-act="exemplo-charter">Usar um exemplo</button></div>
+    </div>
     <form class="panel form-grid" id="charter-form" novalidate>
       <div class="charter-sentence">
         <label for="c-exp">Explorar</label>
@@ -432,7 +456,7 @@ function viewReport(s){
         <div class="card debrief">
           <div class="eyebrow">Debriefing</div>
           <h3 style="font-size:17px;margin:4px 0 2px">Como o tempo foi dividido?</h3>
-          <p class="hint" style="margin:0">Teste, investigação de bug e preparo (TBS).</p>
+          <p class="hint" style="margin:0">Teste, investigação de bug e preparo (TBS). <button class="ajuda" data-go="metodo" data-arg="debriefing">Como fazer um bom debriefing?</button></p>
           <div class="tbs" id="tbs-bar">${tbsBar(db)}</div>
           <div class="tbs-legend">
             ${[['test','Teste','var(--accent)'],['bug','Bug','var(--t-bug)'],['setup','Setup','var(--marker)']].map(([k,l,col])=>`<div class="slider"><label for="tbs-${k}"><span class="sw" style="background:${col}"></span>${l}</label><input type="range" id="tbs-${k}" min="0" max="100" step="5" value="${db[k]}" data-tbs="${k}"><span class="mono" id="tbs-${k}-v">${db[k]}%</span></div>`).join('')}
@@ -527,6 +551,112 @@ function viewDeck(){
 }
 function mostraCarta(){ const c=$('#carta'); if(c) c.innerHTML=cartaHtml(); document.querySelectorAll('[data-carta]').forEach(b=>b.classList.toggle('atual',+b.dataset.carta===deckIdx)); }
 
+/* ---------- tela: método ---------- */
+const EXEMPLOS_CHARTER = [
+  {area:'Checkout · pagamento com Pix',explorar:'o pagamento com Pix no checkout',com:'QR Code expirado, botão voltar e cupom de desconto',descobrir:'pedidos pagos que ficam pendentes ou cobranças em dobro'},
+  {area:'Cadastro · pessoa física',explorar:'o cadastro de pessoa física',com:'CPFs com e sem máscara, colados e com dígito inválido',descobrir:'cadastros aceitos com documento inválido'},
+  {area:'Login · recuperação de senha',explorar:'a recuperação de senha',com:'links expirados, duas abas abertas e e-mail com maiúsculas',descobrir:'acessos indevidos ou usuários travados fora da conta'},
+  {area:'Relatórios · exportação',explorar:'a exportação de relatórios',com:'períodos longos, filtros combinados e acentos nos nomes',descobrir:'arquivos com dados faltando, cortados ou com encoding errado'}
+];
+function viewMetodo(){
+  return `<section class="view">
+    <div class="metodo-hero">
+      <div class="eyebrow">Método</div>
+      <h1>Exploratório não é <em>teste sem plano.</em></h1>
+      <p>É aprender, projetar e executar ao mesmo tempo, com foco e com registro. O QA Scout junta as práticas que dão estrutura ao exploratório sem transformá-lo em roteiro.</p>
+    </div>
+    <nav class="trilha" aria-label="Etapas do método">
+      <a href="#m-sbtm" data-ancora="sbtm"><b>Base</b><span>SBTM</span><small>Sessões com missão e tempo</small></a>
+      <a href="#m-charter" data-ancora="charter"><b>Antes</b><span>Charter</span><small>A missão da sessão</small></a>
+      <a href="#m-notas" data-ancora="notas"><b>Durante</b><span>Notas e heurísticas</span><small>O diário da exploração</small></a>
+      <a href="#m-debriefing" data-ancora="debriefing"><b>Depois</b><span>Debriefing</span><small>PROOF e métricas TBS</small></a>
+      <a href="#m-leituras" data-ancora="leituras"><b>Para ir além</b><span>Leituras</span><small>As fontes do método</small></a>
+    </nav>
+
+    <article class="met" id="m-sbtm">
+      <div>
+        <div class="origem">Jonathan e James Bach · 2000</div>
+        <h2>Session-Based Test Management</h2>
+        <p>O <b>SBTM</b> nasceu para responder a uma pergunta difícil: <i>como gerenciar e prestar contas de um trabalho que é exploratório?</i> A resposta foi organizar o exploratório em <b>sessões</b>: blocos de tempo sem interrupção, cada um com uma missão, que terminam num relatório revisável.</p>
+        <p>A sessão é a unidade de trabalho. Em vez de contar casos de teste executados, você conta sessões, o que foi coberto em cada uma e o que elas revelaram.</p>
+      </div>
+      <div class="no-app"><h3>No QA Scout</h3><ul>
+        <li>Cada sessão tem charter, cronômetro, diário e relatório</li>
+        <li>Duração planejada de 30, 60 ou 90 minutos, com aviso de tempo extra</li>
+        <li>Pausa para interrupções reais, sem contar como tempo de teste</li>
+        <li>Histórico com busca para prestar contas depois</li>
+      </ul></div>
+    </article>
+
+    <article class="met" id="m-charter">
+      <div>
+        <div class="origem">Elisabeth Hendrickson · Explore It!</div>
+        <h2>Charter: a missão em uma frase</h2>
+        <p>O charter diz <b>para onde</b> olhar sem dizer <b>como</b> testar. O modelo de Elisabeth Hendrickson cabe numa frase:</p>
+        <p class="exemplo"><b>Explorar</b> o alvo <b>com</b> recursos, dados ou técnicas <b>para descobrir</b> um tipo de informação.</p>
+        <p style="margin-top:12px">Um bom charter é estreito o bastante para caber na sessão e aberto o bastante para deixar espaço à descoberta. Se ele parece um passo a passo, virou caso de teste. Se cabe o sistema inteiro, ainda está largo demais.</p>
+      </div>
+      <div class="no-app"><h3>Dicas</h3><ul>
+        <li>No "para descobrir", pense no risco: o que custaria caro se escapasse?</li>
+        <li>No "com", use as heurísticas: dados de borda, interrupções, permissões</li>
+        <li>Saiu do foco e achou algo interessante? Anote como ideia para outra sessão</li>
+        <li>Travou? A aba Heurísticas sugere um charter pronto</li>
+      </ul></div>
+    </article>
+
+    <article class="met" id="m-notas">
+      <div>
+        <div class="origem">SBTM · James Whittaker · heurísticas brasileiras</div>
+        <h2>Notas e heurísticas: o diário da exploração</h2>
+        <p>A evidência do exploratório é o que você anota. Separar as notas por tipo deixa o relatório legível para quem não estava na sessão:</p>
+        <p><b style="color:var(--t-bug)">Bug</b> o que está errado · <b style="color:var(--t-duv)">Dúvida</b> o que precisa de resposta de Produto ou Dev · <b style="color:var(--t-ide)">Ideia</b> o que testar depois · <b style="color:var(--t-ris)">Risco</b> o que pode dar errado mesmo sem falha visível · <b style="color:var(--t-obs)">Observação</b> o que você viu e vale registrar.</p>
+        <p>As <b>heurísticas</b> são atalhos para gerar ideias de teste. Os <b>tours</b>, de James Whittaker, propõem roteiros temáticos pelo sistema, como seguir o dinheiro ou sabotar a aplicação. O baralho do QA Scout soma a eles contextos do dia a dia brasileiro: CPF, centavos, acentos e fuso.</p>
+      </div>
+      <div class="no-app"><h3>No QA Scout</h3><ul>
+        <li>Notas com o minuto exato da sessão e atalhos <code>Alt+1</code> a <code>Alt+5</code></li>
+        <li>Captura automática de cliques com print, para revisar depois</li>
+        <li>Baralho com 18 cartas e um desafio de "faz isso agora" em cada</li>
+      </ul>
+      <button class="btn" style="margin-top:14px" data-go="deck">Puxar uma carta</button></div>
+    </article>
+
+    <article class="met" id="m-debriefing">
+      <div>
+        <div class="origem">Jon Bach · SBTM</div>
+        <h2>Debriefing: a sessão só acaba quando vira conversa</h2>
+        <p>No SBTM, toda sessão termina com um debriefing curto, de preferência com outra pessoa do time. O roteiro clássico é o <b>PROOF</b>:</p>
+        <div class="proof">
+          <div><b>P</b><span><strong>Past</strong>: o que aconteceu na sessão?</span></div>
+          <div><b>R</b><span><strong>Results</strong>: o que foi descoberto, como bugs, dúvidas e riscos?</span></div>
+          <div><b>O</b><span><strong>Obstacles</strong>: o que atrapalhou o teste?</span></div>
+          <div><b>O</b><span><strong>Outlook</strong>: o que ainda falta e merece outra sessão?</span></div>
+          <div><b>F</b><span><strong>Feelings</strong>: como você se sente sobre a qualidade do que viu?</span></div>
+        </div>
+      </div>
+      <div class="no-app"><h3>Métricas TBS</h3>
+        <p style="margin:0 0 4px;font-size:14.5px">O tempo da sessão se divide em três partes:</p>
+        <div class="tbs-demo"><i style="width:60%;background:var(--accent)"></i><i style="width:25%;background:var(--t-bug)"></i><i style="width:15%;background:var(--marker)"></i></div>
+        <ul>
+          <li><b>Teste</b>: explorar de fato</li>
+          <li><b>Bug</b>: investigar e registrar problemas</li>
+          <li><b>Setup</b>: preparar ambiente e dados</li>
+        </ul>
+        <p style="margin:10px 0 0;font-size:14px">Muito setup indica ambiente instável. Muito bug indica uma área frágil. As duas coisas são informação para o time.</p>
+      </div>
+    </article>
+
+    <div id="m-leituras" style="scroll-margin-top:90px">
+      <div class="section-head" style="margin-bottom:12px"><div><div class="eyebrow">Para ir além</div><h2>Leituras</h2></div></div>
+      <div class="leituras">
+        <div><b>Session-Based Test Management</b><span>Jonathan Bach, 2000. O artigo que apresentou sessões, charters, métricas TBS e o debriefing.</span></div>
+        <div><b>Explore It!</b><span>Elisabeth Hendrickson, 2013. Charters, heurísticas e como explorar com intenção.</span></div>
+        <div><b>Exploratory Software Testing</b><span>James Whittaker, 2009. Os tours como roteiros para explorar um sistema.</span></div>
+        <div><b>Lessons Learned in Software Testing</b><span>Cem Kaner, James Bach e Bret Pettichord, 2001. A escola de contexto que deu origem a tudo isso.</span></div>
+      </div>
+    </div>
+  </section>`;
+}
+
 /* ---------- cronômetro ---------- */
 let tickT=null;
 function startTick(){ tick(); tickT=setInterval(tick,250); }
@@ -570,7 +700,7 @@ function addNote(){
   filter='all';
   $('#log').innerHTML=logHtml(s); $('#thumbs').innerHTML='';
   refreshSessionCounts(s);
-  toast(`${TYPES[type].label} registrado às ${fmtT(s.notes[s.notes.length-1].t)}`);
+  toast(`${registrado(type)} às ${fmtT(s.notes[s.notes.length-1].t)}`);
   inp.focus();
 }
 function refreshSessionCounts(s){
@@ -589,7 +719,7 @@ function readDraft(){
 
 document.addEventListener('click',e=>{
   const t=e.target.closest('button,[data-open]'); if(!t) return;
-  if(t.dataset.go){ if(view==='new') { state.draft=readDraft(); save(); } go(t.dataset.go==='active' && !getActive() ? 'new' : t.dataset.go); return; }
+  if(t.dataset.go){ if(view==='new') { state.draft=readDraft(); save(); } go(t.dataset.go==='active' && !getActive() ? 'new' : t.dataset.go, t.dataset.arg||null); return; }
   if(t.dataset.open){ go('report',t.dataset.open); return; }
   if(t.dataset.dur){ document.querySelectorAll('[data-dur]').forEach(b=>b.setAttribute('aria-pressed',b===t)); return; }
   if(t.dataset.type){ setType(t.dataset.type); $('#note-in')?.focus(); return; }
@@ -617,7 +747,7 @@ document.addEventListener('click',e=>{
     const text=$('#edit-in').value.trim(), tipo=box.querySelector('[data-edtype][aria-pressed="true"]')?.dataset.edtype || n.type;
     if(!text && !(n.imgs&&n.imgs.length)){ toast('A nota precisa de texto ou de um print.'); return; }
     n.text=text; n.type=tipo; n.pending=false; editId=null; save(); atualizaNotas(s);
-    toast(`${TYPES[tipo].label} salvo`); return;
+    toast(`${TYPES[tipo].label} ${FEM[tipo]?'salva':'salvo'}`); return;
   }
   if(t.dataset.parar){ chrome.runtime.sendMessage({cmd:'parar', tabId:+t.dataset.parar}).then(atualizaAbas); return; }
   const act=t.dataset.act; if(!act) return;
@@ -625,6 +755,11 @@ document.addEventListener('click',e=>{
   if(act==='add-note') addNote();
   if(act==='acompanhar') acompanharAbaAtual();
   if(act==='puxar'){ puxarCarta(); mostraCarta(); }
+  if(act==='exemplo-charter'){
+    const ex=EXEMPLOS_CHARTER[Math.floor(Math.random()*EXEMPLOS_CHARTER.length)];
+    [['c-exp',ex.explorar],['c-com',ex.com],['c-des',ex.descobrir],['c-area',ex.area]].forEach(([id,v])=>{ const el=$('#'+id); if(el) el.value=v; });
+    toast('Exemplo preenchido. Ajuste para o seu sistema.');
+  }
   if(act==='ver-todas'){ deckAberto=!deckAberto; render(); }
   if(act==='usar-carta'){
     const h=HEUR[deckIdx], d=DESAFIO[h.t];
@@ -694,6 +829,22 @@ document.addEventListener('paste',e=>{
 document.addEventListener('change',e=>{ if(e.target.id==='file-in'){ [...e.target.files].forEach(addImageFile); e.target.value=''; } });
 
 function afterRender(){}
+// Abertura: aparece uma vez por visita (por aba), some sozinha em ~5 s e pode ser pulada.
+// Não aparece em navegador automatizado, para não atrapalhar os testes.
+function abertura(){
+  const el=$('#abertura'); if(!el) return;
+  const fim=()=>{ el.remove(); document.body.classList.remove('com-abertura'); };
+  let vista=false; try{ vista=sessionStorage.getItem('qascout.abertura')==='1'; sessionStorage.setItem('qascout.abertura','1'); }catch(e){}
+  if(vista || navigator.webdriver){ fim(); return; }
+  const calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let saiu=false;
+  const sair=()=>{ if(saiu) return; saiu=true; el.classList.add('saindo'); setTimeout(fim, calmo?300:900); };
+  const t=setTimeout(sair, calmo?1500:4100);
+  el.addEventListener('click',()=>{ clearTimeout(t); sair(); });
+  addEventListener('keydown',e=>{ if(e.key==='Escape'){ clearTimeout(t); sair(); } },{once:true});
+}
+abertura();
+
 async function init(){
   if(EXT){
     try{ const r=await chrome.storage.local.get([KEY,'qascout.modo']); if(r[KEY]) state=r[KEY]; modoNavegador = r['qascout.modo']==='navegador'; }catch(e){}
