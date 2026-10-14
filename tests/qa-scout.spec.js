@@ -155,3 +155,17 @@ test.describe('Baralho de heurísticas', () => {
     await expect(page.locator('.carta h3')).toHaveText('Permissões');
   });
 });
+
+test.describe('Tema', () => {
+  test('Alternar o tema e manter a escolha ao recarregar', async ({ page }) => {
+    const botao = page.locator('#tema');
+    const inicial = await page.evaluate(() => document.documentElement.hasAttribute('data-escuro'));
+    await botao.click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', inicial ? 'light' : 'dark');
+    const fundo = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', inicial ? 'light' : 'dark');
+    expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(fundo);
+    await expect(botao).toContainText(inicial ? 'Claro' : 'Escuro');
+  });
+});

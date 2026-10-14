@@ -829,6 +829,26 @@ document.addEventListener('paste',e=>{
 document.addEventListener('change',e=>{ if(e.target.id==='file-in'){ [...e.target.files].forEach(addImageFile); e.target.value=''; } });
 
 function afterRender(){}
+// Tema: segue o sistema até a pessoa escolher; a escolha fica salva neste navegador.
+const TEMA_KEY='qascout.tema', escuroSistema=matchMedia('(prefers-color-scheme: dark)');
+function temaAtual(){ const d=document.documentElement.dataset.theme; return d || (escuroSistema.matches?'dark':'light'); }
+function aplicaTema(t){
+  if(t) document.documentElement.dataset.theme=t;
+  const escuro=temaAtual()==='dark';
+  document.documentElement.toggleAttribute('data-escuro',escuro);
+  const b=$('#tema'); if(!b) return;
+  b.querySelector('span').textContent=escuro?'Escuro':'Claro';
+  b.setAttribute('aria-label',`Tema ${escuro?'escuro':'claro'}. Mudar para ${escuro?'claro':'escuro'}`);
+}
+try{ const salvo=localStorage.getItem(TEMA_KEY); if(salvo==='light'||salvo==='dark') document.documentElement.dataset.theme=salvo; }catch(e){}
+aplicaTema();
+escuroSistema.addEventListener('change',()=>aplicaTema());
+$('#tema')?.addEventListener('click',()=>{
+  const novo=temaAtual()==='dark'?'light':'dark';
+  aplicaTema(novo);
+  try{ localStorage.setItem(TEMA_KEY,novo); }catch(e){}
+});
+
 // Abertura: aparece uma vez por visita (por aba), some sozinha em ~5 s e pode ser pulada.
 // Não aparece em navegador automatizado, para não atrapalhar os testes.
 function abertura(){
