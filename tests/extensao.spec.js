@@ -32,16 +32,11 @@ async function iniciarSessao(painel) {
   await painel.getByRole('button', { name: 'Iniciar sessão' }).click();
 }
 
-// No navegador real, a testadora clica em "Acompanhar a aba atual" com a loja em primeiro plano.
-// Aqui o painel é uma aba, então o comando vai direto para o service worker com o id da loja.
+// Toda aba de site é acompanhada: basta abrir a loja depois de iniciar a sessão.
+// A abertura da loja já gera uma nota automática "Abriu a página".
 async function acompanharLoja(context, painel) {
   const loja = await context.newPage();
   await loja.goto(LOJA);
-  const r = await painel.evaluate(async url => {
-    const [tab] = await chrome.tabs.query({ url });
-    return chrome.runtime.sendMessage({ cmd: 'acompanhar', tabId: tab.id });
-  }, LOJA);
-  expect(r.ok).toBe(true);
   await loja.bringToFront();
   return loja;
 }
@@ -56,7 +51,7 @@ test.describe('Captura automática', () => {
     await expect(nota).toBeVisible();
     await expect(nota.locator('.tag-auto')).toHaveText('auto · a revisar');
     await expect(nota.locator('.imgs img')).toHaveCount(1);
-    await expect(painel.getByRole('button', { name: 'a revisar 1' })).toBeVisible();
+    await expect(painel.getByRole('button', { name: 'a revisar 2' })).toBeVisible();
   });
 
   test('Registrar campo preenchido sem guardar o valor digitado', async ({ context, painel }) => {
@@ -82,7 +77,7 @@ test.describe('Captura automática', () => {
     await expect(painel.locator('.note')).toHaveCount(0);
   });
 
-  test('Registrar a nova página ao navegar na aba acompanhada', async ({ context, painel }) => {
+  test('Registrar a nova página ao navegar no sistema em teste', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('link', { name: 'Ir para o passo 2' }).click();
@@ -126,12 +121,81 @@ test.describe('Revisão das notas automáticas', () => {
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
     await painel.bringToFront();
-    await expect(painel.locator('.note.pendente')).toHaveCount(1);
+    await expect(painel.locator('.note.pendente')).toHaveCount(2);
     await painel.getByRole('button', { name: 'Encerrar' }).click();
     await painel.getByRole('button', { name: 'Sim, encerrar' }).click();
-    await expect(painel.getByText('1 nota automática para revisar')).toBeVisible();
+    await expect(painel.getByText('2 notas automáticas para revisar')).toBeVisible();
     await expect(painel.locator('#md-out')).not.toHaveValue(/Pagar com Pix/);
-    await painel.locator('#revisar').getByRole('button', { name: 'Confirmar' }).click();
+    await painel.locator('#revisar .note', { hasText: 'Pagar com Pix' }).getByRole('button', { name: 'Confirmar' }).click();
     await expect(painel.locator('#md-out')).toHaveValue(/Pagar com Pix/);
+  });
+});
+
+test.describe('Erros de console e rede', () => {
+  test('Sugerir bug ao capturar erro de JavaScript na página', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.getByRole('button', { name: 'Aplicar cupom' }).click();
+    const nota = painel.locator('.note.t-bug.pendente', { hasText: 'Erro de JavaScript: TypeError: cupom.valor is undefined' });
+    await expect(nota).toBeVisible();
+    await expect(nota.locator('.tag-auto')).toHaveText('auto · a revisar');
+  });
+
+  test('Sugerir risco ao capturar console.error', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.getByRole('button', { name: 'Ver aviso' }).click();
+    await expect(painel.locator('.note.t-ris.pendente', { hasText: 'Erro no console: Falha ao carregar o aviso de frete grátis' })).toBeVisible();
+  });
+
+  test('Registrar resposta 4xx como risco e falha de conexão como bug', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.getByRole('button', { name: 'Consultar frete' }).click();
+    await expect(painel.locator('.note.t-ris.pendente', { hasText: 'Requisição com erro: GET /api/frete?cep=01001000 → 404' })).toBeVisible();
+    await loja.getByRole('button', { name: 'Simular parcelas' }).click();
+    await expect(painel.locator('.note.t-bug.pendente', { hasText: 'Requisição falhou: GET /api/parcelas' })).toBeVisible();
+  });
+
+  test('Ignorar erros enquanto a sessão está pausada', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    await painel.getByRole('button', { name: 'Pausar' }).click();
+    const loja = await acompanharLoja(context, painel);
+    await loja.getByRole('button', { name: 'Aplicar cupom' }).click();
+    await loja.getByRole('button', { name: 'Consultar frete' }).click();
+    await painel.waitForTimeout(800);
+    await expect(painel.locator('.note')).toHaveCount(0);
+  });
+});
+
+test.describe('Marcar o momento', () => {
+  test('Criar nota com print ao apertar Alt+Shift+M no sistema em teste', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.locator('body').press('Alt+Shift+KeyM');
+    const nota = painel.locator('.note.pendente', { hasText: 'Marcou este momento' });
+    await expect(nota).toBeVisible();
+    await expect(nota.locator('.imgs img')).toHaveCount(1);
+  });
+});
+
+test.describe('Passos para reproduzir', () => {
+  test('Incluir na nota de bug as ações registradas até ela', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.getByLabel('CPF').fill('123.456.789-09');
+    await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
+    await painel.bringToFront();
+    const nota = painel.locator('.note', { hasText: 'Clicou no botão “Pagar com Pix”' });
+    await nota.getByRole('button', { name: 'Editar' }).click();
+    await painel.getByLabel('Texto da nota').fill('Pix não responde no primeiro clique');
+    await painel.getByRole('group', { name: 'Tipo da nota editada' }).getByRole('button', { name: 'Bug' }).click();
+    await painel.getByRole('button', { name: 'Incluir passos para reproduzir' }).click();
+    await expect(painel.getByLabel('Texto da nota')).toHaveValue(
+      'Pix não responde no primeiro clique\n\nPassos para reproduzir:\n1. Abriu a página “Loja fictícia · Checkout”\n2. Preencheu o campo “CPF”\n3. Clicou no botão “Pagar com Pix”');
+    await painel.getByRole('button', { name: 'Salvar e confirmar' }).click();
+    await painel.getByRole('button', { name: 'Encerrar' }).click();
+    await painel.getByRole('button', { name: 'Sim, encerrar' }).click();
+    await expect(painel.locator('#md-out')).toHaveValue(/Pix não responde no primeiro clique\n  Passos para reproduzir:\n  1\. Abriu a página/);
   });
 });

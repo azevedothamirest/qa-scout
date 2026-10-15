@@ -9,7 +9,6 @@ body:
       label: Onde aconteceu?
       options:
         - Navegador de teste (npx qa-scout)
-        - Extensão do Chrome
         - Versão web
     validations:
       required: true
