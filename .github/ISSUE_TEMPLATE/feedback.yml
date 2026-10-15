@@ -12,7 +12,6 @@ body:
       label: Como você usou?
       options:
         - Navegador de teste (npx qa-scout)
-        - Extensão do Chrome
         - Versão web
     validations:
       required: true

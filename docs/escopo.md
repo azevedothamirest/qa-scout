@@ -22,23 +22,33 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] Debriefing: divisão Teste/Bug/Setup (TBS) somando 100%, áreas cobertas, próximas sessões
 - [x] Relatório em Markdown (completo ou só bugs) e PDF pelo navegador
 - [x] Histórico com busca e duas sessões de exemplo removíveis
-- [x] Suíte Playwright (24 testes: desktop e celular), CI e deploy no Pages
+- [x] Suíte Playwright, CI e deploy no Pages
+
+## Versão 0.2 (beta aberto)
+
+- [x] Navegador de teste com um comando (`npx github:azevedothamirest/qa-scout <url>`), perfil próprio que guarda logins
+- [x] Captura automática: cliques, campos preenchidos (sem ler o valor) e páginas abertas viram observações com print do ponto clicado
+- [x] Revisão das notas automáticas: confirmar, editar (texto e tipo) ou excluir; só as revisadas entram no relatório
+- [x] Editar e excluir qualquer nota já registrada
+- [x] Tema claro e escuro com botão para alternar
+- [x] Tutorial (`docs/tutorial.md`) e modelos de issue para feedback, bug e ideia
+- [x] Suíte com 45 testes em três perfis: desktop, celular e navegador de teste
 
 ## Fora do MVP (próximas versões)
 
 - [ ] Integração com Jira e Azure DevOps para abrir bug direto da nota
 - [ ] IA sugerindo cenários a partir do charter e resumindo a sessão
-- [ ] Extensão de navegador para capturar console e rede
+- [ ] Capturar erros de console e falhas de rede no navegador de teste
 - [ ] Sessões em dupla ou em time
 - [ ] Métricas acumuladas (tempo explorado por área, bugs por sessão)
 - [ ] Exportar e importar sessões em JSON (backup, já que os dados ficam no navegador)
-- [ ] Editar uma nota já registrada
 
 ## Decisões tomadas
 
 - Web app sem servidor e sem conta no início: custo zero e nenhuma preocupação com LGPD na largada.
 - Repositório público para hospedar de graça no GitHub Pages (diferente de QA Pulse e QA Sidekick, que são privados).
 - Licença MIT.
+- Captura automática só no navegador de teste (Chromium do Playwright com extensão interna). A extensão do Chrome avulsa foi retirada em outubro de 2026 para simplificar instalação e suporte no beta.
 - Nome: QA Scout.
 
 ## Plano de validação
