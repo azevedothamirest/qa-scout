@@ -30,11 +30,14 @@ async function registra(msg, tab) {
   const { capturando, acompanha } = await estado();
   if (!capturando || !acompanha(tab)) return;
   const ev = { tipo: msg.tipo, desc: msg.desc, url: msg.url, titulo: msg.titulo, ts: msg.ts };
-  if (msg.tipo === 'clique' && tab.active && Date.now() - ultimoPrint >= INTERVALO_PRINT) {
-    ultimoPrint = Date.now();
+  // Erro de JavaScript chega sugerido como bug; console.error, como risco. A testadora decide na revisão.
+  if (msg.tipo === 'erro') ev.nota = msg.grave ? 'bug' : 'ris';
+  const marca = msg.tipo === 'marca';
+  if (tab.active && (marca || (msg.tipo === 'clique' && Date.now() - ultimoPrint >= INTERVALO_PRINT))) {
+    if (!marca) ultimoPrint = Date.now();
     try {
       ev.img = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 70 });
-      Object.assign(ev, { x: msg.x, y: msg.y, vw: msg.vw, vh: msg.vh });
+      if (!marca) Object.assign(ev, { x: msg.x, y: msg.y, vw: msg.vw, vh: msg.vh });
     } catch (e) {}
   }
   await guardaEvento(ev);
@@ -48,3 +51,29 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   await injeta(tabId);
   if (capturando) await guardaEvento({ tipo: 'pagina', desc: `Abriu a página “${(tab.title || '').slice(0, 80)}”`, url: tab.url, titulo: tab.title, ts: Date.now() });
 });
+
+// Falhas de rede das abas acompanhadas: respostas 4xx/5xx e requisições que nem chegaram a responder.
+// 5xx e falha de conexão chegam como bug; 4xx, como risco. Repetições da mesma chamada em 10 s viram uma só.
+const IGNORA_REDE = /\/favicon\.ico(\?|$)/;
+const recentes = new Map();
+function caminho(url) {
+  try { const u = new URL(url); return (u.pathname + u.search).slice(0, 90); } catch (e) { return String(url).slice(0, 90); }
+}
+async function falhaDeRede(det, status, erro) {
+  if (det.tabId < 0 || IGNORA_REDE.test(det.url)) return;
+  const chave = `${det.method} ${det.url} ${status || erro}`;
+  const agora = Date.now();
+  if (agora - (recentes.get(chave) || 0) < 10000) return;
+  recentes.set(chave, agora);
+  if (recentes.size > 200) recentes.clear();
+  const { capturando, acompanha } = await estado();
+  if (!capturando) return;
+  const tab = await chrome.tabs.get(det.tabId).catch(() => null);
+  if (!tab || !acompanha(tab)) return;
+  const desc = status ? `Requisição com erro: ${det.method} ${caminho(det.url)} → ${status}`
+    : `Requisição falhou: ${det.method} ${caminho(det.url)} (${erro.replace(/^net::/, '')})`;
+  await guardaEvento({ tipo: 'rede', nota: !status || status >= 500 ? 'bug' : 'ris', desc, url: tab.url, titulo: tab.title, ts: agora });
+}
+const FILTRO_REDE = { urls: ['http://*/*', 'https://*/*'] };
+chrome.webRequest.onCompleted.addListener(d => { if (d.statusCode >= 400) falhaDeRede(d, d.statusCode); }, FILTRO_REDE);
+chrome.webRequest.onErrorOccurred.addListener(d => { if (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(d.error)) falhaDeRede(d, 0, d.error); }, FILTRO_REDE);

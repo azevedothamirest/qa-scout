@@ -326,6 +326,14 @@ function logHtml(s){
   if(!notes.length) return `<div style="padding:28px 4px;color:var(--muted);text-align:center">${s.notes.length?(filter==='rev'?'Nada para revisar.':'Nenhuma nota desse tipo.'):'Sua primeira nota aparece aqui. Comece pelo que chamou sua atenção nos primeiros minutos.'}</div>`;
   return notes.map(noteHtml).join('');
 }
+// Passos para reproduzir: as ações registradas (cliques, campos, páginas e marcações) até o minuto da nota.
+const ORIGEM_PASSO = ['clique','campo','pagina','marca'];
+function passosAte(s, n){
+  const ehPasso = x => x.auto && (x.origem ? ORIGEM_PASSO.includes(x.origem) : x.type==='obs');
+  const lista = s.notes.slice(0, s.notes.indexOf(n)+1).filter(ehPasso).slice(-8);
+  if(!lista.length) return '';
+  return 'Passos para reproduzir:\n' + lista.map((x,i)=>`${i+1}. ${(x.passo||x.text).replace(/\n+/g,' ')}`).join('\n');
+}
 // Nota com ações de revisar, editar e excluir. Usada no diário da sessão e no relatório.
 let editId = null;
 function noteHtml(n){
@@ -335,7 +343,7 @@ function noteHtml(n){
         <div class="types" role="group" aria-label="Tipo da nota editada">${TYPE_ORDER.map(k=>`<button type="button" class="type ${TYPES[k].cls}" data-edtype="${k}" aria-pressed="${n.type===k}"><i></i>${TYPES[k].label}</button>`).join('')}</div>
         <label for="edit-in" style="position:absolute;left:-9999px">Texto da nota</label>
         <textarea id="edit-in">${esc(n.text)}</textarea>
-        <div class="edit-foot"><button class="btn ghost" data-cancel-edit>Cancelar</button><button class="btn primary" data-saveedit="${n.id}">Salvar${n.pending?' e confirmar':''}</button></div>
+        <div class="edit-foot">${n.text.includes('Passos para reproduzir:')?'':`<button class="btn ghost" data-passos="${n.id}">Incluir passos para reproduzir</button>`}<button class="btn ghost" data-cancel-edit>Cancelar</button><button class="btn primary" data-saveedit="${n.id}">Salvar${n.pending?' e confirmar':''}</button></div>
       </div>`
     : `<p class="txt">${esc(n.text)}</p>${n.url?`<p class="url">${esc(n.url)}</p>`:''}
       ${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.map(src=>`<img src="${src}" alt="Print da nota">`).join('')}</div>`:''}
@@ -349,7 +357,8 @@ function noteHtml(n){
 /* ---------- captura automática (só no navegador de teste) ---------- */
 function capturaHtml(s){
   return `<div class="eyebrow">Captura automática · navegador de teste</div>
-    <p class="hint" style="margin:6px 0 0">${s.status==='running'?'Todas as abas deste navegador são acompanhadas: cliques, campos preenchidos e páginas abertas viram observações a revisar, com print.':'Sessão pausada: nada está sendo registrado.'} O que você digita nunca é guardado.</p>`;
+    <p class="hint" style="margin:6px 0 0">${s.status==='running'?'Todas as abas deste navegador são acompanhadas: cliques, campos preenchidos, páginas abertas, erros de JavaScript e falhas de rede viram notas a revisar.':'Sessão pausada: nada está sendo registrado.'} O que você digita nunca é guardado.</p>
+    <p class="hint" style="margin:6px 0 0"><kbd>Alt+Shift+M</kbd> no sistema em teste marca o momento com print.</p>`;
 }
 function syncCaptura(){
   if(!EXT) return;
@@ -390,7 +399,7 @@ async function drenar(){
         const ev=tudo[k], img = ev.img ? await anotaPrint(ev) : null;
         const t=Math.max(0, elapsed(s)-(Date.now()-ev.ts));
         const lugar = ev.tipo==='pagina' ? '' : (ev.titulo ? ` · ${ev.titulo.slice(0,60)}` : '');
-        s.notes.push({id:uid(),type:'obs',t,text:ev.desc+lugar,url:ev.url||'',imgs:img?[img]:[],auto:true,pending:true});
+        s.notes.push({id:uid(),type:ev.nota||'obs',t,text:ev.desc+lugar,passo:ev.desc,origem:ev.tipo,url:ev.url||'',imgs:img?[img]:[],auto:true,pending:true});
       }
       s.notes.sort((a,b)=>a.t-b.t);
       save();
@@ -468,7 +477,7 @@ function tbsBar(db){ const tot=(db.test+db.bug+db.setup)||1; return `<i style="w
 function toMarkdown(s, onlyBugs=false){
   const c=counts(s), db=s.debrief||{};
   s={...s, notes:s.notes.filter(n=>!n.pending)};
-  const line = n => `- \`${fmtT(n.t)}\` ${n.text.replace(/\n+/g,' ')}${n.imgs&&n.imgs.length?` _(${n.imgs.length} print${n.imgs.length>1?'s':''})_`:''}`;
+  const line = n => `- \`${fmtT(n.t)}\` ${n.text.replace(/\n+/g,'\n  ')}${n.imgs&&n.imgs.length?` _(${n.imgs.length} print${n.imgs.length>1?'s':''})_`:''}`;
   if(onlyBugs){
     return `## Bugs · ${s.area}\n_${fmtDate(s.startedAt)} · ${s.ambiente||'ambiente não informado'}_\n\n` + (s.notes.filter(n=>n.type==='bug').map(line).join('\n') || '_Nenhum bug registrado._');
   }
@@ -722,6 +731,12 @@ document.addEventListener('click',e=>{
   }
   if(t.dataset.editnote){ editId=t.dataset.editnote; confirmDel=null; atualizaNotas(sessaoDaTela()); const ed=$('#edit-in'); if(ed){ ed.focus(); ed.setSelectionRange(ed.value.length,ed.value.length); } return; }
   if(t.dataset.edtype){ t.parentElement.querySelectorAll('[data-edtype]').forEach(b=>b.setAttribute('aria-pressed',b===t)); return; }
+  if(t.dataset.passos){
+    const s=sessaoDaTela(), n=s.notes.find(x=>x.id===t.dataset.passos), ed=$('#edit-in'), p=passosAte(s,n);
+    if(!p){ toast('Nenhum clique ou página registrado até essa nota.'); return; }
+    ed.value = ed.value.replace(/\s+$/,'') + (ed.value.trim()?'\n\n':'') + p;
+    t.remove(); ed.focus(); return;
+  }
   if(t.hasAttribute('data-cancel-edit')){ editId=null; atualizaNotas(sessaoDaTela()); return; }
   if(t.dataset.saveedit){
     const s=sessaoDaTela(), n=s.notes.find(x=>x.id===t.dataset.saveedit), box=t.closest('.edit-box');

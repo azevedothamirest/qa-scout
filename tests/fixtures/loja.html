@@ -6,6 +6,16 @@
   <label for="cpf">CPF</label> <input id="cpf"><br><br>
   <label for="senha">Senha</label> <input id="senha" type="password"><br><br>
   <button id="pagar">Pagar com Pix</button>
-  <a href="loja.html?passo=2">Ir para o passo 2</a>
+  <a href="loja.html?passo=2">Ir para o passo 2</a><br><br>
+  <button id="cupom">Aplicar cupom</button>
+  <button id="frete">Consultar frete</button>
+  <button id="parcelas">Simular parcelas</button>
+  <button id="aviso">Ver aviso</button>
+  <script>
+    document.getElementById('cupom').addEventListener('click', () => { setTimeout(() => { throw new TypeError('cupom.valor is undefined'); }); });
+    document.getElementById('frete').addEventListener('click', () => { fetch('/api/frete?cep=01001000').catch(() => {}); });
+    document.getElementById('parcelas').addEventListener('click', () => { fetch('http://127.0.0.1:9/api/parcelas').catch(() => {}); });
+    document.getElementById('aviso').addEventListener('click', () => { console.error('Falha ao carregar o aviso de frete grátis'); });
+  </script>
 </body>
 </html>

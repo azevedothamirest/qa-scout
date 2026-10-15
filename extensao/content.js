@@ -57,4 +57,20 @@
       : `Preencheu o campo${nome ? ` “${nome}”` : ''}`;
     envia({ tipo: 'campo', desc });
   }, true);
+
+  // Atalho para marcar o momento sem sair do sistema em teste: vira nota com print da tela.
+  document.addEventListener('keydown', e => {
+    if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyM') {
+      e.preventDefault();
+      envia({ tipo: 'marca', desc: 'Marcou este momento' });
+    }
+  }, true);
+
+  // Erros de JavaScript e console.error, repassados pelo pagina.js (que roda no contexto da página).
+  document.addEventListener('qascout:erro', e => {
+    let det; try { det = JSON.parse(e.detail); } catch (err) { return; }
+    const desc = det.tipo === 'js' ? `Erro de JavaScript: ${det.msg}` : `Erro no console: ${det.msg}`;
+    envia({ tipo: 'erro', grave: det.tipo === 'js', desc });
+  });
+  document.dispatchEvent(new CustomEvent('qascout:pronto'));
 })();

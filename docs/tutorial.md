@@ -93,12 +93,19 @@ Vá para a janela do sistema em teste e explore normalmente. Enquanto a sessão 
 | Preenche um campo | `Preencheu o campo “CPF”` (o valor digitado **nunca** é lido) |
 | Abre uma página | `Abriu a página “Checkout”` |
 
+| Acontece um erro de JavaScript | `Erro de JavaScript: TypeError: ...`, sugerido como **bug** |
+| A página chama `console.error` | `Erro no console: ...`, sugerido como **risco** |
+| Uma requisição volta 4xx | `Requisição com erro: GET /api/frete → 404`, sugerida como **risco** |
+| Uma requisição volta 5xx ou nem conecta | `Requisição com erro: POST /api/pix → 500`, sugerida como **bug** |
+| Aperta `Alt+Shift+M` no sistema em teste | `Marcou este momento`, com print da tela |
+
 Detalhes que vale saber:
 
 - Sai **no máximo um print por segundo**. Cliques muito rápidos geram nota, mas nem todos têm print.
 - Em campos de senha, a nota diz apenas "Preencheu um campo de senha".
 - Com a sessão **pausada**, nada é registrado. Use a pausa para responder uma mensagem ou almoçar.
 - Abas novas abertas nesse navegador também são acompanhadas.
+- Erros repetidos não viram uma enxurrada de notas: o mesmo erro aparece uma vez por página (até 20 por página), e a mesma requisição com falha, uma vez a cada 10 segundos.
 
 Quer anotar algo que só você percebeu? Escreva no campo de nota do painel e escolha o tipo:
 
@@ -117,7 +124,7 @@ Quer anotar algo que só você percebeu? Escreva no campo de nota do painel e es
 As notas automáticas chegam com a etiqueta **auto · a revisar** e um fundo amarelado. Elas **não entram no relatório** até você decidir o que fazer com cada uma:
 
 - **Confirmar**: era isso mesmo, fica como observação.
-- **Editar**: corrige o texto ou troca o tipo. Por exemplo, o clique em "Pagar com Pix" que não respondeu vira um **Bug** com a sua descrição.
+- **Editar**: corrige o texto ou troca o tipo. Por exemplo, o clique em "Pagar com Pix" que não respondeu vira um **Bug** com a sua descrição. Clique em **Incluir passos para reproduzir** e o QA Scout acrescenta a lista com as ações registradas até ali (até 8 passos), que vai junto para o relatório.
 - **Excluir**: era ruído.
 
 Dica: use o filtro **a revisar** no diário da sessão para ver só as pendentes. Dá para revisar durante a sessão ou tudo de uma vez no final.

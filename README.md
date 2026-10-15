@@ -25,6 +25,9 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - **Heurísticas:** 18 cartas com tours inspirados em James Whittaker e casos do dia a dia brasileiro (CPF com máscara, acentos, valores em reais, fuso).
 - **Debriefing:** divisão do tempo em Teste, Bug e Setup (TBS), áreas cobertas e próximas sessões.
 - **Captura automática** no navegador de teste: cliques, campos preenchidos e páginas abertas viram observações com print. Você confirma, edita (texto e tipo) ou exclui cada uma; só as revisadas entram no relatório.
+- **Erros de console e de rede** viram notas a revisar: erro de JavaScript e falha de conexão ou 5xx chegam como bug; `console.error` e 4xx, como risco.
+- **Passos para reproduzir** num clique: ao editar uma nota, o QA Scout monta a lista com os cliques, campos e páginas que vieram antes dela.
+- **`Alt+Shift+M`** no sistema em teste marca o momento com print, sem sair da tela.
 - **Relatório** em Markdown para colar no Jira, GitHub, Notion ou Slack, **Copiar só os bugs** para abrir os tickets, e exportação em PDF pelo navegador.
 - **Tema claro e escuro**, com botão para alternar.
 - **Histórico com busca** por área, charter ou conteúdo das notas.
@@ -64,7 +67,7 @@ npm test
 npm run test:report
 ```
 
-Cobertura atual: histórico e busca, validação do charter, registro de notas por atalho e por comando, pausa do cronômetro, persistência após recarregar, geração do relatório em Markdown, regra da divisão TBS somando 100%, captura automática de cliques, campos e páginas (sem guardar o valor digitado), revisão das notas automáticas e abertura do navegador de teste com um comando.
+Cobertura atual: histórico e busca, validação do charter, registro de notas por atalho e por comando, pausa do cronômetro, persistência após recarregar, geração do relatório em Markdown, regra da divisão TBS somando 100%, captura automática de cliques, campos e páginas (sem guardar o valor digitado), revisão das notas automáticas captura de erros de JavaScript, console e rede, atalho de marcar o momento, passos para reproduzir e abertura do navegador de teste com um comando.
 
 ## Próximos passos
 
@@ -75,7 +78,7 @@ Cobertura atual: histórico e busca, validação do charter, registro de notas p
 
 ## English
 
-QA Scout is a session-based exploratory testing companion: write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Run `npx github:azevedothamirest/qa-scout <url>` to open a dedicated test browser where clicks, filled fields and visited pages become screenshot-backed observations for you to review. Data stays on your machine. Tested end to end with Playwright on desktop, mobile and the test browser.
+QA Scout is a session-based exploratory testing companion: write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Run `npx github:azevedothamirest/qa-scout <url>` to open a dedicated test browser where clicks, filled fields, visited pages, JavaScript errors and failed requests become notes for you to review, with one-click reproduction steps and an `Alt+Shift+M` shortcut to capture the moment. Data stays on your machine. Tested end to end with Playwright on desktop, mobile and the test browser.
 
 ---
 

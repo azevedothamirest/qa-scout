@@ -32,13 +32,15 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] Editar e excluir qualquer nota já registrada
 - [x] Tema claro e escuro com botão para alternar
 - [x] Tutorial (`docs/tutorial.md`) e modelos de issue para feedback, bug e ideia
-- [x] Suíte com 45 testes em três perfis: desktop, celular e navegador de teste
+- [x] Erros de JavaScript, console e rede viram notas a revisar
+- [x] Passos para reproduzir montados a partir das ações registradas
+- [x] Atalho Alt+Shift+M para marcar o momento com print
+- [x] Suíte com 51 testes em três perfis: desktop, celular e navegador de teste
 
 ## Fora do MVP (próximas versões)
 
 - [ ] Integração com Jira e Azure DevOps para abrir bug direto da nota
 - [ ] IA sugerindo cenários a partir do charter e resumindo a sessão
-- [ ] Capturar erros de console e falhas de rede no navegador de teste
 - [ ] Sessões em dupla ou em time
 - [ ] Métricas acumuladas (tempo explorado por área, bugs por sessão)
 - [ ] Exportar e importar sessões em JSON (backup, já que os dados ficam no navegador)

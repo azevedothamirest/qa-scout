@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "QA Scout",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Captura do navegador de teste do QA Scout: registra cliques e prints durante a sessão.",
   "background": { "service_worker": "extensao/background.js" },
-  "permissions": ["storage", "unlimitedStorage", "tabs", "scripting"],
+  "content_scripts": [{ "matches": ["http://*/*", "https://*/*", "file://*/*"], "js": ["extensao/pagina.js"], "run_at": "document_start", "world": "MAIN", "all_frames": false }],
+  "permissions": ["storage", "unlimitedStorage", "tabs", "scripting", "webRequest"],
   "host_permissions": ["<all_urls>"]
 }
