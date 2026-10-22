@@ -1,5 +1,8 @@
 // @ts-check
 const { test, expect } = require('@playwright/test');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -24,6 +27,58 @@ test.describe('Histórico de sessões', () => {
     await page.getByRole('button', { name: 'Remover exemplos' }).click();
     await expect(page.locator('.row')).toHaveCount(0);
     await expect(page.getByText('Nenhuma sessão ainda')).toBeVisible();
+  });
+});
+
+test.describe('Backup das sessões', () => {
+  test('Restaurar sessões removidas a partir do backup baixado', async ({ page }) => {
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: 'Baixar backup' }).click(),
+    ]);
+    expect(download.suggestedFilename()).toMatch(/^qa-scout-backup-\d{4}-\d{2}-\d{2}\.json$/);
+    const arquivo = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-')), 'backup.json');
+    await download.saveAs(arquivo);
+
+    await page.getByRole('button', { name: 'Remover exemplos' }).click();
+    await expect(page.locator('.row')).toHaveCount(0);
+    await page.getByLabel('Importar backup').setInputFiles(arquivo);
+    await expect(page.locator('#toast')).toHaveText('2 sessões importadas');
+    await expect(page.locator('.row')).toHaveCount(2);
+
+    await page.reload();
+    await expect(page.locator('.row')).toHaveCount(2);
+  });
+
+  test('Ignorar sessões que já existem ao importar o mesmo backup', async ({ page }) => {
+    const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Baixar backup' }).click()]);
+    const arquivo = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-')), 'backup.json');
+    await download.saveAs(arquivo);
+    await page.getByLabel('Importar backup').setInputFiles(arquivo);
+    await expect(page.locator('#toast')).toHaveText('Todas as sessões desse backup já estão aqui.');
+    await expect(page.locator('.row')).toHaveCount(2);
+  });
+
+  test('Recusar arquivo que não é backup do QA Scout', async ({ page }) => {
+    await page.getByLabel('Importar backup').setInputFiles({ name: 'outro.json', mimeType: 'application/json', buffer: Buffer.from('{"nome":"planilha"}') });
+    await expect(page.locator('#toast')).toHaveText('Esse arquivo não é um backup do QA Scout.');
+    await expect(page.locator('.row')).toHaveCount(2);
+  });
+});
+
+test.describe('Copiar bug', () => {
+  test('Copiar bug com ambiente, passos e resultado esperado a partir do relatório', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.getByText('Checkout · pagamento com Pix').click();
+    await page.locator('.group.t-bug .note', { hasText: 'aplica o desconto duas vezes' }).getByRole('button', { name: 'Copiar bug' }).click();
+    await expect(page.locator('#toast')).toHaveText('Bug copiado. É só colar no Jira ou no GitHub.');
+    const md = await page.evaluate(() => navigator.clipboard.readText());
+    expect(md).toMatch(/^## Com cupom de 10%, voltar da tela do QR Code/);
+    expect(md).toContain('| Ambiente | Homologação · build 4.18.2 |');
+    expect(md).toMatch(/\| Navegador \| \S+/);
+    expect(md).toContain('### Passos para reproduzir\n1.');
+    expect(md).toContain('### Resultado obtido\nCom cupom de 10%');
+    expect(md).toContain('### Resultado esperado');
   });
 });
 

@@ -29,6 +29,8 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - **Passos para reproduzir** num clique: ao editar uma nota, o QA Scout monta a lista com os cliques, campos e páginas que vieram antes dela.
 - **`Alt+Shift+M`** no sistema em teste marca o momento com print, sem sair da tela.
 - **Relatório** em Markdown para colar no Jira, GitHub, Notion ou Slack, **Copiar só os bugs** para abrir os tickets, e exportação em PDF pelo navegador.
+- **Copiar bug** pronto para o Jira ou GitHub: título, ambiente, navegador, página, passos para reproduzir, resultado obtido e esperado, e os erros de console e rede do mesmo minuto.
+- **Backup das sessões** em JSON: baixe e importe pelo histórico (sessões repetidas são ignoradas).
 - **Tema claro e escuro**, com botão para alternar.
 - **Histórico com busca** por área, charter ou conteúdo das notas.
 
@@ -67,7 +69,7 @@ npm test
 npm run test:report
 ```
 
-Cobertura atual: histórico e busca, validação do charter, registro de notas por atalho e por comando, pausa do cronômetro, persistência após recarregar, geração do relatório em Markdown, regra da divisão TBS somando 100%, captura automática de cliques, campos e páginas (sem guardar o valor digitado), revisão das notas automáticas captura de erros de JavaScript, console e rede, atalho de marcar o momento, passos para reproduzir e abertura do navegador de teste com um comando.
+Cobertura atual: histórico e busca, validação do charter, registro de notas por atalho e por comando, pausa do cronômetro, persistência após recarregar, geração do relatório em Markdown, regra da divisão TBS somando 100%, captura automática de cliques, campos e páginas (sem guardar o valor digitado), revisão das notas automáticas captura de erros de JavaScript, console e rede, atalho de marcar o momento, passos para reproduzir e abertura do navegador de teste com um comando, backup e importação de sessões e bug copiado no formato de ticket.
 
 ## Próximos passos
 

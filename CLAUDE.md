@@ -14,6 +14,8 @@ Companheiro de teste exploratório baseado em sessões (SBTM), criado por Thamir
 - Comando `qa-scout` (`bin/qa-scout.js`, também `npm run navegador`): abre um Chromium do Playwright com perfil próprio em `~/.qa-scout/perfil` e a extensão carregada e abre o painel numa janela popup de 440 px à esquerda. Usa o Chromium do Playwright porque o Chrome estável não carrega mais extensão por linha de comando. `abrir()` é exportada para os testes.
 - Notas com `pending:true` não contam nos totais nem entram no Markdown até serem confirmadas ou editadas.
 - Dados ficam só no navegador, na chave `qascout.v1`: `localStorage` no site, `chrome.storage.local` (com `unlimitedStorage`) no navegador de teste. Sem servidor, sem conta, sem envio de dados. Toda leitura e escrita fica em try/catch; se o storage estiver bloqueado, o app funciona em memória e avisa uma vez.
+- Backup: `baixarBackup()` gera `{app:'qa-scout', formato:1, sessions}` só com sessões concluídas; `importarBackup()` valida o formato e ignora ids repetidos.
+- `bugMarkdown()` monta o bug para o Jira/GitHub (botão "Copiar bug" nas notas de bug); `navegadorAtual()` é gravado em `s.navegador` ao iniciar a sessão.
 - Prints são comprimidos para JPEG (lado máximo 1100px, qualidade 0.72) antes de salvar, para não estourar a cota do `localStorage`.
 - Fontes: Bricolage Grotesque (títulos), Instrument Sans (texto), IBM Plex Mono (cronômetro, dados, rótulos). Paleta verde-pinho com âmbar, tema claro e escuro por tokens CSS em `:root`. Identidade de caderno de campo e curvas de nível.
 - O app também roda dentro de um artifact do Claude.ai; por isso o botão "Salvar em PDF" só aparece quando `window.self === window.top`.

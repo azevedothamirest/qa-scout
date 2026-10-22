@@ -137,7 +137,11 @@ Clique em **Encerrar** e confirme. Você vai para o relatório da sessão:
 2. Faça o **debriefing**: ajuste a divisão do tempo entre Teste, Bug e Setup (TBS), as áreas cobertas e o que ficou para as próximas sessões.
 3. Clique em **Copiar Markdown** e cole no Jira, no GitHub, no Notion ou no Slack. **Copiar só os bugs** gera uma lista curta para abrir os tickets.
 
+Para abrir um ticket, use **Copiar bug** em qualquer nota de bug (no diário ou no relatório). Sai um texto pronto para o Jira ou GitHub com título, ambiente, navegador, página, passos para reproduzir, resultado obtido, um espaço para o resultado esperado e os erros de console e rede registrados no mesmo minuto.
+
 A sessão fica salva no histórico, com busca por área, charter ou texto das notas.
+
+**Faça backup de vez em quando.** No histórico, **Baixar backup** gera um arquivo `.json` com todas as sessões concluídas. Em outro computador, ou depois de limpar o navegador, **Importar backup** traz tudo de volta; sessões que já existem são ignoradas.
 
 ## 7. Dê seu feedback
 
@@ -178,6 +182,9 @@ Não. O QA Scout registra *que* você preencheu um campo e qual é o rótulo del
 
 **Posso usar no trabalho?**
 O código é aberto ([licença MIT](../LICENSE)) e você pode ler tudo o que ele faz. Se sua empresa tem regras sobre ferramentas que capturam a tela, confira antes.
+
+**Como guardo uma cópia das minhas sessões?**
+No histórico, clique em **Baixar backup**. Para restaurar, use **Importar backup** com o arquivo `.json`.
 
 **Como apago tudo?**
 No navegador de teste, apague a pasta `~/.qa-scout/perfil`. Na versão web, limpe os dados do site no navegador.

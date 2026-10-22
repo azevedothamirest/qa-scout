@@ -35,7 +35,13 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] Erros de JavaScript, console e rede viram notas a revisar
 - [x] Passos para reproduzir montados a partir das ações registradas
 - [x] Atalho Alt+Shift+M para marcar o momento com print
-- [x] Suíte com 51 testes em três perfis: desktop, celular e navegador de teste
+- [x] Suíte com 51 testes
+
+## Versão 0.4
+
+- [x] Backup das sessões em JSON (baixar e importar pelo histórico, ignorando repetidas)
+- [x] Copiar bug no formato de ticket: ambiente, navegador, página, passos, obtido x esperado e erros do mesmo minuto
+- [x] Suíte com 60 testes em três perfis: desktop, celular e navegador de teste
 
 ## Fora do MVP (próximas versões)
 
@@ -43,7 +49,6 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [ ] IA sugerindo cenários a partir do charter e resumindo a sessão
 - [ ] Sessões em dupla ou em time
 - [ ] Métricas acumuladas (tempo explorado por área, bugs por sessão)
-- [ ] Exportar e importar sessões em JSON (backup, já que os dados ficam no navegador)
 
 ## Decisões tomadas
 
