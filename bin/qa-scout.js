@@ -32,11 +32,12 @@ async function abrir({ url, perfil = PERFIL_PADRAO, headless = false } = {}) {
   const id = new URL(sw.url()).host;
 
   // Liga o modo em que todas as abas são acompanhadas e abre o painel numa janela estreita ao lado.
-  // Logo depois de subir, o service worker às vezes ainda não expõe as APIs chrome.*: espera até 5 s.
-  await sw.evaluate(async () => {
-    for (let i = 0; i < 50 && !(globalThis.chrome && chrome.storage); i++) await new Promise(r => setTimeout(r, 100));
-    await chrome.storage.local.set({ 'qascout.modo': 'navegador' });
-  });
+  // Logo depois de subir, o service worker às vezes ainda não está pronto para avaliar código
+  // (sem chrome.storage ou até sem setTimeout): tenta de novo por até 5 s.
+  for (let tentativa = 1; ; tentativa++) {
+    try { await sw.evaluate(() => chrome.storage.local.set({ 'qascout.modo': 'navegador' })); break; }
+    catch (e) { if (tentativa >= 50) throw e; await new Promise(r => setTimeout(r, 100)); }
+  }
   const painelAberto = context.waitForEvent('page', p => p.url().startsWith(`chrome-extension://${id}/`));
   await sw.evaluate(() => chrome.windows.create({ url: chrome.runtime.getURL('index.html'), type: 'popup', width: 440, height: 900, left: 0, top: 0 }));
   const painel = await painelAberto;
