@@ -1,11 +1,11 @@
 // @ts-check
 // Comando qa-scout: abre o navegador de teste com a extensão e acompanha todas as abas sozinho.
 // O nome do arquivo contém "extensao" para rodar no projeto "extensao" do Playwright.
-const { test, expect } = require('@playwright/test');
+const { test, expect, chromium } = require('@playwright/test');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { abrir } = require('../bin/qa-scout');
+const { abrir, prepararExtensao, ID_FIXO } = require('../bin/qa-scout');
 
 const LOJA = 'http://localhost:4173/tests/fixtures/loja.html';
 
@@ -20,6 +20,7 @@ test.describe('Navegador de teste (comando qa-scout)', () => {
   test.afterEach(async () => {
     await aberto.context.close();
     fs.rmSync(perfil, { recursive: true, force: true });
+    fs.rmSync(perfil + '-extensao', { recursive: true, force: true });
   });
 
   test('Abrir o painel e o sistema em teste com um único comando', async () => {
@@ -45,5 +46,40 @@ test.describe('Navegador de teste (comando qa-scout)', () => {
     await outra.getByLabel('CPF').fill('123');
     await outra.locator('body').click({ position: { x: 5, y: 5 } });
     await expect(painel.locator('.note', { hasText: 'Preencheu o campo “CPF”' })).toBeVisible();
+  });
+});
+
+test.describe('Navegador de teste · atualização', () => {
+  test('Recuperar as sessões guardadas sob o id antigo da extensão', async () => {
+    const perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-'));
+    const antiga = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-antiga-'));
+    // Versão antiga: mesma extensão sem a chave fixa, então com outro id (como acontecia com o npx).
+    prepararExtensao(antiga);
+    const manifesto = JSON.parse(fs.readFileSync(path.join(antiga, 'manifest.json'), 'utf8'));
+    delete manifesto.key;
+    fs.writeFileSync(path.join(antiga, 'manifest.json'), JSON.stringify(manifesto));
+    const velho = await chromium.launchPersistentContext(perfil, { channel: 'chromium', args: [`--disable-extensions-except=${antiga}`, `--load-extension=${antiga}`] });
+    let [sw] = velho.serviceWorkers();
+    if (!sw) sw = await velho.waitForEvent('serviceworker');
+    expect(new URL(sw.url()).host).not.toBe(ID_FIXO);
+    const painelVelho = await velho.newPage();
+    await painelVelho.goto(`chrome-extension://${new URL(sw.url()).host}/index.html`);
+    await painelVelho.getByRole('button', { name: 'Remover exemplos' }).click();
+    await painelVelho.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await painelVelho.getByLabel('Explorar').fill('o carrinho antigo');
+    await painelVelho.getByLabel('para descobrir').fill('itens duplicados');
+    await painelVelho.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await painelVelho.getByRole('button', { name: 'Encerrar' }).click();
+    await painelVelho.getByRole('button', { name: 'Sim, encerrar' }).click();
+    await velho.close();
+
+    const aberto = await abrir({ perfil, headless: true });
+    try {
+      expect(aberto.id).toBe(ID_FIXO);
+      await expect(aberto.painel.locator('.row', { hasText: 'o carrinho antigo' })).toBeVisible();
+    } finally {
+      await aberto.context.close();
+      for (const p of [perfil, perfil + '-extensao', antiga]) fs.rmSync(p, { recursive: true, force: true });
+    }
   });
 });

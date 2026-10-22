@@ -32,7 +32,7 @@ footer{margin-top:48px;color:var(--muted);font-size:14px}
 <body>
 <main>
   <a class="brand" href="./"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="14" cy="14" r="7.5" fill="none" stroke="var(--accent)" stroke-width="1.2" opacity=".5"/><path d="M14 4.5 L17 14 L14 23.5 L11 14 Z" fill="var(--accent)"/><path d="M14 14 L17 14 L14 23.5 Z" fill="var(--marker)"/></svg>QA Scout</a>
-  <div class="eyebrow">Política de privacidade · atualizada em 22 de outubro de 2026</div>
+  <div class="eyebrow">Política de privacidade · atualizada em 23 de outubro de 2026</div>
   <h1>Seus dados ficam <em>no seu computador.</em></h1>
   <p class="lead">O QA Scout não tem servidor, conta nem envio de dados. Esta página explica o que a extensão registra, onde guarda e o que nunca faz.</p>
 
@@ -57,7 +57,7 @@ footer{margin-top:48px;color:var(--muted);font-size:14px}
 
   <h2>Por que a extensão pede cada permissão</h2>
   <ul>
-    <li><b>Acesso aos sites (<code>&lt;all_urls&gt;</code>)</b>: o sistema em teste pode estar em qualquer endereço. A captura só roda nas abas acompanhadas e com a sessão em andamento.</li>
+    <li><b>Acesso aos sites (<code>&lt;all_urls&gt;</code>), opcional</b>: não é pedido na instalação. O Chrome pergunta na primeira vez que você clica em “Acompanhar a aba atual”, porque o sistema em teste pode estar em qualquer endereço e o print da aba exige esse acesso. Dá para retirar quando quiser em <code>chrome://extensions</code>. Mesmo com o acesso concedido, a captura só roda nas abas acompanhadas e com a sessão em andamento.</li>
     <li><b><code>tabs</code> e <code>scripting</code></b>: saber qual aba você marcou, tirar o print dela e registrar cliques e campos.</li>
     <li><b><code>webRequest</code></b>: perceber respostas com erro (4xx e 5xx) e falhas de conexão nas abas acompanhadas. Só leitura; nenhuma requisição é bloqueada ou alterada.</li>
     <li><b><code>storage</code> e <code>unlimitedStorage</code></b>: guardar as sessões e os prints no seu computador.</li>

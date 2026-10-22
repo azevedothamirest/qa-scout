@@ -18,14 +18,49 @@ function garanteNavegador() {
   if (r.status !== 0) throw new Error('Não foi possível baixar o Chromium. Rode "npx playwright install chromium" e tente de novo.');
 }
 
+// O navegador de teste é separado e existe só para testar: carrega uma cópia da extensão em que o
+// acesso a todos os sites já vem concedido (na Chrome Web Store ele é opcional e pedido no primeiro uso).
+const ARQUIVOS_EXTENSAO = ['index.html', 'app.js', 'extensao', 'icones'];
+// Chave pública fixa: sem ela, o id da extensão (e com ele o lugar onde as sessões ficam guardadas)
+// mudava junto com a pasta em que o npx instala o pacote. Só a chave pública; a privada não é usada.
+const CHAVE = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0r1RT9W6ROqrLashHW7SfAuLCm5GQe/kJsbj5cRX94V0wFtU7bwiPAf2ocW/JMW4ExCcrnvLsawtxJuXXDRHJDNeGwusrtRRdsMfTvBc+GatHErudRVTKsBmyorM7OnmIrrSWzQmZV0EHonfUsGb81ZgctZQhZ6kElEkwoQp0IgWlJ0mTwikovg+BXS6jA457wfi6S31hAHe9StHnRAQABluRtqJW2n/F77228fuZJz97f8db43Vs3vjFzD0GHRS6yS9zFhhz+EA+9l4ZnQ8VCr0pIkSF32h+fqO2JK1rmKVhmgKEGW1KLM2XllkUJ6gBuYVMD4AWdqRQdfi7e4XNQIDAQAB';
+const ID_FIXO = 'kmnlnoaakacblihodeehdlbbfcmjaaam';
+function prepararExtensao(destino = path.join(os.homedir(), '.qa-scout', 'extensao')) {
+  fs.rmSync(destino, { recursive: true, force: true });
+  fs.mkdirSync(destino, { recursive: true });
+  for (const item of ARQUIVOS_EXTENSAO) fs.cpSync(path.join(RAIZ, item), path.join(destino, item), { recursive: true });
+  const manifesto = JSON.parse(fs.readFileSync(path.join(RAIZ, 'manifest.json'), 'utf8'));
+  manifesto.key = CHAVE;
+  manifesto.host_permissions = ['<all_urls>'];
+  delete manifesto.optional_host_permissions;
+  fs.writeFileSync(path.join(destino, 'manifest.json'), JSON.stringify(manifesto, null, 2));
+  return destino;
+}
+
+// Até a 0.5, o id mudava com a pasta do npx (por exemplo, ao trocar o comando para "#main") e as
+// sessões ficavam guardadas sob o id antigo. Na primeira vez com o id fixo, copia os dados da
+// extensão usada por último para o novo id.
+function recuperaSessoesAntigas(perfil) {
+  const base = path.join(perfil, 'Default', 'Local Extension Settings');
+  const destino = path.join(base, ID_FIXO);
+  if (!fs.existsSync(base) || fs.existsSync(destino)) return;
+  const antigas = fs.readdirSync(base)
+    .filter(n => /^[a-p]{32}$/.test(n))
+    .map(n => ({ n, t: fs.statSync(path.join(base, n)).mtimeMs }))
+    .sort((a, b) => b.t - a.t);
+  if (antigas.length) fs.cpSync(path.join(base, antigas[0].n), destino, { recursive: true });
+}
+
 async function abrir({ url, perfil = PERFIL_PADRAO, headless = false } = {}) {
   garanteNavegador();
   fs.mkdirSync(perfil, { recursive: true });
+  const extensao = prepararExtensao(path.join(perfil, '..', path.basename(perfil) + '-extensao'));
+  recuperaSessoesAntigas(perfil);
   const context = await chromium.launchPersistentContext(perfil, {
     channel: 'chromium',
     headless,
     viewport: null,
-    args: [`--disable-extensions-except=${RAIZ}`, `--load-extension=${RAIZ}`],
+    args: [`--disable-extensions-except=${extensao}`, `--load-extension=${extensao}`],
   });
   let [sw] = context.serviceWorkers();
   if (!sw) sw = await context.waitForEvent('serviceworker');
@@ -59,7 +94,7 @@ async function abrir({ url, perfil = PERFIL_PADRAO, headless = false } = {}) {
   return { context, painel, site, id };
 }
 
-module.exports = { abrir, PERFIL_PADRAO };
+module.exports = { abrir, prepararExtensao, recuperaSessoesAntigas, ID_FIXO, PERFIL_PADRAO };
 
 if (require.main === module) {
   const args = process.argv.slice(2);
