@@ -205,6 +205,7 @@ function viewHome(){
     </div>` : ''}
     <div class="section-head">
       <div><div class="eyebrow">Histórico</div><h2>Sessões anteriores</h2></div>
+      <div class="backup"><button class="btn ghost" data-act="backup">Baixar backup</button><label class="btn ghost file-lbl">Importar backup<input type="file" id="backup-in" accept="application/json,.json"></label></div>
       <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="Buscar por área, charter ou nota" value="${esc(query)}" aria-label="Buscar sessões"></label>
     </div>
     <div class="list" id="list">
@@ -348,7 +349,7 @@ function noteHtml(n){
     : `<p class="txt">${esc(n.text)}</p>${n.url?`<p class="url">${esc(n.url)}</p>`:''}
       ${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.map(src=>`<img src="${src}" alt="Print da nota">`).join('')}</div>`:''}
       <div class="note-actions">${confirmDel===n.id?`<button class="confirm" data-delnote="${n.id}" data-sure="1">Confirmar exclusão</button><button data-cancel-del>Cancelar</button>`
-        :`${n.pending?`<button class="ok" data-oknote="${n.id}">Confirmar</button>`:''}<button data-editnote="${n.id}">Editar</button><button data-delnote="${n.id}">Excluir</button>`}</div>`;
+        :`${n.pending?`<button class="ok" data-oknote="${n.id}">Confirmar</button>`:''}${n.type==='bug'&&!n.pending?`<button data-copybug="${n.id}">Copiar bug</button>`:''}<button data-editnote="${n.id}">Editar</button><button data-delnote="${n.id}">Excluir</button>`}</div>`;
   return `<article class="note ${TYPES[n.type].cls}${n.pending?' pendente':''}" data-note="${n.id}">
     <div class="t">${fmtT(n.t)}</div>
     <div style="min-width:0"><div class="kind"><i></i>${TYPES[n.type].label} ${tag}</div>${corpo}</div></article>`;
@@ -439,7 +440,7 @@ function viewReport(s){
           <p class="hint" style="margin:0 0 6px">Elas só entram no relatório e no Markdown depois de confirmadas. Edite o texto ou o tipo se não for observação.</p>
           ${pendentes(s).map(noteHtml).join('')}</div>`:''}
         ${TYPE_ORDER.filter(k=>c[k]).map(k=>`<div class="group ${TYPES[k].cls}"><h3><i></i>${PLURAL[k]}</h3>
-          ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.map(src=>`<img src="${src}" alt="Print da nota">`).join('')}</div>`:''}</div></div>`).join('')}
+          ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.map(src=>`<img src="${src}" alt="Print da nota">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}">Copiar bug</button></div>`:''}</div></div>`).join('')}
         </div>`).join('') || '<p class="hint">Nenhuma nota registrada nessa sessão.</p>'}
       </div>
       <aside style="display:grid;gap:16px;min-width:0">
@@ -491,6 +492,59 @@ function toMarkdown(s, onlyBugs=false){
   if(db.next) md += `\n## Fora do escopo e próximas sessões\n${db.next}\n`;
   md += `\n---\n_Gerado com QA Scout_`;
   return md;
+}
+
+/* ---------- bug pronto para o Jira ou GitHub ---------- */
+function navegadorAtual(){
+  const ua=navigator.userAgent, m=ua.match(/(Edg|OPR|Firefox|Chrome|Version)\/(\d+)/);
+  const nome = !m ? 'Navegador' : m[1]==='Edg' ? 'Edge' : m[1]==='OPR' ? 'Opera' : m[1]==='Version' ? 'Safari' : m[1];
+  const so = /Windows/.test(ua)?'Windows':/Android/.test(ua)?'Android':/iPhone|iPad/.test(ua)?'iOS':/Mac OS/.test(ua)?'macOS':/Linux/.test(ua)?'Linux':'';
+  return `${nome}${m?' '+m[2]:''}${so?' · '+so:''} · tela ${screen.width}×${screen.height}`;
+}
+const MARCA_PASSOS = 'Passos para reproduzir:';
+function bugMarkdown(s,n){
+  const [obtido, passosTxt=''] = n.text.split(MARCA_PASSOS);
+  const descricao = obtido.trim() || 'Bug sem descrição';
+  const titulo = descricao.split('\n')[0].slice(0,90);
+  const passos = (passosTxt.trim() || passosAte(s,n).replace(MARCA_PASSOS,'').trim() || '1. ').trim();
+  const erros = s.notes.filter(x=>x!==n && (x.origem==='erro'||x.origem==='rede') && Math.abs(x.t-n.t)<=60000);
+  let md = `## ${titulo}\n\n`;
+  md += `| | |\n|---|---|\n| Sessão | ${s.area} · ${fmtDate(s.startedAt)}, aos ${fmtT(n.t)} |\n| Ambiente | ${s.ambiente||'-'} |\n| Navegador | ${s.navegador||navegadorAtual()} |\n`;
+  if(n.url) md += `| Página | ${n.url} |\n`;
+  md += `\n### Passos para reproduzir\n${passos}\n`;
+  md += `\n### Resultado obtido\n${descricao}\n`;
+  md += `\n### Resultado esperado\n_Descreva o comportamento esperado._\n`;
+  if(erros.length) md += `\n### Erros de console e rede no mesmo minuto\n${erros.map(x=>`- \`${fmtT(x.t)}\` ${(x.passo||x.text).replace(/\n+/g,' ')}`).join('\n')}\n`;
+  if(n.imgs&&n.imgs.length) md += `\n### Evidências\n${n.imgs.length} print${n.imgs.length>1?'s':''} na nota do QA Scout. Anexe ao ticket.\n`;
+  md += `\n---\n_Registrado com QA Scout · charter: ${charterText(s.charter)}_`;
+  return md;
+}
+
+/* ---------- backup das sessões ---------- */
+function baixarBackup(){
+  const sessoes = state.sessions.filter(x=>x.status==='done');
+  if(!sessoes.length){ toast('Nenhuma sessão concluída para salvar.'); return; }
+  const dados = {app:'qa-scout', formato:1, exportadoEm:new Date().toISOString(), sessions:sessoes};
+  const url = URL.createObjectURL(new Blob([JSON.stringify(dados)],{type:'application/json'}));
+  const a = document.createElement('a');
+  const d = new Date();
+  a.href=url; a.download=`qa-scout-backup-${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast(`Backup com ${sessoes.length} ${sessoes.length===1?'sessão':'sessões'} baixado`);
+}
+function importarBackup(txt){
+  let dados; try{ dados=JSON.parse(txt); }catch(e){ toast('Esse arquivo não é um backup do QA Scout.'); return; }
+  if(!dados || dados.app!=='qa-scout' || !Array.isArray(dados.sessions)){ toast('Esse arquivo não é um backup do QA Scout.'); return; }
+  const ids = new Set(state.sessions.map(x=>x.id));
+  const validas = dados.sessions.filter(x=>x && x.id && x.charter && Array.isArray(x.notes) && x.status==='done');
+  const novas = validas.filter(x=>!ids.has(x.id));
+  if(!novas.length){ toast(validas.length?'Todas as sessões desse backup já estão aqui.':'Nenhuma sessão encontrada no backup.'); return; }
+  state.sessions.push(...novas);
+  if(!save()){ state.sessions=state.sessions.filter(x=>!novas.includes(x)); return; }
+  render();
+  const rep = validas.length-novas.length;
+  toast(`${novas.length} ${novas.length===1?'sessão importada':'sessões importadas'}${rep?` · ${rep} já ${rep===1?'existia':'existiam'}`:''}`);
 }
 
 /* ---------- tela: heurísticas ---------- */
@@ -731,6 +785,11 @@ document.addEventListener('click',e=>{
   }
   if(t.dataset.editnote){ editId=t.dataset.editnote; confirmDel=null; atualizaNotas(sessaoDaTela()); const ed=$('#edit-in'); if(ed){ ed.focus(); ed.setSelectionRange(ed.value.length,ed.value.length); } return; }
   if(t.dataset.edtype){ t.parentElement.querySelectorAll('[data-edtype]').forEach(b=>b.setAttribute('aria-pressed',b===t)); return; }
+  if(t.dataset.copybug){
+    const s=sessaoDaTela(), n=s&&s.notes.find(x=>x.id===t.dataset.copybug);
+    if(n) copy(bugMarkdown(s,n),'Bug copiado. É só colar no Jira ou no GitHub.');
+    return;
+  }
   if(t.dataset.passos){
     const s=sessaoDaTela(), n=s.notes.find(x=>x.id===t.dataset.passos), ed=$('#edit-in'), p=passosAte(s,n);
     if(!p){ toast('Nenhum clique ou página registrado até essa nota.'); return; }
@@ -774,6 +833,7 @@ document.addEventListener('click',e=>{
     pendingImgs=[]; go('report',s.id); toast('Sessão encerrada. Faça o debriefing enquanto está fresco.');
   }
   if(act==='print'){ window.print(); }
+  if(act==='backup') baixarBackup();
   if(act==='clear-ex'){ state.sessions=state.sessions.filter(x=>!x.example); save(); render(); toast('Exemplos removidos'); }
   if(act==='copy-md' || act==='copy-bugs'){ const rs=state.sessions.find(x=>x.id===viewArg); copy(toMarkdown(rs,act==='copy-bugs'), act==='copy-md'?'Relatório copiado':'Bugs copiados', $('#md-out')); }
   if(act==='del-session'){ $('#del-wrap').innerHTML='<span class="hint" style="margin-right:auto;align-self:center">Excluir de vez?</span><button class="btn" data-act="del-no">Cancelar</button><button class="btn danger" data-act="del-yes">Excluir</button>'; }
@@ -786,7 +846,7 @@ document.addEventListener('submit',e=>{
   e.preventDefault();
   const d=readDraft();
   if(!d.explorar || !d.descobrir){ $('#form-err').textContent='Preencha pelo menos o que explorar e o que descobrir.'; (d.explorar?$('#c-des'):$('#c-exp')).focus(); return; }
-  const s={id:uid(),area:d.area||d.explorar,charter:{explorar:d.explorar,com:d.com||'o que estiver à mão',descobrir:d.descobrir},ambiente:d.ambiente,testadora:d.testadora,plannedMin:d.plannedMin,status:'running',startedAt:Date.now(),runStartedAt:Date.now(),elapsedMs:0,notes:[]};
+  const s={id:uid(),area:d.area||d.explorar,charter:{explorar:d.explorar,com:d.com||'o que estiver à mão',descobrir:d.descobrir},ambiente:d.ambiente,testadora:d.testadora,plannedMin:d.plannedMin,navegador:navegadorAtual(),status:'running',startedAt:Date.now(),runStartedAt:Date.now(),elapsedMs:0,notes:[]};
   state.sessions.push(s); state.activeId=s.id; state.draft=null; noteType='bug'; filter='all';
   save(); go('active'); setTimeout(()=>$('#note-in')?.focus(),50);
 });
@@ -820,7 +880,10 @@ document.addEventListener('paste',e=>{
   const items=[...(e.clipboardData?.items||[])].filter(i=>i.type.startsWith('image/'));
   if(items.length){ e.preventDefault(); items.forEach(i=>addImageFile(i.getAsFile())); toast('Print anexado à nota'); }
 });
-document.addEventListener('change',e=>{ if(e.target.id==='file-in'){ [...e.target.files].forEach(addImageFile); e.target.value=''; } });
+document.addEventListener('change',e=>{
+  if(e.target.id==='file-in'){ [...e.target.files].forEach(addImageFile); e.target.value=''; }
+  if(e.target.id==='backup-in'){ const f=e.target.files[0]; e.target.value=''; if(f) f.text().then(importarBackup).catch(()=>toast('Não foi possível ler o arquivo.')); }
+});
 
 function afterRender(){}
 // Tema: segue o sistema até a pessoa escolher; a escolha fica salva neste navegador.

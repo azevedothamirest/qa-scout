@@ -81,7 +81,8 @@ test.describe('Captura automática', () => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('link', { name: 'Ir para o passo 2' }).click();
-    await expect(painel.locator('.note', { hasText: 'Abriu a página “Loja fictícia · Checkout”' })).toBeVisible();
+    // Uma nota ao abrir a loja e outra ao navegar para o passo 2 (o título é o mesmo).
+    await expect(painel.locator('.note', { hasText: 'Abriu a página “Loja fictícia · Checkout”' })).toHaveCount(2);
     await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
     await expect(painel.locator('.note', { hasText: 'Pagar com Pix' })).toBeVisible();
   });
@@ -197,5 +198,28 @@ test.describe('Passos para reproduzir', () => {
     await painel.getByRole('button', { name: 'Encerrar' }).click();
     await painel.getByRole('button', { name: 'Sim, encerrar' }).click();
     await expect(painel.locator('#md-out')).toHaveValue(/Pix não responde no primeiro clique\n  Passos para reproduzir:\n  1\. Abriu a página/);
+  });
+});
+
+test.describe('Copiar bug', () => {
+  test('Levar passos e erros do mesmo minuto para o bug copiado', async ({ context, painel }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
+    await loja.getByRole('button', { name: 'Aplicar cupom' }).click();
+    await painel.bringToFront();
+    await painel.locator('.note', { hasText: 'Clicou no botão “Pagar com Pix”' }).getByRole('button', { name: 'Editar' }).click();
+    await painel.getByLabel('Texto da nota').fill('Pix não responde no primeiro clique');
+    await painel.getByRole('group', { name: 'Tipo da nota editada' }).getByRole('button', { name: 'Bug' }).click();
+    await painel.getByRole('button', { name: 'Incluir passos para reproduzir' }).click();
+    await painel.getByRole('button', { name: 'Salvar e confirmar' }).click();
+    await painel.locator('.note', { hasText: 'Pix não responde' }).getByRole('button', { name: 'Copiar bug' }).click();
+    const md = await painel.evaluate(() => navigator.clipboard.readText());
+    expect(md).toMatch(/^## Pix não responde no primeiro clique/);
+    expect(md).toContain('### Passos para reproduzir\n1. Abriu a página “Loja fictícia · Checkout”\n2. Clicou no botão “Pagar com Pix”');
+    expect(md).toContain('### Resultado obtido\nPix não responde no primeiro clique\n');
+    expect(md).toContain('| Página | http://localhost:4173/tests/fixtures/loja.html |');
+    expect(md).toMatch(/### Erros de console e rede no mesmo minuto\n- `\d\d:\d\d` Erro de JavaScript: TypeError: cupom.valor is undefined/);
   });
 });

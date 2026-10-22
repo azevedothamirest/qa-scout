@@ -1,6 +1,6 @@
 {
   "name": "qa-scout",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Companheiro de teste exploratório baseado em sessões",
   "bin": {
