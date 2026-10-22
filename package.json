@@ -1,6 +1,6 @@
 {
   "name": "qa-scout",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "description": "Companheiro de teste exploratório baseado em sessões",
   "bin": {
@@ -10,7 +10,8 @@
     "start": "http-server . -p 4173 -c-1",
     "navegador": "node bin/qa-scout.js",
     "test": "playwright test",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "pacote": "node bin/empacotar.js"
   },
   "author": "Thamires Azevedo",
   "license": "MIT",

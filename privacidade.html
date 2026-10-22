@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacidade · QA Scout</title>
+<meta name="description" content="Política de privacidade do QA Scout: o que a extensão registra, onde os dados ficam e o que nunca sai do seu computador.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{--paper:#EBF0EC;--surface:#FFFFFF;--ink:#12201D;--muted:#5A6B66;--line:#D3DCD7;--accent:#1E6A56;--marker:#C97F12;
+  --f-display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;--f-body:"Instrument Sans",ui-sans-serif,system-ui,sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,monospace}
+@media (prefers-color-scheme:dark){:root{--paper:#0D1412;--surface:#141E1B;--ink:#E5EDE9;--muted:#93A59F;--line:#283833;--accent:#5BC3A0;--marker:#F0AE48;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+main{max-width:760px;margin:0 auto;padding:40px 20px 72px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:19px;color:var(--ink);text-decoration:none;margin-bottom:36px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+h1{font-family:var(--f-display);font-size:clamp(32px,6vw,44px);line-height:1.05;letter-spacing:-.03em;margin:10px 0 14px}
+h1 em{font-style:normal;color:var(--accent)}
+h2{font-family:var(--f-display);font-size:21px;margin:36px 0 8px;letter-spacing:-.01em}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px 24px;margin-top:24px}
+.card p{margin:0}
+ul{padding-left:20px}li{margin:6px 0}
+code{font-family:var(--f-mono);font-size:.88em;background:color-mix(in srgb,var(--accent) 12%,transparent);padding:1px 6px;border-radius:6px}
+a{color:var(--accent)}
+.lead{color:var(--muted);font-size:17px;margin:0}
+footer{margin-top:48px;color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="./"><svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12.5" fill="none" stroke="var(--accent)" stroke-width="2"/><circle cx="14" cy="14" r="7.5" fill="none" stroke="var(--accent)" stroke-width="1.2" opacity=".5"/><path d="M14 4.5 L17 14 L14 23.5 L11 14 Z" fill="var(--accent)"/><path d="M14 14 L17 14 L14 23.5 Z" fill="var(--marker)"/></svg>QA Scout</a>
+  <div class="eyebrow">Política de privacidade · atualizada em 22 de outubro de 2026</div>
+  <h1>Seus dados ficam <em>no seu computador.</em></h1>
+  <p class="lead">O QA Scout não tem servidor, conta nem envio de dados. Esta página explica o que a extensão registra, onde guarda e o que nunca faz.</p>
+
+  <div class="card"><p><b>Resumo:</b> nada do que o QA Scout registra sai do seu navegador. Não coletamos, vendemos nem compartilhamos dados com ninguém, e não usamos ferramentas de análise ou anúncios.</p></div>
+
+  <h2>O que a extensão registra</h2>
+  <p>Só durante uma sessão de teste em andamento e só nas abas que você escolhe acompanhar (no navegador de teste aberto pelo comando <code>qa-scout</code>, todas as abas daquele navegador separado):</p>
+  <ul>
+    <li><b>Cliques</b>: o tipo e o nome do elemento clicado (por exemplo, “botão Pagar com Pix”), com um print da aba visível.</li>
+    <li><b>Campos preenchidos</b>: só o rótulo do campo. <b>O valor digitado nunca é lido nem guardado.</b> Em campos de senha, a nota diz apenas “Preencheu um campo de senha”.</li>
+    <li><b>Páginas abertas</b>: título e endereço.</li>
+    <li><b>Erros de JavaScript, <code>console.error</code> e falhas de rede</b>: a mensagem de erro, o método, o caminho da requisição e o código de resposta. O conteúdo das requisições e respostas não é lido.</li>
+    <li><b>Atalho <code>Alt+Shift+M</code></b>: um print da aba visível no momento.</li>
+  </ul>
+  <p>Com a sessão pausada ou encerrada, nada é registrado.</p>
+
+  <h2>Onde os dados ficam</h2>
+  <p>Sessões, notas e prints ficam no armazenamento local do navegador (<code>chrome.storage.local</code> na extensão, <code>localStorage</code> na versão web). Nada é enviado para servidores do QA Scout ou de terceiros. Os dados só saem do seu computador quando <b>você</b> copia um relatório, copia um bug ou baixa um backup.</p>
+
+  <h2>Atenção aos prints</h2>
+  <p>Os prints mostram o que está na tela no momento do clique. Se você explorar um sistema com dados reais de clientes, eles podem aparecer nas imagens. Prefira ambientes de teste com dados fictícios e revise os prints antes de compartilhar um relatório.</p>
+
+  <h2>Por que a extensão pede cada permissão</h2>
+  <ul>
+    <li><b>Acesso aos sites (<code>&lt;all_urls&gt;</code>)</b>: o sistema em teste pode estar em qualquer endereço. A captura só roda nas abas acompanhadas e com a sessão em andamento.</li>
+    <li><b><code>tabs</code> e <code>scripting</code></b>: saber qual aba você marcou, tirar o print dela e registrar cliques e campos.</li>
+    <li><b><code>webRequest</code></b>: perceber respostas com erro (4xx e 5xx) e falhas de conexão nas abas acompanhadas. Só leitura; nenhuma requisição é bloqueada ou alterada.</li>
+    <li><b><code>storage</code> e <code>unlimitedStorage</code></b>: guardar as sessões e os prints no seu computador.</li>
+    <li><b><code>sidePanel</code></b>: abrir o QA Scout no painel lateral do Chrome.</li>
+  </ul>
+
+  <h2>Como apagar tudo</h2>
+  <p>Desinstale a extensão ou limpe os dados dela em <code>chrome://extensions</code>. No navegador de teste, apague a pasta <code>~/.qa-scout/perfil</code>. Na versão web, limpe os dados do site no navegador.</p>
+
+  <h2>Código aberto</h2>
+  <p>O código do QA Scout é aberto (licença MIT): dá para conferir tudo o que ele faz. Dúvidas sobre privacidade podem ser enviadas pelo link “Dar feedback” no rodapé do app.</p>
+
+  <h2>Mudanças nesta política</h2>
+  <p>Se o QA Scout passar a enviar qualquer dado para fora do seu computador (por exemplo, numa futura sincronização opcional), esta página será atualizada antes, e a funcionalidade só será ativada com o seu consentimento.</p>
+
+  <footer>QA Scout · feito por Thamires Azevedo, QA Sênior.</footer>
+</main>
+</body>
+</html>

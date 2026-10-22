@@ -88,7 +88,7 @@ function ex2(){
 
 /* ---------- armazenamento ---------- */
 const KEY = 'qascout.v1';
-// No navegador de teste (painel carregado pela extensão interna), o estado vai para chrome.storage.local (sem o limite de ~5 MB do localStorage,
+// Dentro da extensão, o estado vai para chrome.storage.local (sem o limite de ~5 MB do localStorage,
 // que estouraria com os prints automáticos).
 const EXT = (()=>{ try{ return !!(window.chrome && chrome.runtime && chrome.runtime.id && chrome.storage); }catch(e){ return false; } })();
 const EV_PREFIX = 'qascout.ev.';
@@ -355,16 +355,35 @@ function noteHtml(n){
     <div style="min-width:0"><div class="kind"><i></i>${TYPES[n.type].label} ${tag}</div>${corpo}</div></article>`;
 }
 
-/* ---------- captura automática (só no navegador de teste) ---------- */
+/* ---------- captura automática (só na extensão) ---------- */
+let abasInfo = [], modoNavegador = false;
 function capturaHtml(s){
-  return `<div class="eyebrow">Captura automática · navegador de teste</div>
-    <p class="hint" style="margin:6px 0 0">${s.status==='running'?'Todas as abas deste navegador são acompanhadas: cliques, campos preenchidos, páginas abertas, erros de JavaScript e falhas de rede viram notas a revisar.':'Sessão pausada: nada está sendo registrado.'} O que você digita nunca é guardado.</p>
-    <p class="hint" style="margin:6px 0 0"><kbd>Alt+Shift+M</kbd> no sistema em teste marca o momento com print.</p>`;
+  const extras = `<p class="hint" style="margin:6px 0 0"><kbd>Alt+Shift+M</kbd> no sistema em teste marca o momento com print.</p>`;
+  if(modoNavegador) return `<div class="eyebrow">Captura automática · navegador de teste</div>
+    <p class="hint" style="margin:6px 0 0">${s.status==='running'?'Todas as abas deste navegador são acompanhadas: cliques, campos preenchidos, páginas abertas, erros de JavaScript e falhas de rede viram notas a revisar.':'Sessão pausada: nada está sendo registrado.'} O que você digita nunca é guardado.</p>${extras}`;
+  return `<div class="eyebrow">Captura automática</div>
+    <p class="hint" style="margin:6px 0 0">${s.status==='running'?'Cliques, campos preenchidos, páginas abertas, erros de JavaScript e falhas de rede nas abas abaixo viram notas a revisar.':'Sessão pausada: nada está sendo registrado.'} O que você digita nunca é guardado.</p>
+    <div class="abas">${abasInfo.length?abasInfo.map(a=>`<div class="aba"><i></i><span title="${esc(a.url)}">${esc(a.title||a.url)}</span><button class="link-btn" data-parar="${a.id}">Parar</button></div>`).join(''):'<p class="hint" style="margin:0">Nenhuma aba acompanhada ainda.</p>'}</div>
+    <button class="btn" data-act="acompanhar">Acompanhar a aba atual</button>${extras}`;
+}
+async function atualizaAbas(){
+  if(!EXT) return;
+  const { abas = [] } = await chrome.storage.session.get('abas');
+  abasInfo = (await Promise.all(abas.map(id=>chrome.tabs.get(id).catch(()=>null)))).filter(Boolean);
+  const c=$('#captura'), s=getActive(); if(c&&s) c.innerHTML=capturaHtml(s);
 }
 function syncCaptura(){
   if(!EXT) return;
   const s=getActive();
   chrome.runtime.sendMessage({cmd:'capturando', valor: !!(s && s.status==='running')}).catch(()=>{});
+}
+async function acompanharAbaAtual(){
+  const [tab] = await chrome.tabs.query({active:true, lastFocusedWindow:true});
+  if(!tab || !/^https?:|^file:/.test(tab.url||'')){ toast('Abra a página do sistema em teste e clique de novo.'); return; }
+  const r = await chrome.runtime.sendMessage({cmd:'acompanhar', tabId:tab.id}).catch(()=>null);
+  if(!r || !r.ok){ toast('O navegador não deixa acompanhar essa aba.'); return; }
+  toast('Aba acompanhada. Pode explorar.');
+  atualizaAbas();
 }
 // Desenha um anel no ponto clicado e reduz o print para o mesmo tamanho dos prints colados.
 function anotaPrint(ev){
@@ -804,9 +823,11 @@ document.addEventListener('click',e=>{
     n.text=text; n.type=tipo; n.pending=false; editId=null; save(); atualizaNotas(s);
     toast(`${TYPES[tipo].label} ${FEM[tipo]?'salva':'salvo'}`); return;
   }
+  if(t.dataset.parar){ chrome.runtime.sendMessage({cmd:'parar', tabId:+t.dataset.parar}).then(atualizaAbas); return; }
   const act=t.dataset.act; if(!act) return;
   const s=getActive();
   if(act==='add-note') addNote();
+  if(act==='acompanhar') acompanharAbaAtual();
   if(act==='puxar'){ puxarCarta(); mostraCarta(); }
   if(act==='exemplo-charter'){
     const ex=EXEMPLOS_CHARTER[Math.floor(Math.random()*EXEMPLOS_CHARTER.length)];
@@ -924,14 +945,15 @@ abertura();
 
 async function init(){
   if(EXT){
-    try{ const r=await chrome.storage.local.get(KEY); if(r[KEY]) state=r[KEY]; }catch(e){}
+    try{ const r=await chrome.storage.local.get([KEY,'qascout.modo']); if(r[KEY]) state=r[KEY]; modoNavegador = r['qascout.modo']==='navegador'; }catch(e){}
     chrome.storage.onChanged.addListener((mud,area)=>{
       if(area==='local' && Object.keys(mud).some(k=>k.startsWith(EV_PREFIX) && mud[k].newValue)) drenar();
+      if(area==='session' && mud.abas) atualizaAbas();
     });
   }
   if(getActive()) view='active';
   render();
-  if(EXT) drenar();
+  if(EXT){ atualizaAbas(); drenar(); }
 }
 init();
 })();

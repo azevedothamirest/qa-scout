@@ -27,9 +27,10 @@ Este tutorial leva uns 10 minutos. Ao final, você terá feito uma sessão compl
 | Jeito | Para quem | Captura automática |
 |---|---|---|
 | **Navegador de teste** (recomendado) | Quem tem Node instalado e quer o registro automático | Sim, em todas as abas desse navegador |
+| **Extensão do Chrome** | Quem prefere usar o próprio Chrome, sem terminal | Sim, só nas abas que você marcar com **Acompanhar a aba atual** |
 | **Versão web** · [azevedothamirest.github.io/qa-scout](https://azevedothamirest.github.io/qa-scout/) | Quem só quer experimentar, ou não pode instalar nada | Não. As notas e os prints são manuais |
 
-Este tutorial segue o **navegador de teste**. As seções 3 e 6 valem para os dois jeitos; a 4 e a 5 (captura automática) são só do navegador de teste.
+Este tutorial segue o **navegador de teste**. As seções 3 e 6 valem para todos os jeitos; a 4 e a 5 (captura automática) valem para o navegador de teste e para a extensão. Na extensão, a diferença é que você abre o QA Scout pelo ícone na barra do Chrome e, depois de iniciar a sessão, clica em **Acompanhar a aba atual** na página do sistema em teste.
 
 ## 2. Instale e abra o navegador de teste
 
@@ -161,7 +162,7 @@ Você precisa de uma conta no GitHub para abrir uma issue. O link **Dar feedback
 O Node não está instalado ou não está no PATH. Instale pelo [nodejs.org](https://nodejs.org) e abra um terminal novo.
 
 **O download do Chromium falhou.**
-Pode ser proxy ou firewall da empresa. Rode `npx playwright install chromium` e tente de novo. Se não der, use a versão web.
+Pode ser proxy ou firewall da empresa. Rode `npx playwright install chromium` e tente de novo. Se não der, use a extensão do Chrome ou a versão web.
 
 **Cliquei no sistema e nenhuma nota apareceu.**
 Confira se a sessão está rodando (não pausada) e se o card do painel mostra "Captura automática · navegador de teste". Páginas internas do navegador, como `chrome://`, não são acompanhadas. Cliques dentro de iframes de outros domínios também não.
@@ -175,7 +176,7 @@ Feche o navegador de teste e rode o comando de novo. A sessão em andamento cont
 ## Perguntas frequentes
 
 **Meus dados vão para algum servidor?**
-Não. O QA Scout não tem servidor nem conta. Sessões, notas e prints ficam só no seu computador: no perfil do navegador de teste ou no `localStorage` da versão web.
+Não. O QA Scout não tem servidor nem conta. Sessões, notas e prints ficam só no seu computador: no perfil do navegador de teste, no armazenamento da extensão ou no `localStorage` da versão web. Veja a [política de privacidade](https://azevedothamirest.github.io/qa-scout/privacidade.html).
 
 **Ele grava o que eu digito?**
 Não. O QA Scout registra *que* você preencheu um campo e qual é o rótulo dele, nunca o valor. Os prints, porém, mostram o que está na tela no momento do clique: evite explorar com dados reais de clientes.

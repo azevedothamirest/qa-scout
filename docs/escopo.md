@@ -41,7 +41,14 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 
 - [x] Backup das sessões em JSON (baixar e importar pelo histórico, ignorando repetidas)
 - [x] Copiar bug no formato de ticket: ambiente, navegador, página, passos, obtido x esperado e erros do mesmo minuto
-- [x] Suíte com 60 testes em três perfis: desktop, celular e navegador de teste
+- [x] Suíte com 60 testes
+
+## Versão 0.5 (Chrome Web Store)
+
+- [x] Extensão do Chrome de volta, com painel lateral e "Acompanhar a aba atual", somando as novidades da 0.3 e 0.4
+- [x] Ícones, pacote para a loja (`npm run pacote`), política de privacidade e textos da ficha (`docs/chrome-web-store.md`)
+- [ ] Publicar na Chrome Web Store
+- [ ] Domínio próprio para o site em três perfis: desktop, celular e navegador de teste
 
 ## Fora do MVP (próximas versões)
 
@@ -56,6 +63,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - Repositório público para hospedar de graça no GitHub Pages (diferente de QA Pulse e QA Sidekick, que são privados).
 - Licença MIT.
 - Captura automática só no navegador de teste (Chromium do Playwright com extensão interna). A extensão do Chrome avulsa foi retirada em outubro de 2026 para simplificar instalação e suporte no beta.
+- A extensão voltou na 0.5 para ser publicada na Chrome Web Store, que é onde QAs procuram ferramentas. O navegador de teste continua como opção. Monetização futura: grátis o que roda no computador; pago só o que exigir servidor (sincronização, integração direta com Jira/Azure, IA, times).
 - Nome: QA Scout.
 
 ## Plano de validação
