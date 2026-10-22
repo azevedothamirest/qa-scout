@@ -1,16 +1,26 @@
 // @ts-check
 const { test: base, expect, chromium } = require('@playwright/test');
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { prepararExtensao } = require('../bin/qa-scout');
 
 const RAIZ = path.join(__dirname, '..');
 const LOJA = 'http://localhost:4173/tests/fixtures/loja.html';
 
 // Cada teste ganha um Chromium com a extensão carregada e o painel aberto numa aba.
+// O acesso aos sites é opcional no manifesto e pedido no primeiro "Acompanhar"; aqui a extensão é a
+// cópia do navegador de teste, em que o acesso já vem concedido. O pedido em si é testado à parte.
 const test = base.extend({
-  context: async ({}, use) => {
+  pasta: async ({}, use) => {
+    const pasta = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-ext-'));
+    await use(prepararExtensao(pasta));
+    fs.rmSync(pasta, { recursive: true, force: true });
+  },
+  context: async ({ pasta }, use) => {
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
-      args: [`--disable-extensions-except=${RAIZ}`, `--load-extension=${RAIZ}`],
+      args: [`--disable-extensions-except=${pasta}`, `--load-extension=${pasta}`],
     });
     await use(context);
     await context.close();
@@ -242,5 +252,36 @@ test.describe('Copiar bug', () => {
     expect(md).toContain('### Resultado obtido\nPix não responde no primeiro clique\n');
     expect(md).toContain('| Página | http://localhost:4173/tests/fixtures/loja.html |');
     expect(md).toMatch(/### Erros de console e rede no mesmo minuto\n- `\d\d:\d\d` Erro de JavaScript: TypeError: cupom.valor is undefined/);
+  });
+});
+
+test.describe('Acesso aos sites', () => {
+  // Extensão como vai para a Chrome Web Store: sem acesso aos sites até a pessoa conceder.
+  const testLoja = base.extend({
+    context: async ({}, use) => {
+      const context = await chromium.launchPersistentContext('', {
+        channel: 'chromium',
+        args: [`--disable-extensions-except=${RAIZ}`, `--load-extension=${RAIZ}`],
+      });
+      await use(context);
+      await context.close();
+    },
+  });
+
+  testLoja('Pedir acesso aos sites ao acompanhar e explicar quando a pessoa recusa', async ({ context }) => {
+    let [sw] = context.serviceWorkers();
+    if (!sw) sw = await context.waitForEvent('serviceworker');
+    expect(await sw.evaluate(() => chrome.permissions.contains({ origins: ['<all_urls>'] }))).toBe(false);
+    const painel = await context.newPage();
+    await painel.goto(`chrome-extension://${new URL(sw.url()).host}/index.html`);
+    await iniciarSessao(painel);
+    await painel.evaluate(() => {
+      window.pedidos = [];
+      chrome.permissions.request = async p => { window.pedidos.push(p); return false; };
+    });
+    await painel.getByRole('button', { name: 'Acompanhar a aba atual' }).click();
+    await expect(painel.locator('#toast')).toHaveText('Sem acesso aos sites, o QA Scout não consegue registrar cliques e prints dessa aba.');
+    expect(await painel.evaluate(() => window.pedidos)).toEqual([{ origins: ['<all_urls>'] }]);
+    await expect(painel.locator('.captura .aba')).toHaveCount(0);
   });
 });

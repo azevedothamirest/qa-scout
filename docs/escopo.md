@@ -47,7 +47,12 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 
 - [x] Extensão do Chrome de volta, com painel lateral e "Acompanhar a aba atual", somando as novidades da 0.3 e 0.4
 - [x] Ícones, pacote para a loja (`npm run pacote`), política de privacidade e textos da ficha (`docs/chrome-web-store.md`)
-- [ ] Publicar na Chrome Web Store
+- [x] Enviada para análise na Chrome Web Store
+
+## Versão 0.6
+
+- [x] Acesso aos sites opcional: pedido no primeiro "Acompanhar a aba atual", não na instalação (o print exige acesso a todos os sites, então não dá para pedir site a site)
+- [x] Navegador de teste com id fixo da extensão e recuperação das sessões guardadas sob o id antigo (até a 0.5, trocar o comando para `#main` escondia as sessões)
 - [ ] Domínio próprio para o site em três perfis: desktop, celular e navegador de teste
 
 ## Fora do MVP (próximas versões)

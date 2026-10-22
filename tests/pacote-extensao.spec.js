@@ -29,6 +29,11 @@ test.describe('Pacote da Chrome Web Store', () => {
 
     expect(nomes).toEqual(expect.arrayContaining(['manifest.json', 'index.html', 'app.js', 'extensao/background.js', 'extensao/content.js', 'extensao/pagina.js']));
     for (const icone of Object.values(manifesto.icons)) expect(nomes).toContain(icone);
+    // Na loja, o acesso aos sites é opcional (pedido no primeiro uso) e o id vem da própria loja.
+    expect(manifesto.host_permissions).toBeUndefined();
+    expect(manifesto.content_scripts).toBeUndefined();
+    expect(manifesto.optional_host_permissions).toEqual(['<all_urls>']);
+    expect(manifesto.key).toBeUndefined();
     expect(nomes.filter(n => /^(tests|docs|bin|node_modules)\//.test(n) || n === 'package.json')).toEqual([]);
   });
 });

@@ -39,7 +39,7 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 O QA Scout roda no painel lateral do Chrome, ao lado do sistema em teste:
 
 1. Instale a extensão e clique no ícone do QA Scout para abrir o painel.
-2. Comece a sessão e, na página do sistema em teste, clique em **Acompanhar a aba atual**. Abas abertas a partir dela entram junto.
+2. Comece a sessão e, na página do sistema em teste, clique em **Acompanhar a aba atual**. Na primeira vez, o Chrome pede acesso aos sites: o print da aba precisa dele, e nada é pedido na instalação. Abas abertas a partir dela entram junto.
 3. Explore: cliques, campos, páginas, erros e falhas de rede dessas abas viram notas a revisar. As outras abas não são registradas.
 
 Enquanto a extensão não sai na Chrome Web Store, dá para instalar em modo desenvolvedor: rode `npm run pacote`, descompacte o `.zip` de `dist/` (ou use a pasta do projeto), abra `chrome://extensions`, ligue o **Modo do desenvolvedor** e clique em **Carregar sem compactação**. O passo a passo da publicação está em [`docs/chrome-web-store.md`](docs/chrome-web-store.md).

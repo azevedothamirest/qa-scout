@@ -11,7 +11,7 @@ Tudo o que o painel de desenvolvedor da Chrome Web Store pede, pronto para copia
    ```
 3. No painel, clique em **Novo item** e envie o `.zip`.
 4. Preencha as abas com os textos abaixo e envie as imagens de `docs/loja/`.
-5. Envie para revisão. Por causa do acesso a todos os sites e da captura de tela, a revisão costuma levar alguns dias.
+5. Envie para revisão. Desde a 0.6 o acesso aos sites é opcional (pedido no primeiro uso), o que reduz o aviso de "Permissões amplas do host"; mesmo assim a revisão pode levar alguns dias.
 
 Para cada nova versão: suba o `version` no `manifest.json` e no `package.json`, rode `npm run pacote` e envie o novo `.zip` em **Pacote → Enviar novo pacote**.
 
@@ -76,8 +76,7 @@ Para cada nova versão: suba o `version` no `manifest.json` e no `package.json`,
 | `tabs` | Saber qual aba a pessoa marcou para acompanhar, mostrar o título dela no painel e tirar o print da aba visível (`captureVisibleTab`). |
 | `scripting` | Injetar, só nas abas acompanhadas, o script que descreve cliques e campos preenchidos (sem ler valores). |
 | `webRequest` | Perceber respostas com erro (4xx/5xx) e falhas de conexão nas abas acompanhadas e registrá-las como notas. Só leitura; nada é bloqueado ou alterado. |
-| Acesso aos hosts (`<all_urls>`) | O sistema em teste pode estar em qualquer endereço (produção, homologação, localhost). A captura só acontece nas abas marcadas e com a sessão em andamento. |
-| Content script em todas as páginas (`extensao/pagina.js`) | Precisa rodar desde o início do carregamento para perceber erros de JavaScript e `console.error`. Só repassa um resumo do erro quando a aba está sendo acompanhada; fora disso não envia nada. |
+| Acesso aos hosts (`<all_urls>`, **opcional**) | Não é pedido na instalação: o Chrome pergunta na primeira vez que a pessoa clica em "Acompanhar a aba atual". O sistema em teste pode estar em qualquer endereço (produção, homologação, localhost) e o `captureVisibleTab` exige `<all_urls>` ou `activeTab`; o `activeTab` não serve porque a captura acompanha a sessão inteira, não um único clique no ícone. Com o acesso concedido, a extensão registra um script (`extensao/pagina.js`) que roda desde o início de cada página para perceber erros de JavaScript, mas só repassa algo quando a aba está sendo acompanhada. |
 
 **Código remoto:** Não. Todo o JavaScript está no pacote. (As fontes do Google Fonts são só CSS e arquivos de fonte.)
 

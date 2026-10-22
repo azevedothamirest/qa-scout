@@ -378,6 +378,9 @@ function syncCaptura(){
   chrome.runtime.sendMessage({cmd:'capturando', valor: !!(s && s.status==='running')}).catch(()=>{});
 }
 async function acompanharAbaAtual(){
+  // O pedido precisa sair direto do clique, antes de qualquer outra espera.
+  const acesso = await chrome.permissions.request({origins:['<all_urls>']}).catch(()=>false);
+  if(!acesso){ toast('Sem acesso aos sites, o QA Scout não consegue registrar cliques e prints dessa aba.'); return; }
   const [tab] = await chrome.tabs.query({active:true, lastFocusedWindow:true});
   if(!tab || !/^https?:|^file:/.test(tab.url||'')){ toast('Abra a página do sistema em teste e clique de novo.'); return; }
   const r = await chrome.runtime.sendMessage({cmd:'acompanhar', tabId:tab.id}).catch(()=>null);
