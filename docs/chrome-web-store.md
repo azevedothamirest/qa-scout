@@ -4,7 +4,7 @@ Tudo o que o painel de desenvolvedor da Chrome Web Store pede, pronto para copia
 
 ## Passo a passo
 
-1. Crie a conta de desenvolvedor em https://chrome.google.com/webstore/devconsole (taxa única de US$ 5).
+1. Crie a conta de desenvolvedor em https://chrome.google.com/webstore/devconsole (taxa única de US$ 5). Em **Configurações**: nome do editor "Thamires Azevedo", e-mail de contato `contato.qascout@gmail.com` (público, confirmado pelo link do Google) e declaração **não negociante** enquanto a extensão for grátis.
 2. Gere o pacote:
    ```bash
    npm run pacote   # gera dist/qa-scout-extensao-<versão>.zip
