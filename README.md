@@ -34,9 +34,19 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - **Tema claro e escuro**, com botão para alternar.
 - **Histórico com busca** por área, charter ou conteúdo das notas.
 
+## Extensão do Chrome
+
+O QA Scout roda no painel lateral do Chrome, ao lado do sistema em teste:
+
+1. Instale a extensão e clique no ícone do QA Scout para abrir o painel.
+2. Comece a sessão e, na página do sistema em teste, clique em **Acompanhar a aba atual**. Abas abertas a partir dela entram junto.
+3. Explore: cliques, campos, páginas, erros e falhas de rede dessas abas viram notas a revisar. As outras abas não são registradas.
+
+Enquanto a extensão não sai na Chrome Web Store, dá para instalar em modo desenvolvedor: rode `npm run pacote`, descompacte o `.zip` de `dist/` (ou use a pasta do projeto), abra `chrome://extensions`, ligue o **Modo do desenvolvedor** e clique em **Carregar sem compactação**. O passo a passo da publicação está em [`docs/chrome-web-store.md`](docs/chrome-web-store.md).
+
 ## Navegador de teste: um comando e pronto
 
-Sem instalar extensão nem passar pela Chrome Web Store. Com o Node instalado:
+Sem instalar nada no seu Chrome. Com o Node instalado:
 
 ```bash
 npx github:azevedothamirest/qa-scout https://endereco-do-sistema-em-teste
@@ -48,6 +58,8 @@ Abre um navegador de teste separado, com o painel do QA Scout numa janela à esq
 
 ## Privacidade
 
+Política completa: [`privacidade.html`](privacidade.html).
+
 Tudo fica salvo no navegador de quem usa: `localStorage` na versão web e o armazenamento local do navegador de teste. Não há servidor, conta ou envio de dados.
 
 ## Rodando localmente
@@ -57,7 +69,7 @@ npm install
 npm start          # http://localhost:4173
 ```
 
-O app é `index.html` (HTML e CSS) e `app.js` (JavaScript puro), sem framework e sem build. A captura do navegador de teste fica em `extensao/`, carregada pelo comando `qa-scout`.
+O app é `index.html` (HTML e CSS) e `app.js` (JavaScript puro), sem framework e sem build. A captura fica em `extensao/`: é a extensão do Chrome (`manifest.json` na raiz) e também o que o comando `qa-scout` carrega no navegador de teste. `npm run pacote` gera o `.zip` para a Chrome Web Store.
 
 ## Testes
 

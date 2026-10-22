@@ -32,16 +32,37 @@ async function iniciarSessao(painel) {
   await painel.getByRole('button', { name: 'Iniciar sessão' }).click();
 }
 
-// Toda aba de site é acompanhada: basta abrir a loja depois de iniciar a sessão.
-// A abertura da loja já gera uma nota automática "Abriu a página".
+// Na extensão, a testadora clica em "Acompanhar a aba atual" com a loja em primeiro plano.
+// Aqui o painel é uma aba, então o comando vai direto para o service worker com o id da loja.
+// Depois a loja é recarregada, o que gera a nota automática "Abriu a página".
 async function acompanharLoja(context, painel) {
   const loja = await context.newPage();
   await loja.goto(LOJA);
+  const r = await painel.evaluate(async url => {
+    const [tab] = await chrome.tabs.query({ url });
+    return chrome.runtime.sendMessage({ cmd: 'acompanhar', tabId: tab.id });
+  }, LOJA);
+  expect(r.ok).toBe(true);
+  await loja.reload();
   await loja.bringToFront();
   return loja;
 }
 
 test.describe('Captura automática', () => {
+  test('Mostrar as abas acompanhadas e ignorar as que não foram marcadas', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const outra = await context.newPage();
+    await outra.goto(LOJA + '?aba=outra');
+    await outra.getByRole('button', { name: 'Pagar com Pix' }).click();
+    const loja = await acompanharLoja(context, painel);
+    await painel.bringToFront();
+    await expect(painel.locator('.captura .aba')).toHaveCount(1);
+    await expect(painel.getByRole('button', { name: 'Acompanhar a aba atual' })).toBeVisible();
+    await expect(painel.locator('.note', { hasText: 'Pagar com Pix' })).toHaveCount(0);
+    await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
+    await expect(painel.locator('.note', { hasText: 'Pagar com Pix' })).toHaveCount(1);
+  });
+
   test('Registrar clique como observação a revisar com print marcado', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);

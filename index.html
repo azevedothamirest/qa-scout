@@ -200,6 +200,11 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 .captura kbd{font-family:var(--f-mono);font-size:11.5px;color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:0 5px;background:var(--surface-2)}
 .edit-box .edit-foot{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 .edit-box .edit-foot [data-passos]{margin-right:auto}
+.captura .abas{display:grid;gap:6px;margin:10px 0}
+.captura .aba{display:flex;align-items:center;gap:8px;font-size:13.5px;padding:7px 10px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--surface-2)}
+.captura .aba span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.captura .aba i{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+.captura.pausada .aba i{background:var(--muted)}
 .revisar{border:1px solid var(--marker);background:var(--marker-soft);border-radius:var(--r-sm);padding:12px 14px;margin:0 0 18px}
 .revisar h3{font-size:15px;margin:0 0 4px}
 /* abertura: logo girando como moeda e o site revelado por um círculo que se abre */
@@ -268,6 +273,7 @@ body.com-abertura{overflow:hidden}
 .leituras span{color:var(--muted);font-size:13.5px}
 .ajuda{border:0;background:transparent;color:var(--accent);font-weight:600;font-size:13px;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
 @media (max-width:480px){.tabs .tab{white-space:nowrap;padding-left:9px;padding-right:9px;font-size:13px}}
+@media (max-width:380px){.tabs{gap:2px}.tabs .tab{padding-left:7px;padding-right:7px;font-size:12.5px;gap:5px}}
 .rodape{display:flex;flex-wrap:wrap;gap:6px 18px;justify-content:center;padding:28px 16px 36px;font-size:13.5px;color:var(--muted)}
 .rodape a{color:var(--accent);font-weight:600;text-decoration:none}
 .rodape a:hover{text-decoration:underline}
@@ -405,6 +411,7 @@ body.com-abertura{overflow:hidden}
   <span>QA Scout está em beta aberto.</span>
   <a href="https://github.com/azevedothamirest/qa-scout/blob/main/docs/tutorial.md" target="_blank" rel="noopener">Como usar ↗</a>
   <a href="https://github.com/azevedothamirest/qa-scout/issues/new/choose" target="_blank" rel="noopener">Dar feedback ↗</a>
+  <a href="https://azevedothamirest.github.io/qa-scout/privacidade.html" target="_blank" rel="noopener">Privacidade ↗</a>
 </footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
