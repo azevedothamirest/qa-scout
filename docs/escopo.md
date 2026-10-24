@@ -47,7 +47,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 
 - [x] Extensão do Chrome de volta, com painel lateral e "Acompanhar a aba atual", somando as novidades da 0.3 e 0.4
 - [x] Ícones, pacote para a loja (`npm run pacote`), política de privacidade e textos da ficha (`docs/chrome-web-store.md`)
-- [x] Enviada para análise na Chrome Web Store
+- [x] Publicada na Chrome Web Store: https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin
 
 ## Versão 0.6
 

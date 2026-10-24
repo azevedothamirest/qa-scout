@@ -30,6 +30,14 @@ test.describe('Histórico de sessões', () => {
   });
 });
 
+test.describe('Extensão do Chrome', () => {
+  test('Mostrar o link da Chrome Web Store na tela inicial da versão web', async ({ page }) => {
+    const link = page.getByRole('link', { name: 'Instalar no Chrome ↗' });
+    await expect(link).toHaveAttribute('href', 'https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin');
+    await expect(link).toHaveAttribute('target', '_blank');
+  });
+});
+
 test.describe('Backup das sessões', () => {
   test('Restaurar sessões removidas a partir do backup baixado', async ({ page }) => {
     const [download] = await Promise.all([

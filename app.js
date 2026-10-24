@@ -199,9 +199,9 @@ function viewHome(){
       </div>
     </div>
     ${!EXT ? `<div class="captura-promo">
-      <div><h3>Quer que ele anote sozinho?</h3><p>Rode o comando abaixo: abre um navegador de teste em que cada clique vira observação com print.</p>
-      <code>npx github:azevedothamirest/qa-scout https://seu-sistema</code></div>
-      <a class="btn" href="https://github.com/azevedothamirest/qa-scout/blob/main/docs/tutorial.md" target="_blank" rel="noopener">Ver tutorial ↗</a>
+      <div><h3>Quer que ele anote sozinho?</h3><p>Instale a extensão do Chrome: no painel lateral, cada clique, erro e falha de rede da aba que você acompanhar vira nota com print.</p>
+      <p class="promo-alt">Prefere um navegador separado? <code>npx github:azevedothamirest/qa-scout https://seu-sistema</code></p></div>
+      <a class="btn" href="https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin" target="_blank" rel="noopener">Instalar no Chrome ↗</a>
     </div>` : ''}
     <div class="section-head">
       <div><div class="eyebrow">Histórico</div><h2>Sessões anteriores</h2></div>

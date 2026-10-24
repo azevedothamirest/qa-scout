@@ -1,5 +1,7 @@
 # Publicação na Chrome Web Store
 
+Página da extensão: https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin
+
 Tudo o que o painel de desenvolvedor da Chrome Web Store pede, pronto para copiar e colar.
 
 ## Passo a passo
