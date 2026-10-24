@@ -915,8 +915,8 @@ function abertura(){
   if(vista || navigator.webdriver){ fim(); return; }
   const calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let saiu=false;
-  const sair=()=>{ if(saiu) return; saiu=true; el.classList.add('saindo'); setTimeout(fim, calmo?300:900); };
-  const t=setTimeout(sair, calmo?1500:4100);
+  const sair=()=>{ if(saiu) return; saiu=true; el.classList.add('saindo'); setTimeout(fim, calmo?300:1300); };
+  const t=setTimeout(sair, calmo?1500:6500);
   el.addEventListener('click',()=>{ clearTimeout(t); sair(); });
   addEventListener('keydown',e=>{ if(e.key==='Escape'){ clearTimeout(t); sair(); } },{once:true});
 }
