@@ -241,7 +241,7 @@ body.com-abertura{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.abertura,.abertura *,.abertura::before{animation:none!important}.abertura::before{opacity:.9}.abertura.saindo{opacity:0;transition:opacity .3s}}
 
 /* abertura nova: bolhas de cor cruzando a tela, grão por cima e a bússola girando */
-.abertura{background:radial-gradient(120% 90% at 50% 38%,#163A44 0%,#0F2B33 32%,#0B1418 62%,#07090C 100%);color:#F4F3FF;overflow:hidden}
+.abertura{background:radial-gradient(60% 55% at 88% 8%,rgba(139,92,246,.13),transparent 70%),radial-gradient(55% 50% at 8% 92%,rgba(41,111,130,.16),transparent 70%),radial-gradient(45% 40% at 92% 95%,rgba(255,121,198,.07),transparent 70%),#0B0B12;color:#F4F3FF;overflow:hidden}
 .abertura::before{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.09;mix-blend-mode:normal;animation:none;z-index:1}
 .abertura::after{content:"";position:absolute;inset:0;background:radial-gradient(closest-side,transparent 55%,rgba(11,11,18,.55));pointer-events:none;z-index:1}
 .abertura>*{z-index:2}
