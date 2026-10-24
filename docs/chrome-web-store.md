@@ -34,9 +34,9 @@ Para cada nova versão: suba o `version` no `manifest.json` e no `package.json`,
 >
 > O QA Scout é um companheiro de teste exploratório baseado em sessões (SBTM). Você escreve o charter, liga o cronômetro e explora o sistema. Enquanto isso, ele registra tudo no painel lateral do Chrome:
 >
-> • Cliques, campos preenchidos e páginas abertas viram observações com print, com o ponto clicado marcado.
+> • A captura começa junto com a sessão: cliques, campos preenchidos e páginas abertas viram observações com print, com o ponto clicado marcado.
 > • Erros de JavaScript, console.error e falhas de rede (4xx, 5xx e conexão) viram notas sugeridas como bug ou risco.
-> • Alt+Shift+M marca o momento com print, sem sair do sistema em teste.
+> • Alt+1 a Alt+5 marcam um bug, dúvida, ideia, risco ou observação com print, sem sair do sistema em teste (Alt+Shift+M marca o momento).
 > • Você revisa cada nota automática: confirma, edita ou exclui. Só as revisadas entram no relatório.
 >
 > Na hora de abrir o ticket:
@@ -48,8 +48,9 @@ Para cada nova versão: suba o `version` no `manifest.json` e no `package.json`,
 > • Notas por tipo (bug, dúvida, ideia, risco, observação) com atalhos de teclado.
 > • Baralho com 18 heurísticas para quando você travar.
 > • Debriefing com divisão de tempo TBS e relatório em Markdown ou PDF.
-> • Backup das sessões em arquivo.
-> • Tema claro e escuro.
+> • Backup das sessões em arquivo e relatório em PDF.
+> • Aba Método em flashcards: SBTM, charter, PROOF e métricas TBS explicados de forma rápida.
+> • Tema escuro e claro.
 >
 > Privacidade: não há servidor, conta nem envio de dados. Tudo fica no seu computador. O valor digitado nos campos nunca é lido, e nada é registrado fora de uma sessão em andamento ou fora das abas que você escolher acompanhar.
 >
