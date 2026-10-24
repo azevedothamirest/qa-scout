@@ -412,6 +412,12 @@ body.com-abertura{overflow:hidden}
 .livros{margin:0;padding-left:18px;display:grid;gap:8px;font-size:14px;color:var(--muted)}.livros b{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){.fc-in{transition:none}}
 @media print{.flashcards{display:block}.fc{height:auto;perspective:none;break-inside:avoid;margin-bottom:12px}.fc-in{transform:none!important}.fc-face{position:static;backface-visibility:visible;transform:none}}
+.log{gap:10px}
+.log .note{border:1px solid var(--line);border-radius:18px;padding:14px 16px;background:var(--surface)}
+.log .note.pendente{background:linear-gradient(90deg,var(--marker-soft),var(--surface) 75%);border-color:color-mix(in srgb,var(--marker) 35%,var(--line))}
+.revisar .note{border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:10px;background:var(--surface)}
+.mesa{gap:34px}
+.mesa-acoes{margin-top:14px}
 /* ===== visual neon (camada sobre os componentes) ===== */
 body{background:radial-gradient(900px 500px at 85% -10%,color-mix(in srgb,var(--violet) 18%,transparent),transparent 70%),radial-gradient(700px 400px at -10% 10%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 70%),var(--paper);background-attachment:fixed}
 h1,h2,h3{letter-spacing:-.025em;font-weight:800}
