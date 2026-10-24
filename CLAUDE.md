@@ -20,7 +20,7 @@ Companheiro de teste exploratório baseado em sessões (SBTM), criado por Thamir
 - `bugMarkdown()` monta o bug para o Jira/GitHub (botão "Copiar bug" nas notas de bug); `navegadorAtual()` é gravado em `s.navegador` ao iniciar a sessão.
 - Chrome Web Store: `npm run pacote` (`bin/empacotar.js`) gera `dist/qa-scout-extensao-<versão>.zip` só com manifest, `index.html`, `app.js`, `extensao/` e `icones/`. Textos da ficha e justificativas das permissões em `docs/chrome-web-store.md`; imagens em `docs/loja/`; política em `privacidade.html` (publicada no Pages). A versão fica no `manifest.json` e no `package.json`: suba as duas juntas.
 - Prints são comprimidos para JPEG (lado máximo 1100px, qualidade 0.72) antes de salvar, para não estourar a cota do `localStorage`.
-- Fontes: Bricolage Grotesque (títulos), Instrument Sans (texto), IBM Plex Mono (cronômetro, dados, rótulos). Paleta verde-pinho com âmbar, tema claro e escuro por tokens CSS em `:root`. Identidade de caderno de campo e curvas de nível.
+- Visual (desde a 0.6): escuro como padrão (`temaAtual()` cai em `dark`; o claro fica em `:root[data-theme="light"]`), paleta neon (menta `#3DF5A7`, ciano, roxo, rosa, amarelo) e degradê `--grad` nos botões principais. Fontes: Plus Jakarta Sans (tudo) e JetBrains Mono (cronômetro, horários, atalhos). A camada "visual neon" no fim do CSS sobrepõe os componentes. Ícone: bússola com agulha inclinada a 40° dentro de um disco escuro, com cores fixas para funcionar em qualquer fundo (`icones/` e SVG inline). Aba Método em flashcards (`CARTAS_METODO`, `virarCarta()`).
 - O app também roda dentro de um artifact do Claude.ai; por isso o botão "Salvar em PDF" só aparece quando `window.self === window.top`.
 
 ## Comandos

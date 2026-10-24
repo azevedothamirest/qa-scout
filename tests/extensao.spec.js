@@ -268,20 +268,21 @@ test.describe('Acesso aos sites', () => {
     },
   });
 
-  testLoja('Pedir acesso aos sites ao acompanhar e explicar quando a pessoa recusa', async ({ context }) => {
+  testLoja('Pedir acesso aos sites ao iniciar e ao acompanhar, e explicar quando a pessoa recusa', async ({ context }) => {
     let [sw] = context.serviceWorkers();
     if (!sw) sw = await context.waitForEvent('serviceworker');
     expect(await sw.evaluate(() => chrome.permissions.contains({ origins: ['<all_urls>'] }))).toBe(false);
     const painel = await context.newPage();
     await painel.goto(`chrome-extension://${new URL(sw.url()).host}/index.html`);
-    await iniciarSessao(painel);
     await painel.evaluate(() => {
       window.pedidos = [];
       chrome.permissions.request = async p => { window.pedidos.push(p); return false; };
     });
+    await iniciarSessao(painel);
+    await expect(painel.locator('#toast')).toContainText('a captura automática fica desligada');
     await painel.getByRole('button', { name: 'Acompanhar a aba atual' }).click();
     await expect(painel.locator('#toast')).toHaveText('Sem acesso aos sites, o QA Scout não consegue registrar cliques e prints dessa aba.');
-    expect(await painel.evaluate(() => window.pedidos)).toEqual([{ origins: ['<all_urls>'] }]);
+    expect(await painel.evaluate(() => window.pedidos)).toEqual([{ origins: ['<all_urls>'] }, { origins: ['<all_urls>'] }]);
     await expect(painel.locator('.captura .aba')).toHaveCount(0);
   });
 });

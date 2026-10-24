@@ -247,7 +247,39 @@ test.describe('Baralho de heurísticas', () => {
   });
 });
 
+test.describe('Método', () => {
+  test('Virar o flashcard ao clicar e voltar ao clicar de novo', async ({ page }) => {
+    await page.locator('#tab-metodo').click();
+    const carta = page.locator('#m-sbtm');
+    await expect(carta).toHaveAttribute('aria-pressed', 'false');
+    await carta.click();
+    await expect(carta).toHaveAttribute('aria-pressed', 'true');
+    await expect(carta.locator('.fc-verso')).toHaveAttribute('aria-hidden', 'false');
+    await carta.click();
+    await expect(carta).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('Virar o flashcard pelo teclado', async ({ page }) => {
+    await page.locator('#tab-metodo').click();
+    await page.locator('#m-charter').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#m-charter')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('Abrir o método com a carta do charter já virada pela ajuda do formulário', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.getByRole('button', { name: 'Por que charter?' }).click();
+    await expect(page.locator('#m-charter')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#m-sbtm')).toHaveAttribute('aria-pressed', 'false');
+  });
+});
+
 test.describe('Tema', () => {
+  test('Abrir no tema escuro na primeira visita', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('data-escuro', '');
+    await expect(page.locator('#tema')).toContainText('Escuro');
+  });
+
   test('Alternar o tema e manter a escolha ao recarregar', async ({ page }) => {
     const botao = page.locator('#tema');
     const inicial = await page.evaluate(() => document.documentElement.hasAttribute('data-escuro'));
