@@ -16,7 +16,7 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 
 ## Funcionalidades
 
-- **Charter no modelo de Elisabeth Hendrickson:** *Explorar ___ com ___ para descobrir ___*, mais área, ambiente e duração (30, 60 ou 90 min).
+- **Charter no modelo de Elisabeth Hendrickson:** *Explorar ___ com ___ para descobrir ___*, mais área, ambiente e duração livre, em minutos.
 - **Cronômetro com pausa**, barra de progresso e aviso de tempo extra.
 - **Notas por tipo:** bug, dúvida, ideia, risco e observação, cada uma com o minuto exato da sessão.
   - `Alt+1` a `Alt+5` troca o tipo, `Ctrl+Enter` salva.
@@ -27,7 +27,8 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - **Captura automática** no navegador de teste: cliques, campos preenchidos e páginas abertas viram observações com print. Você confirma, edita (texto e tipo) ou exclui cada uma; só as revisadas entram no relatório.
 - **Erros de console e de rede** viram notas a revisar: erro de JavaScript e falha de conexão ou 5xx chegam como bug; `console.error` e 4xx, como risco.
 - **Passos para reproduzir** num clique: ao editar uma nota, o QA Scout monta a lista com os cliques, campos e páginas que vieram antes dela.
-- **`Alt+Shift+M`** no sistema em teste marca o momento com print, sem sair da tela.
+- **`Alt+Shift+M`** no sistema em teste marca o momento com print, sem sair da tela. **`Alt+1` a `Alt+5`** fazem o mesmo já com o tipo (bug, dúvida, ideia, risco, observação).
+- **Captura automática ligada ao iniciar a sessão** na extensão: a aba do sistema em teste já começa acompanhada; outras abas entram com **Acompanhar a aba atual**.
 - **Relatório** em Markdown para colar no Jira, GitHub, Notion ou Slack, **Copiar só os bugs** para abrir os tickets, e exportação em PDF pelo navegador.
 - **Copiar bug** pronto para o Jira ou GitHub: título, ambiente, navegador, página, passos para reproduzir, resultado obtido e esperado, e os erros de console e rede do mesmo minuto.
 - **Backup das sessões** em JSON: baixe e importe pelo histórico (sessões repetidas são ignoradas).

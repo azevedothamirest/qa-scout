@@ -194,7 +194,7 @@ function viewHome(){
       <div class="section-head" style="margin-bottom:12px"><div><div class="eyebrow">Como funciona</div><h2>Uma sessão em 3 passos</h2></div><button class="link-btn" data-go="metodo">Entenda o método →</button></div>
       <div class="passos">
         <div class="passo"><h3>Escreva o charter</h3><p>Uma missão curta: o que explorar, com o quê e para descobrir o quê.</p><small>Elisabeth Hendrickson</small></div>
-        <div class="passo"><h3>Explore com tempo marcado</h3><p>30, 60 ou 90 minutos sem interrupção. Anote bugs, dúvidas, ideias e riscos na hora.</p><small>SBTM · James e Jon Bach</small></div>
+        <div class="passo"><h3>Explore com tempo marcado</h3><p>Um bloco de tempo sem interrupção, do tamanho da missão. Anote bugs, dúvidas, ideias e riscos na hora.</p><small>SBTM · James e Jon Bach</small></div>
         <div class="passo"><h3>Faça o debriefing</h3><p>Revise as notas, divida o tempo entre teste, bug e setup e leve o relatório para o time.</p><small>PROOF e métricas TBS</small></div>
       </div>
     </div>
@@ -236,25 +236,26 @@ function viewNew(){
     </div>
     <form class="panel form-grid" id="charter-form" novalidate>
       <div class="charter-sentence">
-        <label for="c-exp">Explorar</label>
-        <textarea id="c-exp" rows="1" placeholder="o que você vai testar" required>${esc(d.explorar)}</textarea>
+        <label for="c-exp">Explorar <span class="obrig">obrigatório</span></label>
+        <textarea id="c-exp" rows="1" placeholder="o que você vai testar" required aria-describedby="c-exp-err">${esc(d.explorar)}</textarea>
+        <p class="msg-erro" id="c-exp-err" hidden>Diga o que você vai explorar.</p>
         <label for="c-com">com</label>
         <textarea id="c-com" rows="1" placeholder="quais recursos, dados ou técnicas">${esc(d.com)}</textarea>
-        <label for="c-des">para descobrir</label>
-        <textarea id="c-des" rows="1" placeholder="que tipo de informação ou problema">${esc(d.descobrir)}</textarea>
+        <label for="c-des">para descobrir <span class="obrig">obrigatório</span></label>
+        <textarea id="c-des" rows="1" placeholder="que tipo de informação ou problema" required aria-describedby="c-des-err">${esc(d.descobrir)}</textarea>
+        <p class="msg-erro" id="c-des-err" hidden>Diga o que você quer descobrir.</p>
         <p class="hint" style="font-family:var(--f-body);font-size:13.5px;margin:4px 0 0">Modelo de charter de Elisabeth Hendrickson. Uma missão clara mantém a sessão focada sem virar roteiro.</p>
       </div>
       <div>
         <div class="field"><label for="c-area">Área ou funcionalidade</label><input id="c-area" placeholder="Ex.: Checkout · pagamento com cartão" value="${esc(d.area)}"></div>
         <div class="field"><label for="c-amb">Ambiente e versão</label><input id="c-amb" placeholder="Ex.: Homologação · build 4.19.0" value="${esc(d.ambiente)}"></div>
         <div class="field"><label for="c-tst">Quem testa</label><input id="c-tst" placeholder="Seu nome" value="${esc(d.testadora)}"></div>
-        <div class="field"><span style="font-weight:600;font-size:13.5px">Duração planejada</span>
-          <div class="seg" role="group" aria-label="Duração planejada">
-            ${[[30,'curta'],[60,'normal'],[90,'longa']].map(([m,l])=>`<button type="button" data-dur="${m}" aria-pressed="${d.plannedMin===m}">${m} min<small>${l}</small></button>`).join('')}
-          </div>
+        <div class="field"><label for="c-dur">Duração planejada</label>
+          <div class="dur-in"><input id="c-dur" type="number" inputmode="numeric" min="1" max="480" step="1" value="${d.plannedMin}" aria-describedby="c-dur-err"><span>minutos</span></div>
+          <p class="msg-erro" id="c-dur-err" hidden>Use um tempo entre 1 e 480 minutos.</p>
         </div>
         <div class="form-actions">
-          <span class="hint" id="form-err" role="alert"></span>
+          <div class="form-err" id="form-err" role="alert" hidden></div>
           <button class="btn primary lg" type="submit">Iniciar sessão</button>
         </div>
       </div>
@@ -377,15 +378,17 @@ function syncCaptura(){
   const s=getActive();
   chrome.runtime.sendMessage({cmd:'capturando', valor: !!(s && s.status==='running')}).catch(()=>{});
 }
-async function acompanharAbaAtual(){
-  // O pedido precisa sair direto do clique, antes de qualquer outra espera.
-  const acesso = await chrome.permissions.request({origins:['<all_urls>']}).catch(()=>false);
-  if(!acesso){ toast('Sem acesso aos sites, o QA Scout não consegue registrar cliques e prints dessa aba.'); return; }
+async function acompanharAbaAtual({auto=false}={}){
+  if(!auto){
+    // O pedido precisa sair direto do clique, antes de qualquer outra espera.
+    const acesso = await chrome.permissions.request({origins:['<all_urls>']}).catch(()=>false);
+    if(!acesso){ toast('Sem acesso aos sites, o QA Scout não consegue registrar cliques e prints dessa aba.'); return; }
+  }
   const [tab] = await chrome.tabs.query({active:true, lastFocusedWindow:true});
-  if(!tab || !/^https?:|^file:/.test(tab.url||'')){ toast('Abra a página do sistema em teste e clique de novo.'); return; }
+  if(!tab || !/^https?:|^file:/.test(tab.url||'')){ toast(auto?'Captura ligada. Abra o sistema em teste e clique em “Acompanhar a aba atual”.':'Abra a página do sistema em teste e clique de novo.'); return; }
   const r = await chrome.runtime.sendMessage({cmd:'acompanhar', tabId:tab.id}).catch(()=>null);
   if(!r || !r.ok){ toast('O navegador não deixa acompanhar essa aba.'); return; }
-  toast('Aba acompanhada. Pode explorar.');
+  toast(auto?`Captura automática ligada em “${(tab.title||tab.url).slice(0,40)}”.`:'Aba acompanhada. Pode explorar.');
   atualizaAbas();
 }
 // Desenha um anel no ponto clicado e reduz o print para o mesmo tamanho dos prints colados.
@@ -648,7 +651,7 @@ function viewMetodo(){
       </div>
       <div class="no-app"><h3>No QA Scout</h3><ul>
         <li>Cada sessão tem charter, cronômetro, diário e relatório</li>
-        <li>Duração planejada de 30, 60 ou 90 minutos, com aviso de tempo extra</li>
+        <li>Duração planejada livre, em minutos, com aviso de tempo extra</li>
         <li>Pausa para interrupções reais, sem contar como tempo de teste</li>
         <li>Histórico com busca para prestar contas depois</li>
       </ul></div>
@@ -779,15 +782,13 @@ function setType(k){ noteType=k; document.querySelectorAll('[data-type]').forEac
 
 function readDraft(){
   const g=id=>($('#'+id)?.value||'').trim();
-  const pressed=document.querySelector('[data-dur][aria-pressed="true"]');
-  return {explorar:g('c-exp'),com:g('c-com'),descobrir:g('c-des'),area:g('c-area'),ambiente:g('c-amb'),testadora:g('c-tst'),plannedMin:pressed?+pressed.dataset.dur:60};
+  return {explorar:g('c-exp'),com:g('c-com'),descobrir:g('c-des'),area:g('c-area'),ambiente:g('c-amb'),testadora:g('c-tst'),plannedMin:Number(g('c-dur'))||0};
 }
 
 document.addEventListener('click',e=>{
   const t=e.target.closest('button,[data-open]'); if(!t) return;
   if(t.dataset.go){ if(view==='new') { state.draft=readDraft(); save(); } go(t.dataset.go==='active' && !getActive() ? 'new' : t.dataset.go, t.dataset.arg||null); return; }
   if(t.dataset.open){ go('report',t.dataset.open); return; }
-  if(t.dataset.dur){ document.querySelectorAll('[data-dur]').forEach(b=>b.setAttribute('aria-pressed',b===t)); return; }
   if(t.dataset.type){ setType(t.dataset.type); $('#note-in')?.focus(); return; }
   if(t.dataset.filter){ filter=t.dataset.filter; const s=getActive(); $('#log').innerHTML=logHtml(s); refreshSessionCounts(s); return; }
   if(t.dataset.cat){ deckCat=t.dataset.cat; puxarCarta(); render(); return; }
@@ -856,7 +857,7 @@ document.addEventListener('click',e=>{
     s.runStartedAt=null; s.status='done'; s.endedAt=Date.now(); state.activeId=null; save();
     pendingImgs=[]; go('report',s.id); toast('Sessão encerrada. Faça o debriefing enquanto está fresco.');
   }
-  if(act==='print'){ window.print(); }
+  if(act==='print') salvarPdf();
   if(act==='backup') baixarBackup();
   if(act==='clear-ex'){ state.sessions=state.sessions.filter(x=>!x.example); save(); render(); toast('Exemplos removidos'); }
   if(act==='copy-md' || act==='copy-bugs'){ const rs=state.sessions.find(x=>x.id===viewArg); copy(toMarkdown(rs,act==='copy-bugs'), act==='copy-md'?'Relatório copiado':'Bugs copiados', $('#md-out')); }
@@ -869,14 +870,32 @@ document.addEventListener('submit',e=>{
   if(e.target.id!=='charter-form') return;
   e.preventDefault();
   const d=readDraft();
-  if(!d.explorar || !d.descobrir){ $('#form-err').textContent='Preencha pelo menos o que explorar e o que descobrir.'; (d.explorar?$('#c-des'):$('#c-exp')).focus(); return; }
+  const faltam=[['c-exp',!d.explorar],['c-des',!d.descobrir],['c-dur',!(Number.isInteger(d.plannedMin)&&d.plannedMin>=1&&d.plannedMin<=480)]];
+  faltam.forEach(([id,erro])=>marcaErro(id,erro));
+  const erros=faltam.filter(([,e])=>e);
+  if(erros.length){
+    const box=$('#form-err');
+    box.innerHTML=`<b>Falta pouco para começar.</b> ${!d.explorar||!d.descobrir?'Preencha o que vai explorar e o que quer descobrir, destacados em vermelho.':'Ajuste a duração planejada.'}`;
+    box.hidden=false;
+    $('#'+erros[0][0]).focus();
+    return;
+  }
+  // Na extensão, a captura começa junto com a sessão: o pedido de acesso precisa sair deste clique.
+  const pedidoAcesso = EXT && !modoNavegador ? chrome.permissions.request({origins:['<all_urls>']}).catch(()=>false) : null;
   const s={id:uid(),area:d.area||d.explorar,charter:{explorar:d.explorar,com:d.com||'o que estiver à mão',descobrir:d.descobrir},ambiente:d.ambiente,testadora:d.testadora,plannedMin:d.plannedMin,navegador:navegadorAtual(),status:'running',startedAt:Date.now(),runStartedAt:Date.now(),elapsedMs:0,notes:[]};
   state.sessions.push(s); state.activeId=s.id; state.draft=null; noteType='bug'; filter='all';
   save(); go('active'); setTimeout(()=>$('#note-in')?.focus(),50);
+  if(pedidoAcesso) pedidoAcesso.then(ok=>ok ? acompanharAbaAtual({auto:true}) : toast('Sem acesso aos sites, a captura automática fica desligada. Dá para ligar em “Acompanhar a aba atual”.'));
 });
+function marcaErro(id,erro){
+  const el=$('#'+id), msg=$('#'+id+'-err'); if(!el) return;
+  el.classList.toggle('invalido',erro); el.setAttribute('aria-invalid',erro);
+  if(msg) msg.hidden=!erro;
+}
 
 document.addEventListener('input',e=>{
   const t=e.target;
+  if(t.classList?.contains('invalido') && t.value.trim()){ marcaErro(t.id,false); if(!document.querySelector('#charter-form .invalido')) $('#form-err').hidden=true; }
   if(t.id==='q'){ query=t.value; const sel=t.selectionStart; render(); const q=$('#q'); q.focus(); try{q.setSelectionRange(sel,sel);}catch(_){} return; }
   if(t.dataset.tbs || t.dataset.db){
     const s=state.sessions.find(x=>x.id===viewArg); if(!s) return;
@@ -946,6 +965,12 @@ function abertura(){
 }
 abertura();
 
+// O painel lateral do Chrome não abre a janela de impressão: na extensão, o relatório abre numa aba
+// própria (index.html#imprimir=<id>) e a impressão sai de lá.
+function salvarPdf(){
+  if(EXT && viewArg){ chrome.tabs.create({url:chrome.runtime.getURL('index.html')+'#imprimir='+viewArg}); return; }
+  window.print();
+}
 async function init(){
   if(EXT){
     try{ const r=await chrome.storage.local.get([KEY,'qascout.modo']); if(r[KEY]) state=r[KEY]; modoNavegador = r['qascout.modo']==='navegador'; }catch(e){}
@@ -953,6 +978,13 @@ async function init(){
       if(area==='local' && Object.keys(mud).some(k=>k.startsWith(EV_PREFIX) && mud[k].newValue)) drenar();
       if(area==='session' && mud.abas) atualizaAbas();
     });
+  }
+  const imprimir = location.hash.match(/^#imprimir=(.+)$/);
+  if(imprimir && state.sessions.some(x=>x.id===imprimir[1])){
+    view='report'; viewArg=imprimir[1]; render();
+    document.title=`Relatório · ${state.sessions.find(x=>x.id===viewArg).area} · QA Scout`;
+    setTimeout(()=>window.print(),600);
+    return;
   }
   if(getActive()) view='active';
   render();

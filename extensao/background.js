@@ -72,6 +72,7 @@ async function registra(msg, tab) {
   const ev = { tipo: msg.tipo, desc: msg.desc, url: msg.url, titulo: msg.titulo, ts: msg.ts };
   // Erro de JavaScript chega sugerido como bug; console.error, como risco. A testadora decide na revisão.
   if (msg.tipo === 'erro') ev.nota = msg.grave ? 'bug' : 'ris';
+  if (msg.tipo === 'marca' && msg.nota) ev.nota = msg.nota;
   const marca = msg.tipo === 'marca';
   if (tab.active && (marca || (msg.tipo === 'clique' && Date.now() - ultimoPrint >= INTERVALO_PRINT))) {
     if (!marca) ultimoPrint = Date.now();

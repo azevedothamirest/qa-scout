@@ -122,6 +122,18 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 .field label{font-weight:600;font-size:13.5px}
 .field input{border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r-sm);padding:10px 12px;outline:0;width:100%;min-width:0}
 .field input:focus{border-color:var(--accent)}
+.dur-in{display:flex;align-items:center;gap:10px}
+.dur-in input{width:110px;font-family:var(--f-mono);font-size:18px;text-align:right}
+.dur-in span{color:var(--muted);font-size:14px}
+.obrig{font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--danger);text-transform:none;letter-spacing:0;margin-left:6px;vertical-align:2px}
+.msg-erro[hidden],.form-err[hidden]{display:none}
+.msg-erro{display:flex;align-items:center;gap:6px;margin:-8px 0 12px;color:var(--danger);font-family:var(--f-body);font-size:14px;font-weight:600}
+.msg-erro::before{content:"!";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:12px;font-weight:800;flex:none}
+.field .msg-erro{margin:6px 0 0}
+.invalido{border-color:var(--danger)!important;background:color-mix(in srgb,var(--danger) 8%,transparent)!important}
+.charter-sentence textarea.invalido{border-bottom-width:3px;padding-left:8px;border-radius:6px 6px 0 0}
+.form-err{flex:1;min-width:220px;border:1px solid var(--danger);border-left-width:5px;background:color-mix(in srgb,var(--danger) 10%,var(--surface));color:var(--ink);border-radius:var(--r-sm);padding:10px 14px;font-size:14px}
+.form-err b{color:var(--danger)}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .seg button{border:1px solid var(--line);background:var(--surface-2);border-radius:var(--r-sm);padding:10px 6px;cursor:pointer;font-family:var(--f-mono);font-weight:500}
 .seg button small{display:block;font-family:var(--f-body);font-size:11.5px;color:var(--muted)}
@@ -371,6 +383,7 @@ body.com-abertura{overflow:hidden}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 @media print{
+  .ajuda{display:none}
   :root{--paper:#fff;--surface:#fff;--surface-2:#fff}
   .top,.toast,.no-print,.report>aside>.card:not(.debrief){display:none!important}
   main{padding:0;max-width:none}

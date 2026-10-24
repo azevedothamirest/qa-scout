@@ -44,7 +44,7 @@ Para cada nova versão: suba o `version` no `manifest.json` e no `package.json`,
 > • "Copiar bug" gera o texto pronto para o Jira ou GitHub: título, ambiente, navegador, página, passos, resultado obtido e esperado, e os erros do mesmo minuto.
 >
 > E mais:
-> • Charter no modelo de Elisabeth Hendrickson e sessões de 30, 60 ou 90 minutos.
+> • Charter no modelo de Elisabeth Hendrickson e duração da sessão do jeito que fizer sentido.
 > • Notas por tipo (bug, dúvida, ideia, risco, observação) com atalhos de teclado.
 > • Baralho com 18 heurísticas para quando você travar.
 > • Debriefing com divisão de tempo TBS e relatório em Markdown ou PDF.

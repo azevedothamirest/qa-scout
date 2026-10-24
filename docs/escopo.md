@@ -13,7 +13,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 ## MVP (versão 0.1, entregue)
 
 - [x] Charter no modelo de Elisabeth Hendrickson: Explorar ___ com ___ para descobrir ___
-- [x] Área, ambiente/versão, quem testa e duração (30, 60 ou 90 min)
+- [x] Área, ambiente/versão, quem testa e duração (30, 60 ou 90 min; livre em minutos desde a 0.6)
 - [x] Cronômetro com pausa, barra de progresso e aviso de tempo extra
 - [x] Notas por tipo: bug, dúvida, ideia, risco, observação, com o minuto da sessão
 - [x] Atalhos: Alt+1 a 5 troca o tipo, Ctrl+Enter salva, prefixos /bug /duvida /ideia /risco /obs

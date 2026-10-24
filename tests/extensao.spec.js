@@ -285,3 +285,47 @@ test.describe('Acesso aos sites', () => {
     await expect(painel.locator('.captura .aba')).toHaveCount(0);
   });
 });
+
+test.describe('Atalhos no sistema em teste', () => {
+  test('Marcar uma dúvida com print ao apertar Alt+2 na página acompanhada', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.locator('body').press('Alt+Digit2');
+    const nota = painel.locator('.note.t-duv.pendente', { hasText: 'Dúvida marcado neste momento' });
+    await expect(nota).toBeVisible();
+    await expect(nota.locator('.imgs img')).toHaveCount(1);
+  });
+});
+
+test.describe('Salvar em PDF', () => {
+  test('Abrir o relatório numa aba própria e imprimir de lá', async ({ context, painel }) => {
+    await context.addInitScript(() => { window.print = () => { document.documentElement.dataset.imprimiu = '1'; }; });
+    await painel.getByText('Checkout · pagamento com Pix').click();
+    const [aba] = await Promise.all([context.waitForEvent('page'), painel.getByRole('button', { name: 'Salvar em PDF' }).click()]);
+    await aba.waitForLoadState();
+    expect(aba.url()).toMatch(/index\.html#imprimir=/);
+    await expect(aba.getByRole('heading', { name: 'Checkout · pagamento com Pix' })).toBeVisible();
+    await expect(aba.locator('html')).toHaveAttribute('data-imprimiu', '1');
+    await expect(aba).toHaveTitle(/Relatório · Checkout · pagamento com Pix/);
+  });
+});
+
+test.describe('Captura automática por padrão', () => {
+  test('Acompanhar a aba do sistema em teste ao iniciar a sessão', async ({ context, painel }) => {
+    const loja = await context.newPage();
+    await loja.goto(LOJA);
+    await painel.bringToFront();
+    // No Chrome, a aba ativa da janela é o sistema em teste, ao lado do painel lateral.
+    // Aqui o painel é uma aba, então a busca pela aba ativa devolve a loja.
+    await painel.evaluate(url => {
+      chrome.permissions.request = async () => true;
+      const original = chrome.tabs.query.bind(chrome.tabs);
+      chrome.tabs.query = q => q.active ? original({ url }) : original(q);
+    }, LOJA);
+    await iniciarSessao(painel);
+    await expect(painel.locator('#toast')).toContainText('Captura automática ligada em “Loja fictícia · Checkout”');
+    await expect(painel.locator('.captura .aba')).toHaveCount(1);
+    await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
+    await expect(painel.locator('.note', { hasText: 'Clicou no botão “Pagar com Pix”' })).toBeVisible();
+  });
+});

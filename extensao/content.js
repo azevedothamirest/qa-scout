@@ -58,6 +58,17 @@
     envia({ tipo: 'campo', desc });
   }, true);
 
+  // Alt+1 a Alt+5 no sistema em teste: marca o momento já com o tipo (bug, dúvida, ideia, risco,
+  // observação), com print, sem precisar voltar ao painel.
+  const TIPOS = { Digit1: ['bug', 'Bug'], Digit2: ['duv', 'Dúvida'], Digit3: ['ide', 'Ideia'], Digit4: ['ris', 'Risco'], Digit5: ['obs', 'Observação'] };
+  document.addEventListener('keydown', e => {
+    const tipo = TIPOS[e.code];
+    if (tipo && e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+      e.preventDefault();
+      envia({ tipo: 'marca', nota: tipo[0], desc: `${tipo[1]} marcado neste momento` });
+    }
+  }, true);
+
   // Atalho para marcar o momento sem sair do sistema em teste: vira nota com print da tela.
   document.addEventListener('keydown', e => {
     if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyM') {

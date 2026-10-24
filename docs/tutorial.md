@@ -80,7 +80,7 @@ Exemplo:
 
 > Explorar **o pagamento com Pix no checkout** com **QR Code expirado, botão voltar e cupom** para descobrir **pedidos pagos que ficam pendentes ou cobranças em dobro**.
 
-Preencha também a área, o ambiente e a duração (30, 60 ou 90 minutos) e clique em **Iniciar sessão**. O cronômetro começa a contar.
+Preencha também a área, o ambiente e a duração em minutos (o tempo que fizer sentido para a missão) e clique em **Iniciar sessão**. O cronômetro começa a contar. Na extensão, a captura automática já começa na aba do sistema em teste.
 
 **Sem ideia do que explorar?** Abra a aba **Heurísticas** e clique em **Puxar outra carta** (ou aperte a barra de espaço). Cada carta traz uma heurística e um desafio do tipo *"Faz isso agora"*. O botão **Começar sessão com esta carta** já preenche o campo "com" do charter.
 
@@ -99,6 +99,7 @@ Vá para a janela do sistema em teste e explore normalmente. Enquanto a sessão 
 | Uma requisição volta 4xx | `Requisição com erro: GET /api/frete → 404`, sugerida como **risco** |
 | Uma requisição volta 5xx ou nem conecta | `Requisição com erro: POST /api/pix → 500`, sugerida como **bug** |
 | Aperta `Alt+Shift+M` no sistema em teste | `Marcou este momento`, com print da tela |
+| Aperta `Alt+1` a `Alt+5` no sistema em teste | `Bug marcado neste momento` (ou dúvida, ideia, risco, observação), com print |
 
 Detalhes que vale saber:
 
