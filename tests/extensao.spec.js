@@ -1,16 +1,26 @@
 // @ts-check
 const { test: base, expect, chromium } = require('@playwright/test');
+const fs = require('fs');
+const os = require('os');
 const path = require('path');
+const { prepararExtensao } = require('../bin/qa-scout');
 
 const RAIZ = path.join(__dirname, '..');
 const LOJA = 'http://localhost:4173/tests/fixtures/loja.html';
 
 // Cada teste ganha um Chromium com a extensão carregada e o painel aberto numa aba.
+// O acesso aos sites é opcional no manifesto e pedido no primeiro "Acompanhar"; aqui a extensão é a
+// cópia do navegador de teste, em que o acesso já vem concedido. O pedido em si é testado à parte.
 const test = base.extend({
-  context: async ({}, use) => {
+  pasta: async ({}, use) => {
+    const pasta = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-ext-'));
+    await use(prepararExtensao(pasta));
+    fs.rmSync(pasta, { recursive: true, force: true });
+  },
+  context: async ({ pasta }, use) => {
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
-      args: [`--disable-extensions-except=${RAIZ}`, `--load-extension=${RAIZ}`],
+      args: [`--disable-extensions-except=${pasta}`, `--load-extension=${pasta}`],
     });
     await use(context);
     await context.close();
@@ -242,5 +252,81 @@ test.describe('Copiar bug', () => {
     expect(md).toContain('### Resultado obtido\nPix não responde no primeiro clique\n');
     expect(md).toContain('| Página | http://localhost:4173/tests/fixtures/loja.html |');
     expect(md).toMatch(/### Erros de console e rede no mesmo minuto\n- `\d\d:\d\d` Erro de JavaScript: TypeError: cupom.valor is undefined/);
+  });
+});
+
+test.describe('Acesso aos sites', () => {
+  // Extensão como vai para a Chrome Web Store: sem acesso aos sites até a pessoa conceder.
+  const testLoja = base.extend({
+    context: async ({}, use) => {
+      const context = await chromium.launchPersistentContext('', {
+        channel: 'chromium',
+        args: [`--disable-extensions-except=${RAIZ}`, `--load-extension=${RAIZ}`],
+      });
+      await use(context);
+      await context.close();
+    },
+  });
+
+  testLoja('Pedir acesso aos sites ao iniciar e ao acompanhar, e explicar quando a pessoa recusa', async ({ context }) => {
+    let [sw] = context.serviceWorkers();
+    if (!sw) sw = await context.waitForEvent('serviceworker');
+    expect(await sw.evaluate(() => chrome.permissions.contains({ origins: ['<all_urls>'] }))).toBe(false);
+    const painel = await context.newPage();
+    await painel.goto(`chrome-extension://${new URL(sw.url()).host}/index.html`);
+    await painel.evaluate(() => {
+      window.pedidos = [];
+      chrome.permissions.request = async p => { window.pedidos.push(p); return false; };
+    });
+    await iniciarSessao(painel);
+    await expect(painel.locator('#toast')).toContainText('a captura automática fica desligada');
+    await painel.getByRole('button', { name: 'Acompanhar a aba atual' }).click();
+    await expect(painel.locator('#toast')).toHaveText('Sem acesso aos sites, o QA Scout não consegue registrar cliques e prints dessa aba.');
+    expect(await painel.evaluate(() => window.pedidos)).toEqual([{ origins: ['<all_urls>'] }, { origins: ['<all_urls>'] }]);
+    await expect(painel.locator('.captura .aba')).toHaveCount(0);
+  });
+});
+
+test.describe('Atalhos no sistema em teste', () => {
+  test('Marcar uma dúvida com print ao apertar Alt+2 na página acompanhada', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.locator('body').press('Alt+Digit2');
+    const nota = painel.locator('.note.t-duv.pendente', { hasText: 'Dúvida marcado neste momento' });
+    await expect(nota).toBeVisible();
+    await expect(nota.locator('.imgs img')).toHaveCount(1);
+  });
+});
+
+test.describe('Salvar em PDF', () => {
+  test('Abrir o relatório numa aba própria e imprimir de lá', async ({ context, painel }) => {
+    await context.addInitScript(() => { window.print = () => { document.documentElement.dataset.imprimiu = '1'; }; });
+    await painel.getByText('Checkout · pagamento com Pix').click();
+    const [aba] = await Promise.all([context.waitForEvent('page'), painel.getByRole('button', { name: 'Salvar em PDF' }).click()]);
+    await aba.waitForLoadState();
+    expect(aba.url()).toMatch(/index\.html#imprimir=/);
+    await expect(aba.getByRole('heading', { name: 'Checkout · pagamento com Pix' })).toBeVisible();
+    await expect(aba.locator('html')).toHaveAttribute('data-imprimiu', '1');
+    await expect(aba).toHaveTitle(/Relatório · Checkout · pagamento com Pix/);
+  });
+});
+
+test.describe('Captura automática por padrão', () => {
+  test('Acompanhar a aba do sistema em teste ao iniciar a sessão', async ({ context, painel }) => {
+    const loja = await context.newPage();
+    await loja.goto(LOJA);
+    await painel.bringToFront();
+    // No Chrome, a aba ativa da janela é o sistema em teste, ao lado do painel lateral.
+    // Aqui o painel é uma aba, então a busca pela aba ativa devolve a loja.
+    await painel.evaluate(url => {
+      chrome.permissions.request = async () => true;
+      const original = chrome.tabs.query.bind(chrome.tabs);
+      chrome.tabs.query = q => q.active ? original({ url }) : original(q);
+    }, LOJA);
+    await iniciarSessao(painel);
+    await expect(painel.locator('#toast')).toContainText('Captura automática ligada em “Loja fictícia · Checkout”');
+    await expect(painel.locator('.captura .aba')).toHaveCount(1);
+    await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
+    await expect(painel.locator('.note', { hasText: 'Clicou no botão “Pagar com Pix”' })).toBeVisible();
   });
 });

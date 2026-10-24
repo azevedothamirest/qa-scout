@@ -14,9 +14,29 @@ async function estado() {
   return { abas, capturando, todas, acompanha };
 }
 
+// O acesso aos sites é opcional no manifesto: a pessoa concede na primeira vez que clica em
+// "Acompanhar a aba atual" (o print exige acesso a todos os sites; não dá para pedir site a site).
+// Com o acesso concedido, o pagina.js passa a rodar desde o início de cada página para pegar
+// erros de JavaScript; sem ele, nada é registrado.
+const ACESSO = { origins: ['<all_urls>'] };
+const SCRIPT_PAGINA = { id: 'qascout-pagina', matches: ['http://*/*', 'https://*/*', 'file:///*'], js: ['extensao/pagina.js'], runAt: 'document_start', world: 'MAIN' };
+async function sincronizaScriptPagina() {
+  const tem = await chrome.permissions.contains(ACESSO);
+  const ativos = await chrome.scripting.getRegisteredContentScripts({ ids: [SCRIPT_PAGINA.id] });
+  if (tem && !ativos.length) await chrome.scripting.registerContentScripts([SCRIPT_PAGINA]).catch(() => {});
+  if (!tem && ativos.length) await chrome.scripting.unregisterContentScripts({ ids: [SCRIPT_PAGINA.id] }).catch(() => {});
+}
+sincronizaScriptPagina();
+chrome.permissions.onAdded.addListener(sincronizaScriptPagina);
+chrome.permissions.onRemoved.addListener(sincronizaScriptPagina);
+
 async function injeta(tabId) {
-  try { await chrome.scripting.executeScript({ target: { tabId }, files: ['extensao/content.js'] }); return true; }
-  catch (e) { return false; }
+  try {
+    // Abas já abertas antes do acesso não receberam o pagina.js: injeta também (ele não roda duas vezes).
+    await chrome.scripting.executeScript({ target: { tabId }, files: ['extensao/pagina.js'], world: 'MAIN' }).catch(() => {});
+    await chrome.scripting.executeScript({ target: { tabId }, files: ['extensao/content.js'] });
+    return true;
+  } catch (e) { return false; }
 }
 
 async function guardaEvento(ev) {
@@ -52,6 +72,7 @@ async function registra(msg, tab) {
   const ev = { tipo: msg.tipo, desc: msg.desc, url: msg.url, titulo: msg.titulo, ts: msg.ts };
   // Erro de JavaScript chega sugerido como bug; console.error, como risco. A testadora decide na revisão.
   if (msg.tipo === 'erro') ev.nota = msg.grave ? 'bug' : 'ris';
+  if (msg.tipo === 'marca' && msg.nota) ev.nota = msg.nota;
   const marca = msg.tipo === 'marca';
   if (tab.active && (marca || (msg.tipo === 'clique' && Date.now() - ultimoPrint >= INTERVALO_PRINT))) {
     if (!marca) ultimoPrint = Date.now();

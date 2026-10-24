@@ -13,7 +13,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 ## MVP (versão 0.1, entregue)
 
 - [x] Charter no modelo de Elisabeth Hendrickson: Explorar ___ com ___ para descobrir ___
-- [x] Área, ambiente/versão, quem testa e duração (30, 60 ou 90 min)
+- [x] Área, ambiente/versão, quem testa e duração (30, 60 ou 90 min; livre em minutos desde a 0.6)
 - [x] Cronômetro com pausa, barra de progresso e aviso de tempo extra
 - [x] Notas por tipo: bug, dúvida, ideia, risco, observação, com o minuto da sessão
 - [x] Atalhos: Alt+1 a 5 troca o tipo, Ctrl+Enter salva, prefixos /bug /duvida /ideia /risco /obs
@@ -47,7 +47,12 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 
 - [x] Extensão do Chrome de volta, com painel lateral e "Acompanhar a aba atual", somando as novidades da 0.3 e 0.4
 - [x] Ícones, pacote para a loja (`npm run pacote`), política de privacidade e textos da ficha (`docs/chrome-web-store.md`)
-- [ ] Publicar na Chrome Web Store
+- [x] Publicada na Chrome Web Store: https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin
+
+## Versão 0.6
+
+- [x] Acesso aos sites opcional: pedido no primeiro "Acompanhar a aba atual", não na instalação (o print exige acesso a todos os sites, então não dá para pedir site a site)
+- [x] Navegador de teste com id fixo da extensão e recuperação das sessões guardadas sob o id antigo (até a 0.5, trocar o comando para `#main` escondia as sessões)
 - [ ] Domínio próprio para o site em três perfis: desktop, celular e navegador de teste
 
 ## Fora do MVP (próximas versões)

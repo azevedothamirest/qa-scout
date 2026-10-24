@@ -30,6 +30,14 @@ test.describe('Histórico de sessões', () => {
   });
 });
 
+test.describe('Extensão do Chrome', () => {
+  test('Mostrar o link da Chrome Web Store na tela inicial da versão web', async ({ page }) => {
+    const link = page.getByRole('link', { name: 'Instalar no Chrome ↗' });
+    await expect(link).toHaveAttribute('href', 'https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin');
+    await expect(link).toHaveAttribute('target', '_blank');
+  });
+});
+
 test.describe('Backup das sessões', () => {
   test('Restaurar sessões removidas a partir do backup baixado', async ({ page }) => {
     const [download] = await Promise.all([
@@ -86,17 +94,45 @@ test.describe('Charter', () => {
   test('Impedir início sem missão e objetivo de descoberta', async ({ page }) => {
     await page.getByRole('button', { name: 'Começar nova sessão' }).click();
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
-    await expect(page.locator('#form-err')).toHaveText('Preencha pelo menos o que explorar e o que descobrir.');
+    await expect(page.locator('#form-err')).toBeVisible();
+    await expect(page.locator('#form-err')).toContainText('Preencha o que vai explorar e o que quer descobrir');
+    await expect(page.locator('#c-exp')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#c-des')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.getByText('Diga o que você vai explorar.')).toBeVisible();
+    await expect(page.getByText('Diga o que você quer descobrir.')).toBeVisible();
+    await expect(page.locator('#c-exp')).toBeFocused();
   });
 
-  test('Iniciar sessão com a duração escolhida', async ({ page }) => {
+  test('Tirar o destaque de erro conforme os campos são preenchidos', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await page.locator('#c-exp').fill('o login');
+    await expect(page.locator('#c-exp')).toHaveAttribute('aria-invalid', 'false');
+    await expect(page.getByText('Diga o que você vai explorar.')).toBeHidden();
+    await expect(page.locator('#form-err')).toBeVisible();
+    await page.locator('#c-des').fill('falhas de sessão');
+    await expect(page.locator('#form-err')).toBeHidden();
+  });
+
+  test('Iniciar sessão com a duração digitada', async ({ page }) => {
     await page.getByRole('button', { name: 'Começar nova sessão' }).click();
     await page.locator('#c-exp').fill('o login');
     await page.locator('#c-des').fill('falhas de sessão');
-    await page.getByRole('button', { name: /30 min/ }).click();
+    await page.getByLabel('Duração planejada').fill('45');
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
     await expect(page.locator('.charter-card')).toContainText('Explorar o login');
-    await expect(page.locator('#clock-sub')).toContainText('de 30 min');
+    await expect(page.locator('#clock-sub')).toContainText('de 45 min');
+  });
+
+  test('Recusar duração fora de 1 a 480 minutos', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.locator('#c-exp').fill('o login');
+    await page.locator('#c-des').fill('falhas de sessão');
+    await page.getByLabel('Duração planejada').fill('0');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await expect(page.getByText('Use um tempo entre 1 e 480 minutos.')).toBeVisible();
+    await expect(page.locator('#form-err')).toContainText('Ajuste a duração planejada');
+    await expect(page.locator('.charter-card')).toHaveCount(0);
   });
 });
 
@@ -211,7 +247,39 @@ test.describe('Baralho de heurísticas', () => {
   });
 });
 
+test.describe('Método', () => {
+  test('Virar o flashcard ao clicar e voltar ao clicar de novo', async ({ page }) => {
+    await page.locator('#tab-metodo').click();
+    const carta = page.locator('#m-sbtm');
+    await expect(carta).toHaveAttribute('aria-pressed', 'false');
+    await carta.click();
+    await expect(carta).toHaveAttribute('aria-pressed', 'true');
+    await expect(carta.locator('.fc-verso')).toHaveAttribute('aria-hidden', 'false');
+    await carta.click();
+    await expect(carta).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('Virar o flashcard pelo teclado', async ({ page }) => {
+    await page.locator('#tab-metodo').click();
+    await page.locator('#m-charter').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#m-charter')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('Abrir o método com a carta do charter já virada pela ajuda do formulário', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.getByRole('button', { name: 'Por que charter?' }).click();
+    await expect(page.locator('#m-charter')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#m-sbtm')).toHaveAttribute('aria-pressed', 'false');
+  });
+});
+
 test.describe('Tema', () => {
+  test('Abrir no tema escuro na primeira visita', async ({ page }) => {
+    await expect(page.locator('html')).toHaveAttribute('data-escuro', '');
+    await expect(page.locator('#tema')).toContainText('Escuro');
+  });
+
   test('Alternar o tema e manter a escolha ao recarregar', async ({ page }) => {
     const botao = page.locator('#tema');
     const inicial = await page.evaluate(() => document.documentElement.hasAttribute('data-escuro'));

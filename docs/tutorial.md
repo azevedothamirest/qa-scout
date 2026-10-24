@@ -27,10 +27,10 @@ Este tutorial leva uns 10 minutos. Ao final, você terá feito uma sessão compl
 | Jeito | Para quem | Captura automática |
 |---|---|---|
 | **Navegador de teste** (recomendado) | Quem tem Node instalado e quer o registro automático | Sim, em todas as abas desse navegador |
-| **Extensão do Chrome** | Quem prefere usar o próprio Chrome, sem terminal | Sim, só nas abas que você marcar com **Acompanhar a aba atual** |
+| **Extensão do Chrome** · [instalar na Chrome Web Store](https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin) | Quem prefere usar o próprio Chrome, sem terminal | Sim, só nas abas que você marcar com **Acompanhar a aba atual** |
 | **Versão web** · [azevedothamirest.github.io/qa-scout](https://azevedothamirest.github.io/qa-scout/) | Quem só quer experimentar, ou não pode instalar nada | Não. As notas e os prints são manuais |
 
-Este tutorial segue o **navegador de teste**. As seções 3 e 6 valem para todos os jeitos; a 4 e a 5 (captura automática) valem para o navegador de teste e para a extensão. Na extensão, a diferença é que você abre o QA Scout pelo ícone na barra do Chrome e, depois de iniciar a sessão, clica em **Acompanhar a aba atual** na página do sistema em teste.
+Este tutorial segue o **navegador de teste**. As seções 3 e 6 valem para todos os jeitos; a 4 e a 5 (captura automática) valem para o navegador de teste e para a extensão. Na extensão, a diferença é que você abre o QA Scout pelo ícone na barra do Chrome e, depois de iniciar a sessão, clica em **Acompanhar a aba atual** na página do sistema em teste. Se o Chrome mostrar "Prossiga com cautela" ao instalar, é o aviso padrão para extensões de desenvolvedores novos na loja: clique em **Continuar instalação**. Na primeira vez, o Chrome pergunta se o QA Scout pode acessar os sites: aceite, porque é o que permite tirar o print e registrar os cliques. O acesso só é usado nas abas que você acompanhar.
 
 ## 2. Instale e abra o navegador de teste
 
@@ -80,7 +80,7 @@ Exemplo:
 
 > Explorar **o pagamento com Pix no checkout** com **QR Code expirado, botão voltar e cupom** para descobrir **pedidos pagos que ficam pendentes ou cobranças em dobro**.
 
-Preencha também a área, o ambiente e a duração (30, 60 ou 90 minutos) e clique em **Iniciar sessão**. O cronômetro começa a contar.
+Preencha também a área, o ambiente e a duração em minutos (o tempo que fizer sentido para a missão) e clique em **Iniciar sessão**. O cronômetro começa a contar. Na extensão, a captura automática já começa na aba do sistema em teste.
 
 **Sem ideia do que explorar?** Abra a aba **Heurísticas** e clique em **Puxar outra carta** (ou aperte a barra de espaço). Cada carta traz uma heurística e um desafio do tipo *"Faz isso agora"*. O botão **Começar sessão com esta carta** já preenche o campo "com" do charter.
 
@@ -99,6 +99,7 @@ Vá para a janela do sistema em teste e explore normalmente. Enquanto a sessão 
 | Uma requisição volta 4xx | `Requisição com erro: GET /api/frete → 404`, sugerida como **risco** |
 | Uma requisição volta 5xx ou nem conecta | `Requisição com erro: POST /api/pix → 500`, sugerida como **bug** |
 | Aperta `Alt+Shift+M` no sistema em teste | `Marcou este momento`, com print da tela |
+| Aperta `Alt+1` a `Alt+5` no sistema em teste | `Bug marcado neste momento` (ou dúvida, ideia, risco, observação), com print |
 
 Detalhes que vale saber:
 
