@@ -24,16 +24,16 @@ test.describe('Pacote da Chrome Web Store', () => {
     const manifesto = JSON.parse(fs.readFileSync(path.join(RAIZ, 'manifest.json'), 'utf8'));
     expect(manifesto.version).toBe(version);
 
-    execFileSync(process.execPath, [path.join(RAIZ, 'bin', 'empacotar.js')], { cwd: RAIZ });
+    execFileSync(process.execPath, [path.join(RAIZ, 'scripts', 'empacotar.js')], { cwd: RAIZ });
     const nomes = nomesDoZip(fs.readFileSync(path.join(RAIZ, 'dist', `qa-scout-extensao-${version}.zip`)));
 
-    expect(nomes).toEqual(expect.arrayContaining(['manifest.json', 'index.html', 'app.js', 'extensao/background.js', 'extensao/content.js', 'extensao/pagina.js']));
+    expect(nomes).toEqual(expect.arrayContaining(['manifest.json', 'index.html', 'app.css', 'app.js', 'extensao/background.js', 'extensao/content.js', 'extensao/pagina.js']));
     for (const icone of Object.values(manifesto.icons)) expect(nomes).toContain(icone);
     // Na loja, o acesso aos sites é opcional (pedido no primeiro uso) e o id vem da própria loja.
     expect(manifesto.host_permissions).toBeUndefined();
     expect(manifesto.content_scripts).toBeUndefined();
     expect(manifesto.optional_host_permissions).toEqual(['<all_urls>']);
     expect(manifesto.key).toBeUndefined();
-    expect(nomes.filter(n => /^(tests|docs|bin|node_modules)\//.test(n) || n === 'package.json')).toEqual([]);
+    expect(nomes.filter(n => /^(tests|docs|bin|scripts|node_modules)\//.test(n) || n === 'package.json')).toEqual([]);
   });
 });
