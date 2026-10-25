@@ -91,7 +91,7 @@
   document.addEventListener('qascout:erro', e => {
     let det; try { det = JSON.parse(e.detail); } catch (err) { return; }
     const desc = det.tipo === 'js' ? `Erro de JavaScript: ${det.msg}` : `Erro no console: ${det.msg}`;
-    envia({ tipo: 'erro', grave: det.tipo === 'js', desc });
+    envia({ tipo: 'erro', grave: det.tipo === 'js', desc, chave: det.chave, vezes: det.vezes, repete: det.repete });
   });
   document.dispatchEvent(new CustomEvent('qascout:pronto'));
 })();

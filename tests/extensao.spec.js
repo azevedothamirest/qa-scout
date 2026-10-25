@@ -228,7 +228,7 @@ test.describe('Passos para reproduzir', () => {
     await painel.getByRole('button', { name: 'Salvar e confirmar' }).click();
     await painel.getByRole('button', { name: 'Encerrar' }).click();
     await painel.getByRole('button', { name: 'Sim, encerrar' }).click();
-    await expect(painel.locator('#md-out')).toHaveValue(/Pix não responde no primeiro clique\n  Passos para reproduzir:\n  1\. Abriu a página/);
+    await expect(painel.locator('#md-out')).toHaveValue(/Pix não responde no primeiro clique {2}\n {2}Passos para reproduzir: {2}\n {2}1\\\. Abriu a página/);
   });
 });
 
@@ -347,5 +347,34 @@ test.describe('Privacidade da captura', () => {
     await expect(painel.locator('.note', { hasText: 'Clicou em' })).toHaveCount(1);
     await expect(painel.locator('.note', { hasText: 'Maria' })).toHaveCount(0);
     await expect(painel.locator('.note', { hasText: '123.456' })).toHaveCount(0);
+  });
+});
+
+test.describe('Erros repetidos', () => {
+  // #11
+  test('Agrupar rajada do mesmo erro numa nota com contador e registrar erro diferente depois', { tag: '@regressao' }, async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.evaluate(() => {
+      for (let i = 1; i <= 50; i++) setTimeout(() => { throw new Error(`Falha ao renderizar item ${i}`); });
+      setTimeout(() => console.error('Erro diferente depois da rajada'), 50);
+    });
+    const rajada = painel.locator('.note.t-bug', { hasText: 'Falha ao renderizar item' });
+    await expect(rajada).toHaveCount(1);
+    await expect(rajada).toContainText('(×50)');
+    await expect(painel.locator('.note.t-ris', { hasText: 'Erro diferente depois da rajada' })).toBeVisible();
+  });
+
+  // #12
+  test('Somar na mesma nota a falha de rede que se repete', { tag: '@regressao' }, async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    for (let i = 0; i < 3; i++) {
+      await loja.getByRole('button', { name: 'Consultar frete' }).click();
+      await loja.waitForTimeout(300);
+    }
+    const nota = painel.locator('.note.t-ris', { hasText: 'GET /api/frete?cep=01001000 → 404' });
+    await expect(nota).toHaveCount(1);
+    await expect(nota).toContainText('(×3)');
   });
 });

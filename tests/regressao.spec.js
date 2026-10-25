@@ -218,3 +218,19 @@ test.describe('Regressão · correções da 0.6.2', () => {
     }
   });
 });
+
+test.describe('Regressão · correções da 0.6.3', () => {
+  // #22
+  test('Exportar nota com HTML e várias linhas sem quebrar o Markdown', regressao, async ({ page }) => {
+    await iniciarSessao(page, { area: 'Área <b>teste</b>' });
+    await registrar(page, '<img src=x onerror=alert(1)> [link](javascript:alert(2))');
+    await page.locator('#note-in').fill('# título\n- item\n| a | b |');
+    await page.getByRole('button', { name: 'Registrar nota' }).click();
+    await encerrar(page);
+    const md = await page.locator('#md-out').inputValue();
+    expect(md).toContain('# Sessão exploratória · Área &lt;b&gt;teste&lt;/b&gt;');
+    expect(md).toContain('&lt;img src=x onerror=alert(1)&gt; \\[link\\](javascript:alert(2))');
+    expect(md).toMatch(/- `\d\d:\d\d` \\# título {2}\n {2}\\- item {2}\n {2}\\\| a \\\| b \\\|/);
+    expect(md).not.toMatch(/<img|<b>/);
+  });
+});

@@ -109,7 +109,11 @@ function load(){
 let state = load();
 let storageOk = true, warned = false;
 if(!EXT){ try{ localStorage.setItem(KEY+'.t','1'); localStorage.removeItem(KEY+'.t'); }catch(e){ storageOk = false; } }
+// Cada aba marca o que grava; assim adotarEstado() ignora o eco das próprias gravações
+// (o chrome.storage.onChanged chega depois, e o estado em memória pode já estar mais novo).
+const ABA_ID = Math.random().toString(36).slice(2);
 function save(){
+  state._aba = ABA_ID;
   if(EXT){ chrome.storage.local.set({[KEY]:state}).catch(()=>toast('Não foi possível salvar a sessão.')); return true; }
   if(!storageOk){ if(!warned){ warned=true; toast('Este navegador não permite salvar. A sessão fica só nesta aba.'); } return true; }
   try{ localStorage.setItem(KEY, JSON.stringify(state)); return true; }
@@ -419,6 +423,11 @@ function anotaPrint(ev){
   });
 }
 let drenando=false, drenarDeNovo=false;
+function contaRepeticao(n, mais){
+  n.vezes=(n.vezes||1)+mais;
+  const marca=` (×${n.vezes})`;
+  n.text = / \(×\d+\)$/.test(n.text) ? n.text.replace(/ \(×\d+\)$/, marca) : n.text+marca;
+}
 async function drenar(){
   if(!EXT) return;
   if(drenando){ drenarDeNovo=true; return; }
@@ -430,10 +439,16 @@ async function drenar(){
     const s=getActive();
     if(s){
       for(const k of chaves){
-        const ev=tudo[k], img = ev.img ? await anotaPrint(ev) : null;
+        const ev=tudo[k];
+        // Erro ou falha de rede repetida: soma na nota que já existe em vez de criar outra.
+        const igual = ev.chave && s.notes.find(n=>n.chave===ev.chave);
+        if(igual){ contaRepeticao(igual, ev.vezes||1); continue; }
+        const img = ev.img ? await anotaPrint(ev) : null;
         const t=Math.max(0, elapsed(s)-(Date.now()-ev.ts));
         const lugar = ev.tipo==='pagina' ? '' : (ev.titulo ? ` · ${ev.titulo.slice(0,60)}` : '');
-        s.notes.push({id:uid(),type:ev.nota||'obs',t,text:ev.desc+lugar,passo:ev.desc,origem:ev.tipo,url:ev.url||'',imgs:img?[img]:[],auto:true,pending:true});
+        const nota={id:uid(),type:ev.nota||'obs',t,text:ev.desc+lugar,passo:ev.desc,origem:ev.tipo,url:ev.url||'',imgs:img?[img]:[],auto:true,pending:true};
+        if(ev.chave){ nota.chave=ev.chave; nota.vezes=1; if((ev.vezes||1)>1) contaRepeticao(nota, ev.vezes-1); }
+        s.notes.push(nota);
       }
       s.notes.sort((a,b)=>a.t-b.t);
       save();
@@ -537,16 +552,21 @@ function viewReport(s){
   </section>`;
 }
 function tbsBar(db){ const tot=(db.test+db.bug+db.setup)||1; return `<i style="width:${db.test/tot*100}%;background:var(--accent)"></i><i style="width:${db.bug/tot*100}%;background:var(--t-bug)"></i><i style="width:${db.setup/tot*100}%;background:var(--marker)"></i>`; }
+// Texto digitado vai para o Markdown como texto: HTML, links e marcadores de bloco no início da linha
+// são escapados, para o relatório não mudar de forma no GitHub ou no Jira.
+const mdEsc = l => l.replace(/[\\`[\]|]/g,'\\$&').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const mdInline = t => mdEsc(String(t??'').replace(/\s*\n\s*/g,' '));
+const mdBloco = (t, recuo='') => String(t??'').split(/\n+/).map(l=>mdEsc(l).replace(/^(\s*)(\d+)([.)])(?=\s|$)/,'$1$2\\$3').replace(/^(\s*)([#+*-])(?=\s|$)/,'$1\\$2')).join('  \n'+recuo);
 function toMarkdown(s, onlyBugs=false){
   const c=counts(s), db=s.debrief||{};
   s={...s, notes:s.notes.filter(n=>!n.pending)};
-  const line = n => `- \`${fmtT(n.t)}\` ${n.text.replace(/\n+/g,'\n  ')}${n.imgs&&n.imgs.length?` _(${n.imgs.length} print${n.imgs.length>1?'s':''})_`:''}`;
+  const line = n => `- \`${fmtT(n.t)}\` ${mdBloco(n.text,'  ')}${n.imgs&&n.imgs.length?` _(${n.imgs.length} print${n.imgs.length>1?'s':''})_`:''}`;
   if(onlyBugs){
-    return `## Bugs · ${s.area}\n_${fmtDate(s.startedAt)} · ${s.ambiente||'ambiente não informado'}_\n\n` + (s.notes.filter(n=>n.type==='bug').map(line).join('\n') || '_Nenhum bug registrado._');
+    return `## Bugs · ${mdInline(s.area)}\n_${fmtDate(s.startedAt)} · ${mdInline(s.ambiente)||'ambiente não informado'}_\n\n` + (s.notes.filter(n=>n.type==='bug').map(line).join('\n') || '_Nenhum bug registrado._');
   }
-  let md = `# Sessão exploratória · ${s.area}\n\n`;
-  md += `**Charter:** ${charterText(s.charter)}.\n\n`;
-  md += `| | |\n|---|---|\n| Data | ${fmtDate(s.startedAt)} |\n| Ambiente | ${s.ambiente||'-'} |\n| Quem testou | ${s.testadora||'-'} |\n| Duração | ${Math.round(s.elapsedMs/MIN)} de ${s.plannedMin} min |\n`;
+  let md = `# Sessão exploratória · ${mdInline(s.area)}\n\n`;
+  md += `**Charter:** ${mdInline(charterText(s.charter))}.\n\n`;
+  md += `| | |\n|---|---|\n| Data | ${fmtDate(s.startedAt)} |\n| Ambiente | ${mdInline(s.ambiente)||'-'} |\n| Quem testou | ${mdInline(s.testadora)||'-'} |\n| Duração | ${Math.round(s.elapsedMs/MIN)} de ${s.plannedMin} min |\n`;
   if(db.test!=null) md += `| Divisão do tempo | Teste ${db.test}% · Bug ${db.bug}% · Setup ${db.setup}% |\n`;
   md += `\n**Resumo:** ${TYPE_ORDER.map(k=>`${c[k]} ${(c[k]===1?TYPES[k].label:PLURAL[k]).toLowerCase()}`).join(', ')}.\n`;
   TYPE_ORDER.forEach(k=>{ const ns=s.notes.filter(n=>n.type===k); if(ns.length) md += `\n## ${PLURAL[k]}\n${ns.map(line).join('\n')}\n`; });
@@ -570,15 +590,15 @@ function bugMarkdown(s,n){
   const titulo = descricao.split('\n')[0].slice(0,90);
   const passos = (passosTxt.trim() || passosAte(s,n).replace(MARCA_PASSOS,'').trim() || '1. ').trim();
   const erros = s.notes.filter(x=>x!==n && (x.origem==='erro'||x.origem==='rede') && Math.abs(x.t-n.t)<=60000);
-  let md = `## ${titulo}\n\n`;
-  md += `| | |\n|---|---|\n| Sessão | ${s.area} · ${fmtDate(s.startedAt)}, aos ${fmtT(n.t)} |\n| Ambiente | ${s.ambiente||'-'} |\n| Navegador | ${s.navegador||navegadorAtual()} |\n`;
+  let md = `## ${mdInline(titulo)}\n\n`;
+  md += `| | |\n|---|---|\n| Sessão | ${mdInline(s.area)} · ${fmtDate(s.startedAt)}, aos ${fmtT(n.t)} |\n| Ambiente | ${mdInline(s.ambiente)||'-'} |\n| Navegador | ${s.navegador||navegadorAtual()} |\n`;
   if(n.url) md += `| Página | ${n.url} |\n`;
   md += `\n### Passos para reproduzir\n${passos}\n`;
-  md += `\n### Resultado obtido\n${descricao}\n`;
+  md += `\n### Resultado obtido\n${mdBloco(descricao)}\n`;
   md += `\n### Resultado esperado\n_Descreva o comportamento esperado._\n`;
-  if(erros.length) md += `\n### Erros de console e rede no mesmo minuto\n${erros.map(x=>`- \`${fmtT(x.t)}\` ${(x.passo||x.text).replace(/\n+/g,' ')}`).join('\n')}\n`;
+  if(erros.length) md += `\n### Erros de console e rede no mesmo minuto\n${erros.map(x=>`- \`${fmtT(x.t)}\` ${mdInline(x.passo||x.text)}`).join('\n')}\n`;
   if(n.imgs&&n.imgs.length) md += `\n### Evidências\n${n.imgs.length} print${n.imgs.length>1?'s':''} na nota do QA Scout. Anexe ao ticket.\n`;
-  md += `\n---\n_Registrado com QA Scout · charter: ${charterText(s.charter)}_`;
+  md += `\n---\n_Registrado com QA Scout · charter: ${mdInline(charterText(s.charter))}_`;
   return md;
 }
 
@@ -967,7 +987,7 @@ function salvarPdf(){
 }
 // Outra aba (ou a aba de impressão) salvou: adota o estado novo sem perder o que está sendo digitado.
 function adotarEstado(novo){
-  if(!estadoValido(novo) || JSON.stringify(novo)===JSON.stringify(state)) return;
+  if(!estadoValido(novo) || novo._aba===ABA_ID) return;
   const campos=[...document.querySelectorAll('textarea[id],input[id]')].filter(el=>el.type!=='file'&&el.type!=='range').map(el=>[el.id,el.value]);
   const foco=document.activeElement?.id, sel=foco && document.activeElement.selectionStart!=null ? [document.activeElement.selectionStart,document.activeElement.selectionEnd] : null;
   state=novo;
