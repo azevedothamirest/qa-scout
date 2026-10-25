@@ -85,7 +85,7 @@ test.describe('Captura automática', () => {
     await expect(painel.getByRole('button', { name: 'a revisar 2' })).toBeVisible();
   });
 
-  test('Registrar campo preenchido sem guardar o valor digitado', async ({ context, painel }) => {
+  test('Registrar campo preenchido sem guardar o valor digitado', { tag: '@regressao' }, async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByLabel('CPF').fill('123.456.789-09');
@@ -99,7 +99,7 @@ test.describe('Captura automática', () => {
     expect(guardado).not.toContain('segredo-de-teste');
   });
 
-  test('Ignorar cliques enquanto a sessão está pausada', async ({ context, painel }) => {
+  test('Ignorar cliques enquanto a sessão está pausada', { tag: '@regressao' }, async ({ context, painel }) => {
     await iniciarSessao(painel);
     await painel.getByRole('button', { name: 'Pausar' }).click();
     const loja = await acompanharLoja(context, painel);
@@ -148,7 +148,7 @@ test.describe('Revisão das notas automáticas', () => {
     await expect(nota).not.toHaveClass(/pendente/);
   });
 
-  test('Deixar notas não revisadas fora do Markdown do relatório', async ({ context, painel }) => {
+  test('Deixar notas não revisadas fora do Markdown do relatório', { tag: '@regressao' }, async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
@@ -164,7 +164,7 @@ test.describe('Revisão das notas automáticas', () => {
 });
 
 test.describe('Erros de console e rede', () => {
-  test('Sugerir bug ao capturar erro de JavaScript na página', async ({ context, painel }) => {
+  test('Sugerir bug ao capturar erro de JavaScript na página', { tag: '@regressao' }, async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('button', { name: 'Aplicar cupom' }).click();
@@ -180,7 +180,7 @@ test.describe('Erros de console e rede', () => {
     await expect(painel.locator('.note.t-ris.pendente', { hasText: 'Erro no console: Falha ao carregar o aviso de frete grátis' })).toBeVisible();
   });
 
-  test('Registrar resposta 4xx como risco e falha de conexão como bug', async ({ context, painel }) => {
+  test('Registrar resposta 4xx como risco e falha de conexão como bug', { tag: '@regressao' }, async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('button', { name: 'Consultar frete' }).click();
@@ -212,7 +212,7 @@ test.describe('Marcar o momento', () => {
 });
 
 test.describe('Passos para reproduzir', () => {
-  test('Incluir na nota de bug as ações registradas até ela', async ({ context, painel }) => {
+  test('Incluir na nota de bug as ações registradas até ela', { tag: '@regressao' }, async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByLabel('CPF').fill('123.456.789-09');
@@ -299,7 +299,7 @@ test.describe('Atalhos no sistema em teste', () => {
 });
 
 test.describe('Salvar em PDF', () => {
-  test('Abrir o relatório numa aba própria e imprimir de lá', async ({ context, painel }) => {
+  test('Abrir o relatório numa aba própria e imprimir de lá', { tag: '@regressao' }, async ({ context, painel }) => {
     await context.addInitScript(() => { window.print = () => { document.documentElement.dataset.imprimiu = '1'; }; });
     await painel.getByText('Checkout · pagamento com Pix').click();
     const [aba] = await Promise.all([context.waitForEvent('page'), painel.getByRole('button', { name: 'Salvar em PDF' }).click()]);
@@ -312,7 +312,7 @@ test.describe('Salvar em PDF', () => {
 });
 
 test.describe('Captura automática por padrão', () => {
-  test('Acompanhar a aba do sistema em teste ao iniciar a sessão', async ({ context, painel }) => {
+  test('Acompanhar a aba do sistema em teste ao iniciar a sessão', { tag: '@regressao' }, async ({ context, painel }) => {
     const loja = await context.newPage();
     await loja.goto(LOJA);
     await painel.bringToFront();

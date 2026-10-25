@@ -28,6 +28,7 @@ Companheiro de teste exploratório baseado em sessões (SBTM), criado por Thamir
 npm install
 npm start      # http://localhost:4173
 npm test       # Playwright: "desktop", "celular" (Pixel 7) e "extensao" (carrega a extensão num Chromium real)
+npm run test:regressao  # só a suíte de regressão (testes com a tag @regressao)
 npm run pacote # .zip da extensão para a Chrome Web Store
 ```
 
@@ -38,6 +39,7 @@ npm run pacote # .zip da extensão para a Chrome Web Store
 - Agrupar com `test.describe` por área da tela (Histórico, Charter, Sessão em campo, Debriefing).
 - Preferir seletores acessíveis (`getByRole`, `getByLabel`); usar `data-*` e ids só quando não houver alternativa.
 - `beforeEach` limpa o `localStorage` para cada teste começar das sessões de exemplo.
+- Regressão: `tests/regressao.spec.js` cobre as jornadas críticas de ponta a ponta, e testes de outras suítes que protegem fluxo crítico levam `{ tag: '@regressao' }`. A CI (`ci.yml`) roda em toda subida: primeiro o job "Regressão · fluxos críticos" (`--grep @regressao`), depois "Suíte completa" com o resto; `scripts/resumo-testes.js` publica o título de cada teste no resumo da execução. Fluxo crítico novo ou bug corrigido entra com teste `@regressao`.
 - Toda funcionalidade nova entra com teste. Rodar `npm test` antes de qualquer commit.
 
 ## Como trabalhar com a Thamires

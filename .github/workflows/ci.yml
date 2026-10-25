@@ -1,24 +1,63 @@
-name: Testes e2e
+name: Testes
 
+# Roda em toda subida: push em qualquer branch e pull request.
 on:
   push:
-    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: testes-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  playwright:
+  regressao:
+    name: Regressão · fluxos críticos
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install --no-audit --no-fund
+          cache: npm
+      - run: npm ci --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test
+      - name: Rodar a suíte de regressão (@regressao)
+        run: npx playwright test --grep @regressao --reporter=list,json,html
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: resultados.json
+      - name: Publicar os títulos dos testes no resumo
+        if: always()
+        run: node scripts/resumo-testes.js resultados.json "Regressão · fluxos críticos"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
+          name: relatorio-regressao
+          path: playwright-report/
+          retention-days: 14
+
+  completa:
+    name: Suíte completa
+    needs: regressao
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Rodar os demais testes
+        run: npx playwright test --grep-invert @regressao --reporter=list,json,html
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: resultados.json
+      - name: Publicar os títulos dos testes no resumo
+        if: always()
+        run: node scripts/resumo-testes.js resultados.json "Suíte completa · demais testes"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-completo
           path: playwright-report/
           retention-days: 14

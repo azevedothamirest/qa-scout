@@ -40,6 +40,7 @@
     "start": "http-server . -p 4173 -c-1",
     "navegador": "node bin/qa-scout.js",
     "test": "playwright test",
+    "test:regressao": "playwright test --grep @regressao",
     "test:report": "playwright show-report",
     "pacote": "node scripts/empacotar.js"
   },
