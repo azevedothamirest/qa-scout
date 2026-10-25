@@ -19,7 +19,7 @@ async function estado() {
 // Com o acesso concedido, o pagina.js passa a rodar desde o início de cada página para pegar
 // erros de JavaScript; sem ele, nada é registrado.
 const ACESSO = { origins: ['<all_urls>'] };
-const SCRIPT_PAGINA = { id: 'qascout-pagina', matches: ['http://*/*', 'https://*/*', 'file:///*'], js: ['extensao/pagina.js'], runAt: 'document_start', world: 'MAIN' };
+const SCRIPT_PAGINA = { id: 'qascout-pagina', matches: ['http://*/*', 'https://*/*', 'file:///*'], js: ['extensao/pagina.js'], runAt: 'document_start', world: 'MAIN', allFrames: true };
 async function sincronizaScriptPagina() {
   const tem = await chrome.permissions.contains(ACESSO);
   const ativos = await chrome.scripting.getRegisteredContentScripts({ ids: [SCRIPT_PAGINA.id] });
@@ -33,8 +33,9 @@ chrome.permissions.onRemoved.addListener(sincronizaScriptPagina);
 async function injeta(tabId) {
   try {
     // Abas já abertas antes do acesso não receberam o pagina.js: injeta também (ele não roda duas vezes).
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['extensao/pagina.js'], world: 'MAIN' }).catch(() => {});
-    await chrome.scripting.executeScript({ target: { tabId }, files: ['extensao/content.js'] });
+    // allFrames: iframes do mesmo site também são capturados (o content.js ignora os de outros sites).
+    await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, files: ['extensao/pagina.js'], world: 'MAIN' }).catch(() => {});
+    await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, files: ['extensao/content.js'] });
     return true;
   } catch (e) { return false; }
 }
@@ -46,6 +47,10 @@ async function guardaEvento(ev) {
 
 chrome.runtime.onMessage.addListener((msg, sender, responder) => {
   if (msg && msg.qaScout && sender.tab) { registra(msg, sender.tab); return; }
+  if (msg && msg.cmd === 'quadros' && sender.tab) {
+    estado().then(({ acompanha }) => { if (acompanha(sender.tab)) injeta(sender.tab.id); });
+    return;
+  }
   if (msg && msg.cmd === 'acompanhar') {
     (async () => {
       const { abas } = await estado();
@@ -95,15 +100,32 @@ chrome.tabs.onCreated.addListener(async tab => {
 });
 
 // A cada página carregada numa aba acompanhada: injeta de novo e registra a navegação.
+// Em SPA (history.pushState) o "complete" chega antes de a página trocar o título: se a URL mudou
+// e o título ainda é o da página anterior, espera até 1,5 s pelo título novo.
+const ultimaPagina = new Map(); // tabId -> { url, titulo }
+async function tituloAtualizado(tabId, tab) {
+  const antes = ultimaPagina.get(tabId);
+  if (!antes || antes.url === tab.url || antes.titulo !== tab.title) return tab;
+  for (let i = 0; i < 6; i++) {
+    await new Promise(r => setTimeout(r, 250));
+    const t = await chrome.tabs.get(tabId).catch(() => null);
+    if (!t) return tab;
+    if (t.title !== antes.titulo) return t;
+  }
+  return tab;
+}
 chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   if (info.status !== 'complete') return;
   const { capturando, acompanha } = await estado();
   if (!acompanha(tab)) return;
   await injeta(tabId);
+  tab = await tituloAtualizado(tabId, tab);
+  ultimaPagina.set(tabId, { url: tab.url, titulo: tab.title });
   if (capturando) await guardaEvento({ tipo: 'pagina', desc: `Abriu a página “${(tab.title || '').slice(0, 80)}”`, url: tab.url, titulo: tab.title, ts: Date.now() });
 });
 
 chrome.tabs.onRemoved.addListener(async tabId => {
+  ultimaPagina.delete(tabId);
   const { abas } = await estado();
   if (abas.includes(tabId)) await chrome.storage.session.set({ abas: abas.filter(id => id !== tabId) });
 });

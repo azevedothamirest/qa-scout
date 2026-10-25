@@ -80,6 +80,16 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] Erro de JS ou falha de rede que se repete soma na mesma nota ("×N") em vez de criar outra ou sumir (#11, #12)
 - [x] Markdown do relatório e do "Copiar bug" escapa HTML e marcadores de bloco, e nota com várias linhas fica num item só (#22)
 
+## Versão 0.7.0 · cobertura da captura
+
+- [x] SPA: "Abriu a página" espera o título novo depois do pushState (#15)
+- [x] Shadow DOM: clique e campo descritos pelo elemento real (`composedPath`) (#13)
+- [x] Iframes do mesmo site capturados; os de outros sites (anúncios) ficam de fora (#14)
+- [x] Anexo de arquivo (sem o nome), campos de data/deslizante/sem rótulo descritos pelo tipo (#16)
+- [x] Select diz a opção escolhida, exceto em listas de dados sensíveis (#17)
+- [x] Botão só com ícone usa o `<title>`/aria-label do SVG (#18)
+- [x] Texto longo cortado na última palavra inteira, com "…" (#19)
+
 ## Decisões tomadas
 
 - Web app sem servidor e sem conta no início: custo zero e nenhuma preocupação com LGPD na largada.

@@ -378,3 +378,78 @@ test.describe('Erros repetidos', () => {
     await expect(nota).toContainText('(×3)');
   });
 });
+
+// Página com os casos da 0.7.0: campos sem rótulo, select, ícone, SPA, shadow DOM e iframe.
+const CAPTURA = 'http://localhost:4173/tests/fixtures/captura.html';
+async function acompanharCaptura(context, painel) {
+  const pagina = await context.newPage();
+  await pagina.goto(CAPTURA);
+  const r = await painel.evaluate(async url => {
+    const [tab] = await chrome.tabs.query({ url: url + '*' });
+    return chrome.runtime.sendMessage({ cmd: 'acompanhar', tabId: tab.id });
+  }, CAPTURA);
+  expect(r.ok).toBe(true);
+  await pagina.reload();
+  await pagina.bringToFront();
+  return pagina;
+}
+
+test.describe('Cobertura da captura', () => {
+  // #15
+  test('Registrar o título novo ao navegar numa SPA com pushState', { tag: '@regressao' }, async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const pagina = await acompanharCaptura(context, painel);
+    await pagina.getByRole('button', { name: 'Ir para Pagamento' }).click();
+    await expect(painel.locator('.note', { hasText: 'Abriu a página “Captura · Pagamento”' })).toHaveCount(1);
+  });
+
+  // #13
+  test('Descrever clique e campo dentro do shadow DOM', { tag: '@regressao' }, async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const pagina = await acompanharCaptura(context, painel);
+    await pagina.getByRole('button', { name: 'Aplicar no shadow' }).click();
+    await pagina.getByLabel('Código do cupom').fill('PROMO10');
+    await pagina.getByLabel('Código do cupom').blur();
+    await expect(painel.locator('.note', { hasText: 'Clicou no botão “Aplicar no shadow”' })).toHaveCount(1);
+    await expect(painel.locator('.note', { hasText: 'Preencheu o campo “Código do cupom”' })).toHaveCount(1);
+    await expect(painel.locator('.note', { hasText: 'PROMO10' })).toHaveCount(0);
+  });
+
+  // #14
+  test('Registrar clique e campo dentro de iframe do mesmo site', { tag: '@regressao' }, async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const pagina = await acompanharCaptura(context, painel);
+    const quadro = pagina.frameLocator('#quadro');
+    await quadro.getByLabel('CEP de entrega').fill('01001000');
+    await quadro.getByLabel('CEP de entrega').blur();
+    await quadro.getByRole('button', { name: 'Calcular dentro do iframe' }).click();
+    await expect(painel.locator('.note', { hasText: 'Preencheu o campo “CEP de entrega”' })).toHaveCount(1);
+    await expect(painel.locator('.note', { hasText: 'Clicou no botão “Calcular dentro do iframe”' })).toHaveCount(1);
+  });
+
+  // #16 #17 #18 #19
+  test('Descrever upload, campos sem rótulo, opção do select e botões de ícone ou texto longo', { tag: '@regressao' }, async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const pagina = await acompanharCaptura(context, painel);
+    await pagina.getByLabel('Comprovante').setInputFiles({ name: 'segredo-do-cliente.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
+    await pagina.getByLabel('Data da entrega').fill('2026-11-02');
+    await pagina.locator('.volume').fill('7');
+    await pagina.locator('.semrotulo').fill('qualquer coisa');
+    await pagina.locator('.semrotulo').blur();
+    await pagina.getByLabel('Estado').selectOption('RJ');
+    await pagina.getByLabel('Validade do cartão').selectOption('12');
+    await pagina.locator('#lixeira').click();
+    await pagina.locator('#longo').click();
+
+    const nota = t => painel.locator('.note', { hasText: t });
+    await expect(nota('Anexou um arquivo em “Comprovante”')).toHaveCount(1);
+    await expect(nota('segredo-do-cliente')).toHaveCount(0);
+    await expect(nota('Preencheu o campo de data “Data da entrega”')).toHaveCount(1);
+    await expect(nota('Preencheu um campo deslizante')).toHaveCount(1);
+    await expect(nota('Preencheu um campo de texto')).toHaveCount(1);
+    await expect(nota('Escolheu “RJ” em “Estado”')).toHaveCount(1);
+    await expect(nota('Escolheu uma opção em “Validade do cartão”')).toHaveCount(1);
+    await expect(nota('Clicou no botão “Excluir item”')).toHaveCount(1);
+    await expect(nota('Clicou no botão “Confirmar a contratação do plano anual com renovação automática e cobrança no…”')).toHaveCount(1);
+  });
+});
