@@ -4,7 +4,6 @@ Companheiro de teste exploratório baseado em sessões (SBTM), criado por Thamir
 
 - Site: https://azevedothamirest.github.io/qa-scout/ (GitHub Pages, publicado pelo workflow `pages.yml` a cada push na `main`)
 - Escopo do produto, decisões e roadmap: `docs/escopo.md`
-- Ideias de outros produtos para QA: `docs/ideias-produtos.md`
 
 ## Como o projeto está montado
 
