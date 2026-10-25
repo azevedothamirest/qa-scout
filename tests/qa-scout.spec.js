@@ -38,6 +38,22 @@ test.describe('Extensão do Chrome', () => {
   });
 });
 
+test.describe('Relatório em PDF', () => {
+  test('Imprimir só o documento do relatório, com charter, totais e notas confirmadas', async ({ page }) => {
+    await page.getByText('Checkout · pagamento com Pix').click();
+    await page.emulateMedia({ media: 'print' });
+    const doc = page.locator('.doc');
+    await expect(doc).toBeVisible();
+    await expect(page.locator('.top')).toBeHidden();
+    await expect(page.locator('.report')).toBeHidden();
+    await expect(doc.locator('h1')).toHaveText('Checkout · pagamento com Pix');
+    await expect(doc.locator('.doc-charter')).toContainText('Explorar o pagamento com Pix no checkout');
+    await expect(doc.locator('.doc-kpis')).toContainText('2Bugs');
+    await expect(doc.locator('.doc-nota')).toHaveCount(7);
+    await expect(doc.locator('.doc-tbs')).toContainText('Teste 55%');
+  });
+});
+
 test.describe('Backup das sessões', () => {
   test('Restaurar sessões removidas a partir do backup baixado', async ({ page }) => {
     const [download] = await Promise.all([
