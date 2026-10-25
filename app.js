@@ -93,9 +93,17 @@ const KEY = 'qascout.v1';
 const EXT = (()=>{ try{ return !!(window.chrome && chrome.runtime && chrome.runtime.id && chrome.storage); }catch(e){ return false; } })();
 const EV_PREFIX = 'qascout.ev.';
 function fresh(){ return {sessions:[ex1(),ex2()],activeId:null,draft:null}; }
+// Dados ilegíveis não são descartados: vão para KEY.corrompido e o app avisa ao abrir.
+const estadoValido = s => !!s && typeof s==='object' && Array.isArray(s.sessions) && s.sessions.every(x=>x && typeof x==='object' && x.id && x.charter && Array.isArray(x.notes));
+let corrompido = false;
 function load(){
   if(EXT) return fresh();
-  try{ const raw = localStorage.getItem(KEY); if(raw){ return JSON.parse(raw); } }catch(e){}
+  let raw=null;
+  try{ raw = localStorage.getItem(KEY); }catch(e){}
+  if(!raw) return fresh();
+  try{ const s=JSON.parse(raw); if(estadoValido(s)) return s; }catch(e){}
+  corrompido = true;
+  try{ localStorage.setItem(KEY+'.corrompido', raw); }catch(e){}
   return fresh();
 }
 let state = load();
@@ -957,10 +965,29 @@ function salvarPdf(){
   if(EXT && viewArg){ chrome.tabs.create({url:chrome.runtime.getURL('index.html')+'#imprimir='+viewArg}); return; }
   window.print();
 }
+// Outra aba (ou a aba de impressão) salvou: adota o estado novo sem perder o que está sendo digitado.
+function adotarEstado(novo){
+  if(!estadoValido(novo) || JSON.stringify(novo)===JSON.stringify(state)) return;
+  const campos=[...document.querySelectorAll('textarea[id],input[id]')].filter(el=>el.type!=='file'&&el.type!=='range').map(el=>[el.id,el.value]);
+  const foco=document.activeElement?.id, sel=foco && document.activeElement.selectionStart!=null ? [document.activeElement.selectionStart,document.activeElement.selectionEnd] : null;
+  state=novo;
+  if(view==='active' && !getActive()) view='home';
+  render();
+  campos.forEach(([id,v])=>{ const el=document.getElementById(id); if(el && !el.readOnly && el.value!==v) el.value=v; });
+  if(foco){ const el=document.getElementById(foco); if(el){ el.focus(); if(sel) try{ el.setSelectionRange(...sel); }catch(e){} } }
+}
+if(!EXT) addEventListener('storage',e=>{ if(e.key===KEY && e.newValue) try{ adotarEstado(JSON.parse(e.newValue)); }catch(err){} });
+
 async function init(){
   if(EXT){
-    try{ const r=await chrome.storage.local.get([KEY,'qascout.modo']); if(r[KEY]) state=r[KEY]; modoNavegador = r['qascout.modo']==='navegador'; }catch(e){}
+    try{
+      const r=await chrome.storage.local.get([KEY,'qascout.modo']);
+      if(r[KEY] && estadoValido(r[KEY])) state=r[KEY];
+      else if(r[KEY]){ corrompido=true; await chrome.storage.local.set({[KEY+'.corrompido']:r[KEY]}); }
+      modoNavegador = r['qascout.modo']==='navegador';
+    }catch(e){}
     chrome.storage.onChanged.addListener((mud,area)=>{
+      if(area==='local' && mud[KEY]?.newValue) adotarEstado(mud[KEY].newValue);
       if(area==='local' && Object.keys(mud).some(k=>k.startsWith(EV_PREFIX) && mud[k].newValue)) drenar();
       if(area==='session' && mud.abas) atualizaAbas();
     });
@@ -974,6 +1001,7 @@ async function init(){
   }
   if(getActive()) view='active';
   render();
+  if(corrompido) toast('Não foi possível ler as sessões salvas. Guardamos uma cópia e começamos do zero; importe um backup se tiver.');
   if(EXT){ atualizaAbas(); drenar(); }
 }
 init();
