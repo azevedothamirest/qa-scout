@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><title>Captura · Início</title></head>
+<body style="font-family:sans-serif;padding:24px">
+  <h1>Casos da captura</h1>
+
+  <h2>Campos</h2>
+  <label for="doc">Comprovante</label> <input id="doc" type="file"><br>
+  <label for="nasc">Data da entrega</label> <input id="nasc" type="date"><br>
+  <input class="volume" type="range" min="0" max="10"><br>
+  <input class="semrotulo"><br>
+  <label for="uf">Estado</label>
+  <select id="uf"><option value="">Escolha</option><option>SP</option><option>RJ</option></select><br>
+  <label for="validade">Validade do cartão</label>
+  <select id="validade" autocomplete="cc-exp-month"><option value="">Mês</option><option>01</option><option>12</option></select><br>
+
+  <h2>Botões</h2>
+  <button id="lixeira"><svg viewBox="0 0 10 10" width="16" height="16"><title>Excluir item</title><rect width="10" height="10"/></svg></button>
+  <button id="longo">Confirmar a contratação do plano anual com renovação automática e cobrança no cartão de crédito</button>
+
+  <h2>SPA</h2>
+  <button id="spa">Ir para Pagamento</button>
+
+  <h2>Shadow DOM</h2>
+  <caixa-cupom></caixa-cupom>
+
+  <h2>Iframe</h2>
+  <iframe id="quadro" src="quadro.html" width="400" height="140"></iframe>
+
+  <script>
+    document.getElementById('spa').addEventListener('click', () => {
+      history.pushState({}, '', '?tela=pagamento');
+      setTimeout(() => { document.title = 'Captura · Pagamento'; }, 300);
+    });
+    customElements.define('caixa-cupom', class extends HTMLElement {
+      connectedCallback() {
+        const r = this.attachShadow({ mode: 'open' });
+        r.innerHTML = '<label for="c">Código do cupom</label> <input id="c"> <button>Aplicar no shadow</button>';
+      }
+    });
+  </script>
+</body>
+</html>
