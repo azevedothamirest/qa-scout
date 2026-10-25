@@ -39,7 +39,7 @@ test.describe('Extensão do Chrome', () => {
 });
 
 test.describe('Relatório em PDF', () => {
-  test('Imprimir só o documento do relatório, com charter, totais e notas confirmadas', async ({ page }) => {
+  test('Imprimir só o documento do relatório, com charter, totais e notas confirmadas', { tag: '@regressao' }, async ({ page }) => {
     await page.getByText('Checkout · pagamento com Pix').click();
     await page.emulateMedia({ media: 'print' });
     const doc = page.locator('.doc');
@@ -55,7 +55,7 @@ test.describe('Relatório em PDF', () => {
 });
 
 test.describe('Backup das sessões', () => {
-  test('Restaurar sessões removidas a partir do backup baixado', async ({ page }) => {
+  test('Restaurar sessões removidas a partir do backup baixado', { tag: '@regressao' }, async ({ page }) => {
     const [download] = await Promise.all([
       page.waitForEvent('download'),
       page.getByRole('button', { name: 'Baixar backup' }).click(),
@@ -91,7 +91,7 @@ test.describe('Backup das sessões', () => {
 });
 
 test.describe('Copiar bug', () => {
-  test('Copiar bug com ambiente, passos e resultado esperado a partir do relatório', async ({ page, context }) => {
+  test('Copiar bug com ambiente, passos e resultado esperado a partir do relatório', { tag: '@regressao' }, async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.getByText('Checkout · pagamento com Pix').click();
     await page.locator('.group.t-bug .note', { hasText: 'aplica o desconto duas vezes' }).getByRole('button', { name: 'Copiar bug' }).click();
@@ -107,7 +107,7 @@ test.describe('Copiar bug', () => {
 });
 
 test.describe('Charter', () => {
-  test('Impedir início sem missão e objetivo de descoberta', async ({ page }) => {
+  test('Impedir início sem missão e objetivo de descoberta', { tag: '@regressao' }, async ({ page }) => {
     await page.getByRole('button', { name: 'Começar nova sessão' }).click();
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
     await expect(page.locator('#form-err')).toBeVisible();
@@ -209,7 +209,7 @@ test.describe('Sessão em campo', () => {
 });
 
 test.describe('Debriefing', () => {
-  test('Manter a divisão Teste, Bug e Setup somando 100%', async ({ page }) => {
+  test('Manter a divisão Teste, Bug e Setup somando 100%', { tag: '@regressao' }, async ({ page }) => {
     await page.locator('[data-open="ex-pix"]').click();
     await page.locator('#tbs-test').fill('80');
     const vals = await Promise.all(['test', 'bug', 'setup'].map(k => page.locator(`#tbs-${k}`).inputValue()));

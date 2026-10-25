@@ -38,8 +38,8 @@ manifest.json       manifesto da extensão do Chrome (Manifest V3)
 extensao/           captura automática: service worker, script de conteúdo e script da página
 icones/             ícones da extensão (16, 32, 48 e 128 px)
 bin/qa-scout.js     comando "qa-scout": abre o navegador de teste com a extensão carregada
-scripts/            utilitários de desenvolvimento (empacotar a extensão para a loja)
-tests/              testes e2e em Playwright e a loja fictícia usada neles
+scripts/            utilitários: empacotar a extensão e montar o resumo dos testes na CI
+tests/              testes e2e em Playwright (regressao.spec.js: fluxos críticos) e a loja fictícia usada neles
 docs/               tutorial, escopo e roadmap, textos e imagens da Chrome Web Store
 ```
 
@@ -59,7 +59,8 @@ Não há etapa de build: o que está no repositório é o que roda.
 - Título do teste em português, no formato **verbo de ação + objeto + condição**. Nunca comece com "validar" ou "verificar". Exemplo: *"Impedir início sem missão e objetivo de descoberta"*.
 - Agrupe com `test.describe` pela área da tela (Histórico, Charter, Sessão em campo, Debriefing...).
 - Prefira seletores acessíveis (`getByRole`, `getByLabel`); use ids e `data-*` só quando não houver alternativa.
-- Rode `npm test` antes de abrir o pull request. O CI roda a mesma suíte.
+- **Regressão:** os fluxos críticos ficam em `tests/regressao.spec.js` e nos testes marcados com `{ tag: '@regressao' }`. Rode só eles com `npm run test:regressao`. Corrigiu um bug ou criou um fluxo crítico? O teste entra com a tag.
+- Rode `npm test` antes de abrir o pull request. A CI roda em toda subida: primeiro a regressão, depois o resto da suíte, e lista o título e o resultado de cada teste no resumo da execução no GitHub Actions.
 
 ## Pull requests
 

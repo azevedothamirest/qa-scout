@@ -23,7 +23,7 @@ test.describe('Navegador de teste (comando qa-scout)', () => {
     fs.rmSync(perfil + '-extensao', { recursive: true, force: true });
   });
 
-  test('Abrir o painel e o sistema em teste com um único comando', async () => {
+  test('Abrir o painel e o sistema em teste com um único comando', { tag: '@regressao' }, async () => {
     await expect(aberto.painel.getByRole('button', { name: 'Começar nova sessão' })).toBeVisible();
     await expect(aberto.site).toHaveTitle('Loja fictícia · Checkout');
   });
@@ -50,7 +50,7 @@ test.describe('Navegador de teste (comando qa-scout)', () => {
 });
 
 test.describe('Navegador de teste · atualização', () => {
-  test('Recuperar as sessões guardadas sob o id antigo da extensão', async () => {
+  test('Recuperar as sessões guardadas sob o id antigo da extensão', { tag: '@regressao' }, async () => {
     const perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-'));
     const antiga = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-antiga-'));
     // Versão antiga: mesma extensão sem a chave fixa, então com outro id (como acontecia com o npx).
