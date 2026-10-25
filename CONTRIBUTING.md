@@ -60,7 +60,7 @@ Não há etapa de build: o que está no repositório é o que roda.
 - Agrupe com `test.describe` pela área da tela (Histórico, Charter, Sessão em campo, Debriefing...).
 - Prefira seletores acessíveis (`getByRole`, `getByLabel`); use ids e `data-*` só quando não houver alternativa.
 - **Regressão:** os fluxos críticos ficam em `tests/regressao.spec.js` e nos testes marcados com `{ tag: '@regressao' }`. Rode só eles com `npm run test:regressao`. Corrigiu um bug ou criou um fluxo crítico? O teste entra com a tag.
-- Rode `npm test` antes de abrir o pull request. A CI roda em toda subida: primeiro a regressão, depois o resto da suíte, e lista o título e o resultado de cada teste no resumo da execução no GitHub Actions.
+- Rode `npm test` antes de abrir o pull request. A CI roda em cada pull request: primeiro a regressão, depois o resto da suíte, e lista o título e o resultado de cada teste no resumo da execução no GitHub Actions.
 
 ## Pull requests
 

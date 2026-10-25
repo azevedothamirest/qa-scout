@@ -162,3 +162,59 @@ test.describe('Regressão · navegação e layout', () => {
     await semRolagem();
   });
 });
+
+test.describe('Regressão · correções da 0.6.2', () => {
+  // #20
+  test('Manter a página sem rolagem horizontal com texto longo sem espaços', regressao, async ({ page }) => {
+    const longo = 'https://exemplo.com/' + 'a'.repeat(3000);
+    await iniciarSessao(page, { area: longo, explorar: longo });
+    await registrar(page, longo);
+    const semRolagem = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await semRolagem();
+    await registrar(page, 'Botão continua clicável');
+    await expect(page.locator('.note .txt').first()).toHaveText('Botão continua clicável');
+    await encerrar(page);
+    await semRolagem();
+    await page.getByRole('button', { name: '← Todas as sessões' }).click();
+    await semRolagem();
+  });
+
+  // #21
+  test('Manter as notas registradas em duas abas abertas', regressao, async ({ page, context }) => {
+    await iniciarSessao(page);
+    const outra = await context.newPage();
+    await outra.goto('/');
+    await expect(outra.locator('#note-in')).toBeVisible();
+    await registrar(outra, 'Nota da aba 2');
+    await registrar(page, 'Nota da aba 1');
+    await expect(page.locator('.note .txt')).toHaveText(['Nota da aba 1', 'Nota da aba 2']);
+    await page.reload();
+    await expect(page.locator('.note .txt')).toHaveText(['Nota da aba 1', 'Nota da aba 2']);
+  });
+
+  test('Preservar o texto que está sendo digitado quando a outra aba salva', regressao, async ({ page, context }) => {
+    await iniciarSessao(page);
+    await page.locator('#note-in').fill('Rascunho em andamento');
+    const outra = await context.newPage();
+    await outra.goto('/');
+    await registrar(outra, 'Nota da aba 2');
+    await expect(page.locator('.note .txt')).toHaveText(['Nota da aba 2']);
+    await expect(page.locator('#note-in')).toHaveValue('Rascunho em andamento');
+  });
+
+  // #23
+  test('Guardar cópia dos dados corrompidos e avisar ao abrir o app', regressao, async ({ page }) => {
+    for (const quebrado of ['{quebrado', '{"sessions":null}', '[]']) {
+      const erros = [];
+      const ouvir = (e) => erros.push(e.message);
+      page.on('pageerror', ouvir);
+      await page.evaluate((v) => { localStorage.clear(); localStorage.setItem('qascout.v1', v); }, quebrado);
+      await page.reload();
+      await expect(page.locator('#toast')).toContainText('cópia');
+      expect(erros).toEqual([]);
+      expect(await page.evaluate(() => localStorage.getItem('qascout.v1.corrompido'))).toBe(quebrado);
+      await expect(page.getByRole('button', { name: 'Começar nova sessão' })).toBeVisible();
+      page.off('pageerror', ouvir);
+    }
+  });
+});

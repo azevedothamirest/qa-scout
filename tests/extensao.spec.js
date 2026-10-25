@@ -330,3 +330,22 @@ test.describe('Captura automática por padrão', () => {
     await expect(painel.locator('.note', { hasText: 'Clicou no botão “Pagar com Pix”' })).toBeVisible();
   });
 });
+
+test.describe('Privacidade da captura', () => {
+  // #10
+  test('Descrever clique em área sem interação sem copiar o texto da página', { tag: '@regressao' }, async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.evaluate(() => {
+      const caixa = document.createElement('section');
+      caixa.id = 'caixa';
+      caixa.style.cssText = 'padding:40px;margin:20px;background:#eee';
+      caixa.innerHTML = '<p>Cliente: Maria da Silva</p><p>CPF 123.456.789-00</p><span>Saldo R$ 9.999,00</span>';
+      document.body.prepend(caixa);
+    });
+    await loja.locator('#caixa').click({ position: { x: 5, y: 5 } });
+    await expect(painel.locator('.note', { hasText: 'Clicou em' })).toHaveCount(1);
+    await expect(painel.locator('.note', { hasText: 'Maria' })).toHaveCount(0);
+    await expect(painel.locator('.note', { hasText: '123.456' })).toHaveCount(0);
+  });
+});

@@ -67,6 +67,14 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] PDF do relatório com layout próprio de documento
 - [x] CSS em arquivo próprio (`app.css`), código sem uso removido, guia de contribuição
 
+## Versão 0.6.2 · dados e privacidade
+
+- [x] Texto longo sem espaços não quebra mais o layout (#20)
+- [x] Duas abas abertas não perdem notas: o app adota o que a outra aba salvou (#21)
+- [x] Dados corrompidos viram cópia em `qascout.v1.corrompido` com aviso, em vez de sumir (#23)
+- [x] Clique em área sem interação não copia o texto da página para a nota (#10)
+- [x] Suíte de regressão (`@regressao`) e CI com um job por pull request
+
 ## Decisões tomadas
 
 - Web app sem servidor e sem conta no início: custo zero e nenhuma preocupação com LGPD na largada.

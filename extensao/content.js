@@ -13,9 +13,18 @@
     return limpa(el.getAttribute('aria-label') || el.placeholder || el.name || el.id);
   }
 
-  function nomeDe(el) {
+  // Texto só dos nós de texto diretos do elemento, sem descer nos filhos.
+  const textoProprio = el => [...el.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join(' ');
+
+  // Em container (área sem interação, ou com texto longo), o innerText traria a página inteira
+  // para a nota; aí só vale o texto próprio do elemento.
+  function nomeDe(el, interativo) {
     if (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return rotuloDoCampo(el);
-    return limpa(el.getAttribute('aria-label') || el.innerText || el.getAttribute('title') || el.getAttribute('alt') || el.querySelector?.('img[alt]')?.alt);
+    const rotulo = el.getAttribute('aria-label') || el.getAttribute('title') || el.getAttribute('alt');
+    if (rotulo) return limpa(rotulo);
+    const texto = String(el.innerText || '').replace(/\s+/g, ' ').trim();
+    const container = !interativo || (texto.length > 80 && !/^(A|BUTTON|SUMMARY|LABEL)$/.test(el.tagName));
+    return limpa((container ? textoProprio(el) : texto) || el.querySelector?.('img[alt]')?.alt);
   }
 
   function papelDe(el) {
@@ -39,9 +48,10 @@
   }
 
   document.addEventListener('click', e => {
-    const el = (e.target.closest && e.target.closest(ALVO)) || e.target;
+    const alvo = e.target.closest && e.target.closest(ALVO);
+    const el = alvo || e.target;
     if (!el || el.nodeType !== 1) return;
-    const papel = papelDe(el), nome = nomeDe(el);
+    const papel = papelDe(el), nome = nomeDe(el, !!alvo);
     const desc = papel ? `Clicou ${papel === 'campo' || papel === 'link' || papel === 'botão' ? 'no' : 'em'} ${papel}${nome ? ` “${nome}”` : ''}`
       : `Clicou em “${nome || el.tagName.toLowerCase()}”`;
     envia({ tipo: 'clique', desc, x: e.clientX, y: e.clientY, vw: innerWidth, vh: innerHeight });

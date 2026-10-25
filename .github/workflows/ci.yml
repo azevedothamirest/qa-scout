@@ -1,8 +1,8 @@
 name: Testes
+run-name: "Testes · ${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || github.ref_name }}"
 
-# Roda em toda subida: push em qualquer branch e pull request.
+# Uma execução por pull request (e a cada novo push nele). Também dá para rodar à mão.
 on:
-  push:
   pull_request:
   workflow_dispatch:
 

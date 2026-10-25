@@ -503,3 +503,6 @@ h1,h2,h3{letter-spacing:-.025em;font-weight:800}
   .slider input{display:none}
   .note,.group{break-inside:avoid}
 }
+
+/* Texto longo sem espaços (URL, token, hash) quebra dentro do card em vez de alargar a página. */
+.charter-card,.charter-line,.row h3,.row p,.report-head h1,.doc{overflow-wrap:anywhere}
