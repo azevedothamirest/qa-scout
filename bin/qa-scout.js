@@ -20,7 +20,7 @@ function garanteNavegador() {
 
 // O navegador de teste é separado e existe só para testar: carrega uma cópia da extensão em que o
 // acesso a todos os sites já vem concedido (na Chrome Web Store ele é opcional e pedido no primeiro uso).
-const ARQUIVOS_EXTENSAO = ['index.html', 'app.js', 'extensao', 'icones'];
+const ARQUIVOS_EXTENSAO = ['index.html', 'app.css', 'app.js', 'extensao', 'icones'];
 // Chave pública fixa: sem ela, o id da extensão (e com ele o lugar onde as sessões ficam guardadas)
 // mudava junto com a pasta em que o npx instala o pacote. Só a chave pública; a privada não é usada.
 const CHAVE = 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0r1RT9W6ROqrLashHW7SfAuLCm5GQe/kJsbj5cRX94V0wFtU7bwiPAf2ocW/JMW4ExCcrnvLsawtxJuXXDRHJDNeGwusrtRRdsMfTvBc+GatHErudRVTKsBmyorM7OnmIrrSWzQmZV0EHonfUsGb81ZgctZQhZ6kElEkwoQp0IgWlJ0mTwikovg+BXS6jA457wfi6S31hAHe9StHnRAQABluRtqJW2n/F77228fuZJz97f8db43Vs3vjFzD0GHRS6yS9zFhhz+EA+9l4ZnQ8VCr0pIkSF32h+fqO2JK1rmKVhmgKEGW1KLM2XllkUJ6gBuYVMD4AWdqRQdfi7e4XNQIDAQAB';

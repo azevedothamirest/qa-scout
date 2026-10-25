@@ -62,6 +62,11 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [ ] Sessões em dupla ou em time
 - [ ] Métricas acumuladas (tempo explorado por área, bugs por sessão)
 
+## Versão 0.6.1
+
+- [x] PDF do relatório com layout próprio de documento
+- [x] CSS em arquivo próprio (`app.css`), código sem uso removido, guia de contribuição
+
 ## Decisões tomadas
 
 - Web app sem servidor e sem conta no início: custo zero e nenhuma preocupação com LGPD na largada.

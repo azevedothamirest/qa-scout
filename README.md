@@ -72,7 +72,25 @@ npm install
 npm start          # http://localhost:4173
 ```
 
-O app é `index.html` (HTML e CSS) e `app.js` (JavaScript puro), sem framework e sem build. A captura fica em `extensao/`: é a extensão do Chrome (`manifest.json` na raiz) e também o que o comando `qa-scout` carrega no navegador de teste. `npm run pacote` gera o `.zip` para a Chrome Web Store.
+Sem framework e sem build: o que está no repositório é o que roda. `npm run pacote` gera o `.zip` para a Chrome Web Store.
+
+## Estrutura do projeto
+
+```
+index.html          estrutura da página (site, painel da extensão e navegador de teste)
+app.css             visual: tokens de cor, componentes e impressão do relatório
+app.js              a aplicação, em JavaScript puro
+privacidade.html    política de privacidade (GitHub Pages)
+manifest.json       manifesto da extensão do Chrome (Manifest V3)
+extensao/           captura automática (service worker, script de conteúdo, script da página)
+icones/             ícones da extensão
+bin/qa-scout.js     comando que abre o navegador de teste
+scripts/            utilitários de desenvolvimento (empacotar para a loja)
+tests/              testes e2e em Playwright e a loja fictícia usada neles
+docs/               tutorial, escopo e roadmap, material da Chrome Web Store
+```
+
+Quer contribuir? Veja o [guia de contribuição](CONTRIBUTING.md).
 
 ## Testes
 
@@ -84,7 +102,7 @@ npm test
 npm run test:report
 ```
 
-Cobertura atual: histórico e busca, validação do charter, registro de notas por atalho e por comando, pausa do cronômetro, persistência após recarregar, geração do relatório em Markdown, regra da divisão TBS somando 100%, captura automática de cliques, campos e páginas (sem guardar o valor digitado), revisão das notas automáticas captura de erros de JavaScript, console e rede, atalho de marcar o momento, passos para reproduzir e abertura do navegador de teste com um comando, backup e importação de sessões e bug copiado no formato de ticket.
+Cobertura atual: histórico e busca, validação do charter, registro de notas por atalho e por comando, pausa do cronômetro, persistência após recarregar, geração do relatório em Markdown, regra da divisão TBS somando 100%, captura automática de cliques, campos e páginas (sem guardar o valor digitado), revisão das notas automáticas, captura de erros de JavaScript, console e rede, atalho de marcar o momento, passos para reproduzir e abertura do navegador de teste com um comando, backup e importação de sessões e bug copiado no formato de ticket, impressão do relatório em PDF, flashcards do método e pedido de acesso aos sites.
 
 ## Próximos passos
 
@@ -95,7 +113,7 @@ Cobertura atual: histórico e busca, validação do charter, registro de notas p
 
 ## English
 
-QA Scout is a session-based exploratory testing companion: write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Run `npx github:azevedothamirest/qa-scout <url>` to open a dedicated test browser where clicks, filled fields, visited pages, JavaScript errors and failed requests become notes for you to review, with one-click reproduction steps and an `Alt+Shift+M` shortcut to capture the moment. Data stays on your machine. Tested end to end with Playwright on desktop, mobile and the test browser.
+QA Scout is a free, open source companion for session-based exploratory testing (SBTM): write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Install the [Chrome extension](https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin) and, in the side panel, clicks, filled fields, visited pages, JavaScript errors and failed requests of the tab you follow become notes for you to review, with one-click reproduction steps, a Jira/GitHub-ready bug and `Alt+1`–`Alt+5` shortcuts. Prefer a dedicated browser? Run `npx github:azevedothamirest/qa-scout <url>`. No server, no account: data stays on your machine. Tested end to end with Playwright. Contributions welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 

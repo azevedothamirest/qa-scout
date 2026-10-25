@@ -1,20 +1,48 @@
 {
   "name": "qa-scout",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "private": true,
-  "description": "Companheiro de teste exploratório baseado em sessões",
+  "description": "Companheiro de teste exploratório baseado em sessões (SBTM): extensão do Chrome, versão web e navegador de teste.",
+  "homepage": "https://azevedothamirest.github.io/qa-scout/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/azevedothamirest/qa-scout.git"
+  },
+  "bugs": {
+    "url": "https://github.com/azevedothamirest/qa-scout/issues"
+  },
+  "keywords": [
+    "qa",
+    "teste-exploratorio",
+    "exploratory-testing",
+    "sbtm",
+    "chrome-extension",
+    "playwright"
+  ],
+  "license": "MIT",
+  "author": "Thamires Azevedo",
+  "engines": {
+    "node": ">=18"
+  },
   "bin": {
     "qa-scout": "bin/qa-scout.js"
   },
+  "files": [
+    "bin/",
+    "extensao/",
+    "icones/",
+    "manifest.json",
+    "index.html",
+    "app.css",
+    "app.js"
+  ],
   "scripts": {
     "start": "http-server . -p 4173 -c-1",
     "navegador": "node bin/qa-scout.js",
     "test": "playwright test",
     "test:report": "playwright show-report",
-    "pacote": "node bin/empacotar.js"
+    "pacote": "node scripts/empacotar.js"
   },
-  "author": "Thamires Azevedo",
-  "license": "MIT",
   "dependencies": {
     "playwright": "1.56.0"
   },
