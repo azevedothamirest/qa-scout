@@ -75,6 +75,11 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] Clique em área sem interação não copia o texto da página para a nota (#10)
 - [x] Suíte de regressão (`@regressao`) e CI com um job por pull request
 
+## Versão 0.6.3 · erros repetidos e Markdown
+
+- [x] Erro de JS ou falha de rede que se repete soma na mesma nota ("×N") em vez de criar outra ou sumir (#11, #12)
+- [x] Markdown do relatório e do "Copiar bug" escapa HTML e marcadores de bloco, e nota com várias linhas fica num item só (#22)
+
 ## Decisões tomadas
 
 - Web app sem servidor e sem conta no início: custo zero e nenhuma preocupação com LGPD na largada.

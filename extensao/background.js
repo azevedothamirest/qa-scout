@@ -70,6 +70,7 @@ async function registra(msg, tab) {
   const { capturando, acompanha } = await estado();
   if (!capturando || !acompanha(tab)) return;
   const ev = { tipo: msg.tipo, desc: msg.desc, url: msg.url, titulo: msg.titulo, ts: msg.ts };
+  if (msg.chave) Object.assign(ev, { chave: msg.chave, vezes: msg.vezes || 1 });
   // Erro de JavaScript chega sugerido como bug; console.error, como risco. A testadora decide na revisão.
   if (msg.tipo === 'erro') ev.nota = msg.grave ? 'bug' : 'ris';
   if (msg.tipo === 'marca' && msg.nota) ev.nota = msg.nota;
@@ -108,26 +109,23 @@ chrome.tabs.onRemoved.addListener(async tabId => {
 });
 
 // Falhas de rede das abas acompanhadas: respostas 4xx/5xx e requisições que nem chegaram a responder.
-// 5xx e falha de conexão chegam como bug; 4xx, como risco. Repetições da mesma chamada em 10 s viram uma só.
+// 5xx e falha de conexão chegam como bug; 4xx, como risco. A mesma chamada falhando de novo leva a
+// mesma chave, e o painel soma na nota que já existe ("×N") em vez de criar outra.
 const IGNORA_REDE = /\/favicon\.ico(\?|$)/;
-const recentes = new Map();
 function caminho(url) {
   try { const u = new URL(url); return (u.pathname + u.search).slice(0, 90); } catch (e) { return String(url).slice(0, 90); }
 }
 async function falhaDeRede(det, status, erro) {
   if (det.tabId < 0 || IGNORA_REDE.test(det.url)) return;
-  const chave = `${det.method} ${det.url} ${status || erro}`;
+  const chave = `rede:${det.method} ${caminho(det.url)} ${status || erro}`;
   const agora = Date.now();
-  if (agora - (recentes.get(chave) || 0) < 10000) return;
-  recentes.set(chave, agora);
-  if (recentes.size > 200) recentes.clear();
   const { capturando, acompanha } = await estado();
   if (!capturando) return;
   const tab = await chrome.tabs.get(det.tabId).catch(() => null);
   if (!tab || !acompanha(tab)) return;
   const desc = status ? `Requisição com erro: ${det.method} ${caminho(det.url)} → ${status}`
     : `Requisição falhou: ${det.method} ${caminho(det.url)} (${erro.replace(/^net::/, '')})`;
-  await guardaEvento({ tipo: 'rede', nota: !status || status >= 500 ? 'bug' : 'ris', desc, url: tab.url, titulo: tab.title, ts: agora });
+  await guardaEvento({ tipo: 'rede', nota: !status || status >= 500 ? 'bug' : 'ris', desc, chave, vezes: 1, url: tab.url, titulo: tab.title, ts: agora });
 }
 const FILTRO_REDE = { urls: ['http://*/*', 'https://*/*'] };
 chrome.webRequest.onCompleted.addListener(d => { if (d.statusCode >= 400) falhaDeRede(d, d.statusCode); }, FILTRO_REDE);
