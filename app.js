@@ -444,6 +444,34 @@ function atualizaNotas(s){
 }
 
 /* ---------- tela: relatório ---------- */
+
+/* ---------- relatório para imprimir / PDF ---------- */
+// Documento próprio para impressão: claro, em A4, com as cores dos tipos forçadas (print-color-adjust).
+const LOGO_DOC = `<svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#0F2B33"/><circle cx="32" cy="32" r="25" fill="none" stroke="#296F82" stroke-width="4.3"/><circle cx="32" cy="32" r="15" fill="none" stroke="#1B4E5C" stroke-width="2.6"/><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#06171C" opacity=".75" transform="translate(1.8 2.4) rotate(40 32 32)"/><g transform="rotate(40 32 32)"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#296F82"/><path d="M32 32 L38.5 32 L32 52 Z" fill="#8AE3D7"/></g></svg>`;
+function docImpressao(s){
+  const c=counts(s), db=s.debrief||{}, notas=s.notes.filter(n=>!n.pending);
+  const real=Math.round(s.elapsedMs/MIN);
+  const cor={bug:'#E0354F',duv:'#1688C4',ide:'#B97E00',ris:'#7247E0',obs:'#0E9F6E'};
+  const meta=[['Data',fmtDate(s.startedAt)],['Duração',`${real} de ${s.plannedMin} min`],['Ambiente',s.ambiente||'—'],['Quem testou',s.testadora||'—'],['Navegador',s.navegador||'—']];
+  const grupos=TYPE_ORDER.filter(k=>c[k]).map(k=>`<section class="doc-grupo" style="--c:${cor[k]}">
+      <h3><span>${PLURAL[k]}</span><b>${c[k]}</b></h3>
+      ${notas.filter(n=>n.type===k).map(n=>`<div class="doc-nota"><time>${fmtT(n.t)}</time><div><p>${esc(n.text)}</p>${n.url?`<small>${esc(n.url)}</small>`:''}${n.imgs&&n.imgs.length?`<div class="doc-imgs">${n.imgs.map(src=>`<img src="${src}" alt="">`).join('')}</div>`:''}</div></div>`).join('')}
+    </section>`).join('') || '<p class="doc-vazio">Nenhuma nota registrada nessa sessão.</p>';
+  return `<article class="doc" aria-hidden="true">
+    <header class="doc-topo">${LOGO_DOC}<div><b>QA Scout</b><span>Relatório de sessão exploratória</span></div><div class="doc-data">${fmtDate(s.startedAt)}</div></header>
+    <h1>${esc(s.area)}</h1>
+    <div class="doc-charter"><span>Charter</span><p>Explorar <b>${esc(s.charter.explorar)}</b> com <b>${esc(s.charter.com)}</b> para descobrir <b>${esc(s.charter.descobrir)}</b>.</p></div>
+    <dl class="doc-meta">${meta.map(([k,v])=>`<div><dt>${k}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+    <div class="doc-kpis">${TYPE_ORDER.map(k=>`<div style="--c:${cor[k]}"><b>${c[k]}</b><span>${c[k]===1?TYPES[k].label:PLURAL[k]}</span></div>`).join('')}</div>
+    ${db.test!=null?`<section class="doc-tbs"><h2>Divisão do tempo (TBS)</h2><div class="doc-barra"><i style="width:${db.test}%;background:#0E9F6E"></i><i style="width:${db.bug}%;background:#E0354F"></i><i style="width:${db.setup}%;background:#C98A00"></i></div>
+      <ul><li><i style="background:#0E9F6E"></i>Teste ${db.test}%</li><li><i style="background:#E0354F"></i>Bug ${db.bug}%</li><li><i style="background:#C98A00"></i>Setup ${db.setup}%</li></ul></section>`:''}
+    <h2 class="doc-sec">Notas da sessão</h2>
+    ${grupos}
+    ${db.coverage||db.next?`<div class="doc-fim">${db.coverage?`<div><h2>Áreas cobertas</h2><p>${esc(db.coverage)}</p></div>`:''}${db.next?`<div><h2>Próximas sessões</h2><p>${esc(db.next)}</p></div>`:''}</div>`:''}
+    <footer class="doc-rodape">Gerado com QA Scout · teste exploratório baseado em sessões</footer>
+  </article>`;
+}
+
 function viewReport(s){
   if(!s) return `<div class="empty">Sessão não encontrada. <button class="link-btn" data-go="home">Voltar</button></div>`;
   const c=counts(s), db=s.debrief||(s.debrief={test:60,bug:25,setup:15,coverage:'',next:''});
@@ -497,6 +525,7 @@ function viewReport(s){
         </div>
       </aside>
     </div>
+  ${docImpressao(s)}
   </section>`;
 }
 function tbsBar(db){ const tot=(db.test+db.bug+db.setup)||1; return `<i style="width:${db.test/tot*100}%;background:var(--accent)"></i><i style="width:${db.bug/tot*100}%;background:var(--t-bug)"></i><i style="width:${db.setup/tot*100}%;background:var(--marker)"></i>`; }

@@ -483,6 +483,56 @@ h1,h2,h3{letter-spacing:-.025em;font-weight:800}
 .captura-promo .btn{background:var(--pink);color:#0B0B12;border-color:var(--pink)}
 .captura-promo code{background:var(--surface-2);border-color:var(--line)}
 .carta{border-radius:26px}
+
+/* ===== relatório impresso / PDF ===== */
+.doc{display:none}
+@media print{
+  @page{size:A4;margin:14mm 14mm 16mm}
+  html,body{background:#fff!important;color:#14131F}
+  body::before,body::after{display:none!important}
+  .top,.rodape,.toast,.abertura{display:none!important}
+  main{padding:0!important;max-width:none!important}
+  #app .view>*:not(.doc){display:none!important}
+  .doc{display:block;font-family:var(--f-body);color:#14131F;font-size:11pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .doc-topo{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:2px solid #14131F}
+  .doc-topo b{display:block;font-size:13pt;font-weight:800}
+  .doc-topo span{font-size:9pt;color:#66637C}
+  .doc-data{margin-left:auto;font-family:var(--f-mono);font-size:9pt;color:#66637C}
+  .doc h1{font-size:24pt;line-height:1.1;letter-spacing:-.02em;margin:18px 0 12px;font-weight:800;color:#14131F}
+  .doc-charter{border-left:4px solid #296F82;background:#EEF6F7;border-radius:0 10px 10px 0;padding:10px 14px}
+  .doc-charter span{font-size:8pt;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#296F82}
+  .doc-charter p{margin:2px 0 0;font-size:11pt}
+  .doc-meta{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:14px 0}
+  .doc-meta div{border:1px solid #E2DFEE;border-radius:8px;padding:6px 9px}
+  .doc-meta dt{font-size:7.5pt;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#66637C}
+  .doc-meta dd{margin:2px 0 0;font-size:9.5pt;font-weight:600;overflow-wrap:anywhere}
+  .doc-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+  .doc-kpis div{border-radius:10px;padding:8px 10px;border:1px solid #E2DFEE;border-top:4px solid var(--c)}
+  .doc-kpis b{display:block;font-size:20pt;font-weight:800;color:var(--c);line-height:1.1}
+  .doc-kpis span{font-size:9pt;font-weight:600;color:#3d3b4f}
+  .doc h2{font-size:12pt;font-weight:800;margin:0 0 8px}
+  .doc-tbs{border:1px solid #E2DFEE;border-radius:10px;padding:10px 14px;margin-bottom:18px;break-inside:avoid}
+  .doc-barra{display:flex;height:12px;border-radius:99px;overflow:hidden;background:#F0EEF8}
+  .doc-tbs ul{display:flex;gap:18px;list-style:none;padding:0;margin:8px 0 0;font-size:9.5pt;font-weight:600}
+  .doc-tbs li{display:flex;align-items:center;gap:6px}.doc-tbs li i{width:9px;height:9px;border-radius:3px}
+  .doc-sec{padding-top:4px;border-top:1px solid #E2DFEE;padding-top:12px}
+  .doc-grupo{margin-bottom:14px}
+  .doc-grupo h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:10.5pt;break-after:avoid}
+  .doc-grupo h3 span{background:var(--c);color:#fff;border-radius:99px;padding:2px 10px;font-weight:800}
+  .doc-grupo h3 b{color:var(--c);font-weight:800}
+  .doc-nota{display:grid;grid-template-columns:48px 1fr;gap:10px;padding:7px 0 7px 10px;border-left:3px solid var(--c);margin-left:2px;break-inside:avoid}
+  .doc-nota+.doc-nota{border-top:1px dashed #E2DFEE}
+  .doc-nota time{font-family:var(--f-mono);font-size:9pt;color:#66637C;padding-top:1px}
+  .doc-nota p{margin:0;white-space:pre-wrap}
+  .doc-nota small{display:block;font-family:var(--f-mono);font-size:8pt;color:#66637C;overflow-wrap:anywhere}
+  .doc-imgs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+  .doc-imgs img{width:100%;border:1px solid #E2DFEE;border-radius:6px}
+  .doc-fim{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;break-inside:avoid}
+  .doc-fim>div{border:1px solid #E2DFEE;border-radius:10px;padding:10px 14px}
+  .doc-fim p{margin:0;font-size:10pt;white-space:pre-wrap}
+  .doc-vazio{color:#66637C}
+  .doc-rodape{margin-top:20px;padding-top:8px;border-top:1px solid #E2DFEE;font-size:8pt;color:#66637C}
+}
 @media print{
   .ajuda{display:none}
   :root{--paper:#fff;--surface:#fff;--surface-2:#fff}
