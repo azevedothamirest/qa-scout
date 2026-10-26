@@ -38,6 +38,7 @@ manifest.json       manifesto da extensão do Chrome (Manifest V3)
 extensao/           captura automática: service worker, script de conteúdo e script da página
 icones/             ícones da extensão (16, 32, 48 e 128 px)
 bin/qa-scout.js     comando "qa-scout": abre o navegador de teste com a extensão carregada
+bin/mcp.js          servidor MCP (qa-scout mcp): o Claude conduz a sessão pelas ferramentas
 scripts/            utilitários: empacotar a extensão e montar o resumo dos testes na CI
 tests/              testes e2e em Playwright (regressao.spec.js: fluxos críticos) e a loja fictícia usada neles
 docs/               tutorial, escopo e roadmap, textos e imagens da Chrome Web Store

@@ -59,6 +59,32 @@ Ou, com o projeto clonado: `npm install` e depois `npm run navegador -- https://
 
 Abre um navegador de teste separado, com o painel do QA Scout numa janela à esquerda e o sistema à direita. Nele, **todas as abas são acompanhadas**: comece a sessão e explore, os cliques viram observações com print (no máximo 1 por segundo, com o ponto clicado marcado). O valor digitado nos campos nunca é lido nem guardado, e sessão pausada não registra nada. Seu Chrome do dia a dia não é tocado. O perfil fica em `~/.qa-scout/perfil` e guarda os logins entre uma sessão e outra. Na primeira vez, o comando baixa o Chromium sozinho.
 
+## Explorar com o Claude (MCP)
+
+O QA Scout também tem um servidor [MCP](https://modelcontextprotocol.io) para o Claude fazer a sessão exploratória com você: você passa a missão, ele abre o navegador de teste, explora, anota o que encontra e devolve o relatório. A extensão grava tudo como faria com uma pessoa (cliques, campos sem o valor, páginas, erros de console e rede, prints), e a sessão fica no histórico do QA Scout para você revisar.
+
+**Claude Code:**
+
+```bash
+claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp
+```
+
+Com o projeto clonado, prefira apontar para ele (abre mais rápido): `claude mcp add qa-scout -- node /caminho/do/qa-scout/bin/qa-scout.js mcp`.
+
+**Claude Desktop:** em Configurações → Desenvolvedor → Editar configuração, adicione:
+
+```json
+{
+  "mcpServers": {
+    "qa-scout": { "command": "npx", "args": ["-y", "github:azevedothamirest/qa-scout", "mcp"] }
+  }
+}
+```
+
+Depois é só pedir, por exemplo: *"Use o QA Scout para explorar o checkout de https://homolog.minhaloja.com por 20 minutos, com cupons e Pix, para descobrir cobranças erradas."*
+
+Ferramentas: `iniciar_sessao`, `navegar`, `ver_pagina`, `clicar`, `preencher`, `escolher_opcao`, `anotar`, `ver_capturas`, `sugerir_heuristica` e `encerrar_sessao`. Use só ambientes e dados de teste; o Claude é um par de exploração, e a revisão das notas e o julgamento do que importa continuam com você.
+
 ## Privacidade
 
 Política completa: [`privacidade.html`](privacidade.html).
@@ -85,6 +111,7 @@ manifest.json       manifesto da extensão do Chrome (Manifest V3)
 extensao/           captura automática (service worker, script de conteúdo, script da página)
 icones/             ícones da extensão
 bin/qa-scout.js     comando que abre o navegador de teste
+bin/mcp.js          servidor MCP para o Claude conduzir a sessão (qa-scout mcp)
 scripts/            utilitários de desenvolvimento (empacotar para a loja)
 tests/              testes e2e em Playwright e a loja fictícia usada neles
 docs/               tutorial, escopo e roadmap, material da Chrome Web Store
@@ -113,7 +140,7 @@ Cobertura atual: histórico e busca, validação do charter, registro de notas p
 
 ## English
 
-QA Scout is a free, open source companion for session-based exploratory testing (SBTM): write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Install the [Chrome extension](https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin) and, in the side panel, clicks, filled fields, visited pages, JavaScript errors and failed requests of the tab you follow become notes for you to review, with one-click reproduction steps, a Jira/GitHub-ready bug and `Alt+1`–`Alt+5` shortcuts. Prefer a dedicated browser? Run `npx github:azevedothamirest/qa-scout <url>`. No server, no account: data stays on your machine. Tested end to end with Playwright. Contributions welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
+QA Scout is a free, open source companion for session-based exploratory testing (SBTM): write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Install the [Chrome extension](https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin) and, in the side panel, clicks, filled fields, visited pages, JavaScript errors and failed requests of the tab you follow become notes for you to review, with one-click reproduction steps, a Jira/GitHub-ready bug and `Alt+1`–`Alt+5` shortcuts. Prefer a dedicated browser? Run `npx github:azevedothamirest/qa-scout <url>`. Want Claude to explore with you? Add the MCP server: `claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp`. No server, no account: data stays on your machine. Tested end to end with Playwright. Contributions welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 

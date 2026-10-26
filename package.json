@@ -2,7 +2,7 @@
   "name": "qa-scout",
   "version": "0.7.0",
   "private": true,
-  "description": "Companheiro de teste exploratório baseado em sessões (SBTM): extensão do Chrome, versão web e navegador de teste.",
+  "description": "Companheiro de teste exploratório baseado em sessões (SBTM): extensão do Chrome, versão web, navegador de teste e servidor MCP para o Claude.",
   "homepage": "https://azevedothamirest.github.io/qa-scout/",
   "repository": {
     "type": "git",
@@ -17,7 +17,9 @@
     "exploratory-testing",
     "sbtm",
     "chrome-extension",
-    "playwright"
+    "playwright",
+    "mcp",
+    "claude"
   ],
   "license": "MIT",
   "author": "Thamires Azevedo",
@@ -42,10 +44,13 @@
     "test": "playwright test",
     "test:regressao": "playwright test --grep @regressao",
     "test:report": "playwright show-report",
-    "pacote": "node scripts/empacotar.js"
+    "pacote": "node scripts/empacotar.js",
+    "mcp": "node bin/qa-scout.js mcp"
   },
   "dependencies": {
-    "playwright": "1.56.0"
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "playwright": "1.56.0",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@playwright/test": "1.56.0",
