@@ -90,6 +90,13 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] Botão só com ícone usa o `<title>`/aria-label do SVG (#18)
 - [x] Texto longo cortado na última palavra inteira, com "…" (#19)
 
+## MCP · o Claude explora com você
+
+- [x] Servidor MCP (`qa-scout mcp`) com ferramentas para iniciar a sessão, navegar, ler a tela, clicar, preencher, anotar, ver capturas, sortear heurística e encerrar
+- [ ] Ponte para o Claude in Chrome (extensão da loja, com confirmação no painel)
+- [ ] Publicar na Edge Add-ons
+- [ ] Firefox
+
 ## Decisões tomadas
 
 - Web app sem servidor e sem conta no início: custo zero e nenhuma preocupação com LGPD na largada.

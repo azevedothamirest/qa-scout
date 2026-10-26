@@ -96,7 +96,10 @@ async function abrir({ url, perfil = PERFIL_PADRAO, headless = false } = {}) {
 
 module.exports = { abrir, prepararExtensao, recuperaSessoesAntigas, ID_FIXO, PERFIL_PADRAO };
 
-if (require.main === module) {
+if (require.main === module && process.argv[2] === 'mcp') {
+  // qa-scout mcp: servidor MCP para o Claude fazer a sessão exploratória (ver bin/mcp.js).
+  require('./mcp').main(process.argv.slice(3)).catch(e => { console.error(e); process.exit(1); });
+} else if (require.main === module) {
   const args = process.argv.slice(2);
   const i = args.indexOf('--perfil');
   const perfil = i >= 0 ? path.resolve(args.splice(i, 2)[1]) : undefined;
