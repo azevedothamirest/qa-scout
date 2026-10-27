@@ -50,6 +50,7 @@ Para cada nova versão: suba o `version` no `manifest.json` e no `package.json`,
 > • Debriefing com divisão de tempo TBS e relatório em Markdown ou PDF.
 > • Backup das sessões em arquivo e relatório em PDF.
 > • Aba Método em flashcards: SBTM, charter, PROOF e métricas TBS explicados de forma rápida.
+> • Aba MCP: como deixar o Claude conduzir a sessão exploratória com você, pelo Claude Code ou Claude Desktop no seu computador.
 > • Tema escuro e claro.
 >
 > Privacidade: não há servidor, conta nem envio de dados. Tudo fica no seu computador. O valor digitado nos campos nunca é lido, e nada é registrado fora de uma sessão em andamento ou fora das abas que você escolher acompanhar.

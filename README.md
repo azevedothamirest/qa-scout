@@ -61,31 +61,20 @@ Abre um navegador de teste separado, com o painel do QA Scout numa janela à esq
 
 ## Explorar com o Claude (MCP)
 
-O QA Scout também tem um servidor [MCP](https://modelcontextprotocol.io) para o Claude fazer a sessão exploratória com você: você passa a missão, ele abre o navegador de teste, explora, anota o que encontra e devolve o relatório. A extensão grava tudo como faria com uma pessoa (cliques, campos sem o valor, páginas, erros de console e rede, prints), e a sessão fica no histórico do QA Scout para você revisar.
+O QA Scout tem um servidor [MCP](https://modelcontextprotocol.io) para o **Claude conduzir a sessão exploratória com você**: você passa a missão, ele abre o navegador de teste, lê a tela, clica, preenche, anota o que encontra e devolve o relatório. A captura grava tudo como faria com você, e a sessão fica no histórico para revisar.
 
-**Claude Code:**
+**Roda no terminal do seu computador**, no Claude Code ou no Claude Desktop (Node.js 18+). Não funciona no claude.ai pelo navegador nem dentro da extensão, que só explica o uso na aba **MCP**.
 
 ```bash
 claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp
+claude mcp list   # qa-scout conectado
 ```
 
-Com o projeto clonado, prefira apontar para ele (abre mais rápido): `claude mcp add qa-scout -- node /caminho/do/qa-scout/bin/qa-scout.js mcp`.
+Depois, peça como um charter, com endereço e tempo:
 
-**Claude Desktop:** em Configurações → Desenvolvedor → Editar configuração, adicione:
+> Use o QA Scout para uma sessão exploratória de 20 minutos em https://homolog.minhaloja.com: explorar o checkout, com cupons e Pix, para descobrir cobranças erradas. Anote o que encontrar e me mostre o relatório.
 
-```json
-{
-  "mcpServers": {
-    "qa-scout": { "command": "npx", "args": ["-y", "github:azevedothamirest/qa-scout", "mcp"] }
-  }
-}
-```
-
-Depois é só pedir, por exemplo: *"Use o QA Scout para explorar o checkout de https://homolog.minhaloja.com por 20 minutos, com cupons e Pix, para descobrir cobranças erradas."*
-
-Ferramentas: `iniciar_sessao`, `navegar`, `ver_pagina`, `clicar`, `preencher`, `escolher_opcao`, `anotar`, `ver_capturas`, `sugerir_heuristica` e `encerrar_sessao`. Use só ambientes e dados de teste; o Claude é um par de exploração, e a revisão das notas e o julgamento do que importa continuam com você.
-
-**Privacidade no modo MCP:** a sessão e os prints continuam só no seu computador, mas o Claude precisa ler a tela para explorar: o texto e os campos de cada página que ele visita (inclusive valores já preenchidos) vão para o Claude como em qualquer conversa. Por isso, nada de produção nem de dados reais de clientes.
+Use só ambientes e dados de teste: o Claude lê o texto das páginas que visita, enquanto a sessão e os prints ficam no seu computador. Instalação no Claude Desktop, mais exemplos de pedido, ferramentas, privacidade e solução de problemas: **[guia do MCP](docs/mcp.md)**.
 
 ## Privacidade
 

@@ -506,3 +506,26 @@ h1,h2,h3{letter-spacing:-.025em;font-weight:800}
 
 /* Texto longo sem espaços (URL, token, hash) quebra dentro do card em vez de alargar a página. */
 .charter-card,.charter-line,.row h3,.row p,.report-head h1,.doc{overflow-wrap:anywhere}
+
+/* Aba MCP: explorar com o Claude */
+.mcp-aviso{margin:18px 0 20px;padding:14px 16px;border-radius:var(--r);border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);font-size:14.5px;line-height:1.55}
+.mcp code,.mcp-aviso code{font:12.5px var(--f-mono);background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px}
+.mcp-passos .passo p{margin-bottom:10px}
+.mcp-cmd{display:flex;gap:8px;align-items:center;min-width:0}
+.mcp-cmd code{flex:1;min-width:0;display:block;overflow-x:auto;white-space:nowrap;padding:8px 10px}
+.mcp-cmd .btn{flex:none;padding:7px 12px;font-size:13px}
+.mcp-pedidos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.mcp-pedidos .card{display:flex;flex-direction:column;gap:8px}
+.mcp-pedidos h3,.mcp-grade h3{font-size:16px;margin:0}
+.mcp-pedidos p{margin:0;color:var(--muted);font-size:14px;flex:1}
+.mcp-pedidos .btn{align-self:flex-start}
+.mcp-grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
+.mcp-lista{margin:8px 0 0;padding-left:18px;font-size:14px;color:var(--muted)}
+.mcp-lista li{margin:4px 0}
+.mcp-lista b{color:var(--ink);font-family:var(--f-mono);font-size:12.5px;font-weight:600}
+@media (max-width:860px){.mcp-pedidos,.mcp-grade{grid-template-columns:minmax(0,1fr)}}
+.mcp .passo{min-width:0}
+@media (max-width:760px){.mcp-passos{grid-template-columns:minmax(0,1fr)}}
+/* Com a aba MCP são 5 abas: no celular elas ficam mais justas para caber sem rolagem. */
+@media (max-width:480px){.tabs{gap:0;overflow-x:auto;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tabs .tab{padding-left:6px;padding-right:6px;font-size:12.5px}}
+@media (max-width:380px){.tabs .tab{padding-left:4px;padding-right:4px;font-size:11.5px;gap:4px}}

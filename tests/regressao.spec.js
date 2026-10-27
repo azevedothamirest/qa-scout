@@ -139,7 +139,7 @@ test.describe('Regressão · navegação e layout', () => {
     const erros = [];
     page.on('pageerror', (e) => erros.push(e.message));
     await page.reload();
-    for (const aba of ['Heurísticas', 'Método', 'Sessões']) {
+    for (const aba of ['Heurísticas', 'Método', 'MCP', 'Sessões']) {
       await page.getByRole('button', { name: aba, exact: true }).click();
     }
     await iniciarSessao(page);
@@ -150,7 +150,7 @@ test.describe('Regressão · navegação e layout', () => {
   test('Manter a página sem rolagem horizontal em todas as telas', async ({ page }) => {
     const semRolagem = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await semRolagem();
-    for (const aba of ['Heurísticas', 'Método']) {
+    for (const aba of ['Heurísticas', 'Método', 'MCP']) {
       await page.getByRole('button', { name: aba, exact: true }).click();
       await semRolagem();
     }

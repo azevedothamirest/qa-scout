@@ -308,3 +308,16 @@ test.describe('Tema', () => {
     await expect(botao).toContainText(inicial ? 'Claro' : 'Escuro');
   });
 });
+
+test.describe('MCP', () => {
+  test('Mostrar como instalar o MCP no terminal e copiar um pedido de exemplo', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
+    await page.getByRole('button', { name: 'MCP', exact: true }).click();
+    await expect(page.getByRole('heading', { name: /Explore em dupla com o Claude/ })).toBeVisible();
+    await expect(page.getByText('Roda no terminal do seu computador.')).toBeVisible();
+    await expect(page.getByText('claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp')).toBeVisible();
+    await page.getByRole('button', { name: 'Copiar pedido: Sessão com charter' }).click();
+    await expect(page.locator('#toast')).toHaveText(/Copiado|Ctrl\+C/);
+    await expect(page.getByRole('link', { name: /Guia completo do MCP/ })).toHaveAttribute('href', /docs\/mcp\.md$/);
+  });
+});
