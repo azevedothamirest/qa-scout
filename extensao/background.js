@@ -109,7 +109,8 @@ async function tituloAtualizado(tabId, tab) {
   for (let i = 0; i < 6; i++) {
     await new Promise(r => setTimeout(r, 250));
     const t = await chrome.tabs.get(tabId).catch(() => null);
-    if (!t) return tab;
+    // Se a aba já foi para outra URL, o título novo é de outra página (#31): fica o que havia.
+    if (!t || t.url !== tab.url) return tab;
     if (t.title !== antes.titulo) return t;
   }
   return tab;

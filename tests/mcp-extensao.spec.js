@@ -49,6 +49,17 @@ test.describe('MCP · sessão conduzida pelo Claude', () => {
     expect(await f.iniciar_sessao({ explorar: 'outra', descobrir: 'coisa' })).toContain('Já existe uma sessão');
   });
 
+  // #31
+  test('Registrar cada página aberta com o próprio título ao navegar rápido', async () => {
+    await f.iniciar_sessao({ explorar: 'a captura', descobrir: 'erros', url: LOJA });
+    await f.clicar({ papel: 'link', nome: 'Ir para o passo 2' });
+    await f.navegar({ url: 'http://localhost:4173/tests/fixtures/captura.html' });
+    await new Promise(r => setTimeout(r, 2500));
+    const capturas = await f.ver_capturas();
+    expect(capturas.split('Abriu a página “Captura · Início”').length - 1).toBe(1);
+    expect(capturas.split('Abriu a página “Loja fictícia · Checkout”').length - 1).toBe(2);
+  });
+
   test('Explicar quando o elemento a clicar não existe na tela', async () => {
     await f.iniciar_sessao({ explorar: 'a loja', descobrir: 'erros', url: LOJA });
     const r = await f.clicar({ texto: 'botão que não existe' });

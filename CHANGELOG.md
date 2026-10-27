@@ -1,5 +1,8 @@
 # Notas de atualização
 
+## 0.8.1 · Páginas na ordem certa
+- Ao navegar rápido entre páginas com o mesmo título, a nota "Abriu a página" podia ganhar o título da página seguinte, sumindo uma e duplicando a outra (#31).
+
 ## 0.8.0 · Explorar com o Claude
 
 **Novidades**

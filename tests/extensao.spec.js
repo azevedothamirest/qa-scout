@@ -441,15 +441,20 @@ test.describe('Cobertura da captura', () => {
     await pagina.locator('#lixeira').click();
     await pagina.locator('#longo').click();
 
-    const nota = t => painel.locator('.note', { hasText: t });
-    await expect(nota('Anexou um arquivo em “Comprovante”')).toHaveCount(1);
-    await expect(nota('segredo-do-cliente')).toHaveCount(0);
-    await expect(nota('Preencheu o campo de data “Data da entrega”')).toHaveCount(1);
-    await expect(nota('Preencheu um campo deslizante')).toHaveCount(1);
-    await expect(nota('Preencheu um campo de texto')).toHaveCount(1);
-    await expect(nota('Escolheu “RJ” em “Estado”')).toHaveCount(1);
-    await expect(nota('Escolheu uma opção em “Validade do cartão”')).toHaveCount(1);
-    await expect(nota('Clicou no botão “Excluir item”')).toHaveCount(1);
-    await expect(nota('Clicou no botão “Confirmar a contratação do plano anual com renovação automática e cobrança no…”')).toHaveCount(1);
+    // O diário mostra 5 notas por página: confere na sessão salva, não só na tela.
+    const textos = () => painel.evaluate(async () => {
+      const st = (await chrome.storage.local.get('qascout.v1'))['qascout.v1'];
+      return st.sessions.find(x => x.id === st.activeId).notes.map(n => n.text).join('\n');
+    });
+    const vezes = t => expect.poll(async () => (await textos()).split(t).length - 1);
+    await vezes('Anexou um arquivo em “Comprovante”').toBe(1);
+    await vezes('segredo-do-cliente').toBe(0);
+    await vezes('Preencheu o campo de data “Data da entrega”').toBe(1);
+    await vezes('Preencheu um campo deslizante').toBe(1);
+    await vezes('Preencheu um campo de texto').toBe(1);
+    await vezes('Escolheu “RJ” em “Estado”').toBe(1);
+    await vezes('Escolheu uma opção em “Validade do cartão”').toBe(1);
+    await vezes('Clicou no botão “Excluir item”').toBe(1);
+    await vezes('Clicou no botão “Confirmar a contratação do plano anual com renovação automática e cobrança no…”').toBe(1);
   });
 });
