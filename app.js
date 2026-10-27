@@ -338,7 +338,32 @@ function thumbsHtml(){ return pendingImgs.map((src,i)=>`<div class="thumb"><img 
 function logHtml(s){
   const notes = s.notes.filter(n=>filter==='all'||(filter==='rev'?n.pending:(!n.pending&&n.type===filter))).slice().reverse();
   if(!notes.length) return `<div style="padding:28px 4px;color:var(--muted);text-align:center">${s.notes.length?(filter==='rev'?'Nada para revisar.':'Nenhuma nota desse tipo.'):'Sua primeira nota aparece aqui. Comece pelo que chamou sua atenção nos primeiros minutos.'}</div>`;
-  return notes.map(noteHtml).join('');
+  const vis = paginaDe('log',notes);
+  return (filter==='rev'?loteHtml(s,vis):'') + vis.map(noteHtml).join('') + pagerHtml('log',notes.length);
+}
+// Paginação das listas de notas, para não virar uma página gigante.
+const POR_PAGINA = 5, pagina = {log:0, rev:0}, selecionadas = new Set();
+function paginaDe(k,lista){
+  const ult=Math.max(0,Math.ceil(lista.length/POR_PAGINA)-1);
+  if(pagina[k]>ult) pagina[k]=ult;
+  return lista.slice(pagina[k]*POR_PAGINA,(pagina[k]+1)*POR_PAGINA);
+}
+function pagerHtml(k,total){
+  const n=Math.ceil(total/POR_PAGINA); if(n<=1) return '';
+  const p=pagina[k];
+  return `<div class="pager"><button class="btn ghost" data-pag="${k}" data-arg="${p-1}" ${p===0?'disabled':''}>← Anteriores</button>
+    <span class="mono">${p+1} de ${n} · ${total} notas</span>
+    <button class="btn ghost" data-pag="${k}" data-arg="${p+1}" ${p>=n-1?'disabled':''}>Próximas →</button></div>`;
+}
+// Barra de confirmação em lote para as notas automáticas.
+function loteHtml(s,vis){
+  const pend=pendentes(s), ids=new Set(pend.map(n=>n.id));
+  [...selecionadas].forEach(id=>{ if(!ids.has(id)) selecionadas.delete(id); });
+  const daPag=vis.filter(n=>n.pending), todasPag=daPag.length&&daPag.every(n=>selecionadas.has(n.id));
+  return `<div class="lote">
+    <label><input type="checkbox" data-selpag="${daPag.map(n=>n.id).join(',')}" ${todasPag?'checked':''}> Selecionar desta página</label>
+    <span class="lote-btns"><button class="btn" data-act="ok-sel" ${selecionadas.size?'':'disabled'}>Confirmar selecionadas (${selecionadas.size})</button>
+    <button class="btn primary" data-act="ok-todas">Confirmar todas (${pend.length})</button></span></div>`;
 }
 // Passos para reproduzir: as ações registradas (cliques, campos, páginas e marcações) até o minuto da nota.
 const ORIGEM_PASSO = ['clique','campo','pagina','marca'];
@@ -364,7 +389,7 @@ function noteHtml(n){
       <div class="note-actions">${confirmDel===n.id?`<button class="confirm" data-delnote="${n.id}" data-sure="1">Confirmar exclusão</button><button data-cancel-del>Cancelar</button>`
         :`${n.pending?`<button class="ok" data-oknote="${n.id}">Confirmar</button>`:''}${n.type==='bug'&&!n.pending?`<button data-copybug="${n.id}">Copiar bug</button>`:''}<button data-editnote="${n.id}">Editar</button><button data-delnote="${n.id}">Excluir</button>`}</div>`;
   return `<article class="note ${TYPES[n.type].cls}${n.pending?' pendente':''}" data-note="${n.id}">
-    <div class="t">${fmtT(n.t)}</div>
+    <div class="t">${n.pending?`<input type="checkbox" class="sel" data-sel="${n.id}" aria-label="Selecionar nota" ${selecionadas.has(n.id)?'checked':''}> `:''}${fmtT(n.t)}</div>
     <div style="min-width:0"><div class="kind"><i></i>${TYPES[n.type].label} ${tag}</div>${corpo}</div></article>`;
 }
 
@@ -514,7 +539,7 @@ function viewReport(s){
         <div class="kpis">${TYPE_ORDER.map(k=>`<div class="kpi ${TYPES[k].cls}"><b>${c[k]}</b><span>${c[k]===1?TYPES[k].label:PLURAL[k]}</span></div>`).join('')}</div>
         ${pendentes(s).length?`<div class="revisar no-print" id="revisar"><h3>${pendentes(s).length} ${pendentes(s).length===1?'nota automática para revisar':'notas automáticas para revisar'}</h3>
           <p class="hint" style="margin:0 0 6px">Elas só entram no relatório e no Markdown depois de confirmadas. Edite o texto ou o tipo se não for observação.</p>
-          ${pendentes(s).map(noteHtml).join('')}</div>`:''}
+          ${(vis=>loteHtml(s,vis)+`<div class="rev-lista">${vis.map(noteHtml).join('')}</div>`)(paginaDe('rev',pendentes(s)))}${pagerHtml('rev',pendentes(s).length)}</div>`:''}
         ${TYPE_ORDER.filter(k=>c[k]).map(k=>`<div class="group ${TYPES[k].cls}"><h3><i></i>${PLURAL[k]}</h3>
           ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.map(src=>`<img src="${src}" alt="Print da nota">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}">Copiar bug</button></div>`:''}</div></div>`).join('')}
         </div>`).join('') || '<p class="hint">Nenhuma nota registrada nessa sessão.</p>'}
@@ -802,7 +827,13 @@ document.addEventListener('click',e=>{
   if(t.dataset.go){ if(view==='new') { state.draft=readDraft(); save(); } go(t.dataset.go==='active' && !getActive() ? 'new' : t.dataset.go, t.dataset.arg||null); return; }
   if(t.dataset.open){ go('report',t.dataset.open); return; }
   if(t.dataset.type){ setType(t.dataset.type); $('#note-in')?.focus(); return; }
-  if(t.dataset.filter){ filter=t.dataset.filter; const s=getActive(); $('#log').innerHTML=logHtml(s); refreshSessionCounts(s); return; }
+  if(t.dataset.pag){ pagina[t.dataset.pag]=+t.dataset.arg; atualizaNotas(sessaoDaTela()); (t.dataset.pag==='rev'?$('#revisar'):$('#log'))?.scrollIntoView({block:'start'}); return; }
+  if(t.dataset.act==='ok-todas'||t.dataset.act==='ok-sel'){
+    const s=sessaoDaTela(), alvo=s.notes.filter(n=>n.pending&&(t.dataset.act==='ok-todas'||selecionadas.has(n.id)));
+    alvo.forEach(n=>{ n.pending=false; selecionadas.delete(n.id); });
+    save(); atualizaNotas(s); toast(`${alvo.length} ${alvo.length===1?'observação confirmada':'observações confirmadas'}`); return;
+  }
+  if(t.dataset.filter){ filter=t.dataset.filter; pagina.log=0; const s=getActive(); $('#log').innerHTML=logHtml(s); refreshSessionCounts(s); return; }
   if(t.dataset.cat){ deckCat=t.dataset.cat; puxarCarta(); render(); return; }
   if(t.dataset.carta){ deckIdx=+t.dataset.carta; deckGiro++; mostraCarta(); $('#carta').scrollIntoView({block:'center',behavior:'smooth'}); return; }
   if(t.dataset.rmimg!=null){ pendingImgs.splice(+t.dataset.rmimg,1); $('#thumbs').innerHTML=thumbsHtml(); return; }
@@ -938,7 +969,10 @@ document.addEventListener('paste',e=>{
   if(items.length){ e.preventDefault(); items.forEach(i=>addImageFile(i.getAsFile())); toast('Print anexado à nota'); }
 });
 document.addEventListener('change',e=>{
-  if(e.target.id==='file-in'){ [...e.target.files].forEach(addImageFile); e.target.value=''; }
+  if(e.target.id==='file-in'){ [...e.target.files].forEach(addImageFile); e.target.value=''; return; }
+  const d=e.target.dataset;
+  if(d.sel){ e.target.checked?selecionadas.add(d.sel):selecionadas.delete(d.sel); atualizaNotas(sessaoDaTela()); return; }
+  if(d.selpag!=null){ d.selpag.split(',').filter(Boolean).forEach(id=>e.target.checked?selecionadas.add(id):selecionadas.delete(id)); atualizaNotas(sessaoDaTela()); }
   if(e.target.id==='backup-in'){ const f=e.target.files[0]; e.target.value=''; if(f) f.text().then(importarBackup).catch(()=>toast('Não foi possível ler o arquivo.')); }
 });
 
