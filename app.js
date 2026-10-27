@@ -1039,7 +1039,7 @@ document.addEventListener('change',e=>{
 });
 
 function afterRender(){}
-// Idioma: textos fixos do index.html (data-i18n), menu no cabeçalho e troca sem recarregar.
+// Idioma: textos fixos do index.html (data-i18n) e menu no cabeçalho. Trocar recarrega a tela, com a abertura, já no idioma novo.
 const I18N = window.QAS_I18N;
 const PRIVACIDADE = {'pt-BR':'privacidade.html','pt-PT':'privacidade.pt-PT.html',en:'privacidade.en.html',es:'privacidade.es.html'};
 function aplicaTextosFixos(){
@@ -1061,9 +1061,11 @@ $('#idioma')?.addEventListener('click',e=>{ e.stopPropagation(); menuIdioma($('#
 $('#idioma-menu')?.addEventListener('click',e=>{
   const b=e.target.closest('[data-idioma]'); if(!b) return;
   e.stopPropagation();
+  menuIdioma(false);
+  if(b.dataset.idioma===I18N.atual){ $('#idioma').focus(); return; }
   I18N.definir(b.dataset.idioma);
-  menuIdioma(false); aplicaTextosFixos(); aplicaTema(); render();
-  $('#idioma').focus();
+  try{ sessionStorage.removeItem('qascout.abertura'); }catch(e){}
+  location.reload();
 });
 $('#idioma-menu')?.addEventListener('keydown',e=>{
   const itens=[...$('#idioma-menu').querySelectorAll('button')], i=itens.indexOf(document.activeElement);
