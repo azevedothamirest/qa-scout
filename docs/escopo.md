@@ -93,6 +93,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 ## MCP · o Claude explora com você
 
 - [x] Servidor MCP (`qa-scout mcp`) com ferramentas para iniciar a sessão, navegar, ler a tela, clicar, preencher, anotar, ver capturas, sortear heurística e encerrar
+- [x] Aba MCP no app e na extensão (0.8.0) e guia em `docs/mcp.md`
 - [ ] Ponte para o Claude in Chrome (extensão da loja, com confirmação no painel)
 - [ ] Publicar na Edge Add-ons
 - [ ] Firefox

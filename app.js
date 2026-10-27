@@ -154,7 +154,7 @@ function registrado(k){ return `${TYPES[k].label} ${FEM[k]?'registrada':'registr
 
 function render(){
   const active = getActive();
-  ['home','active','deck','metodo'].forEach(k=>{
+  ['home','active','deck','metodo','mcp'].forEach(k=>{
     const b=$('#tab-'+k);
     const cur = (k==='home' && (view==='home'||view==='report')) || (k==='active' && (view==='active'||view==='new')) || k===view;
     b.setAttribute('aria-current', cur ? 'page':'false');
@@ -169,6 +169,7 @@ function render(){
   else if(view==='report') app.innerHTML = viewReport(state.sessions.find(s=>s.id===viewArg));
   else if(view==='deck') app.innerHTML = viewDeck();
   else if(view==='metodo') app.innerHTML = viewMetodo();
+  else if(view==='mcp') app.innerHTML = viewMcp();
   afterRender();
 }
 
@@ -710,6 +711,41 @@ const CARTAS_METODO = [
    autor:'Para ir além', h:'Comece por aqui',
    verso:`<ul class="livros"><li><b>Session-Based Test Management</b> · Jonathan Bach, 2000</li><li><b>Explore It!</b> · Elisabeth Hendrickson, 2013</li><li><b>Exploratory Software Testing</b> · James Whittaker, 2009</li><li><b>Lessons Learned in Software Testing</b> · Kaner, Bach e Pettichord, 2001</li></ul>`},
 ];
+/* ---------- tela: explorar com o Claude (MCP) ---------- */
+// Só explica e dá os comandos: o servidor MCP roda no computador da pessoa (qa-scout mcp), não aqui.
+const MCP_INSTALAR = 'claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp';
+const MCP_PEDIDOS = [
+  ['Sessão com charter', 'Use o QA Scout para uma sessão exploratória de 20 minutos em https://homolog.minhaloja.com: explorar o checkout, com cupons e Pix, para descobrir cobranças erradas. Anote o que encontrar e me mostre o relatório.'],
+  ['Foco em erros', 'Com o QA Scout, explore o cadastro de https://homolog.meusistema.com por 15 minutos procurando erros de validação, mensagens confusas e falhas de rede. Use dados de teste e consulte as capturas depois de cada envio.'],
+  ['Com heurística', 'Abra uma sessão do QA Scout em https://homolog.meusistema.com, sorteie uma heurística do baralho e explore a busca por 10 minutos seguindo ela.'],
+];
+const MCP_DOC = 'https://github.com/azevedothamirest/qa-scout/blob/main/docs/mcp.md';
+function viewMcp(){
+  const cmd = (txt, rotulo) => `<div class="mcp-cmd"><code>${esc(txt)}</code><button class="btn" type="button" data-copiar="${esc(txt)}" aria-label="Copiar ${rotulo}">Copiar</button></div>`;
+  return `<section class="view mcp">
+    <div class="metodo-hero">
+      <div class="eyebrow">Com o Claude · MCP</div>
+      <h1>Explore em dupla <em>com o Claude.</em></h1>
+      <p>Você passa a missão e o Claude conduz a sessão no navegador de teste: lê a tela, clica, preenche, anota o que encontra e devolve o relatório. A captura do QA Scout grava tudo como faria com você, e a sessão fica no seu histórico para revisar.</p>
+    </div>
+    <div class="mcp-aviso" role="note"><b>Roda no terminal do seu computador.</b> O MCP funciona no Claude Code ou no Claude Desktop, com o Node.js 18 ou mais recente instalado. ${EXT?'Esta extensão':'Este site'} só explica como usar: quem abre o navegador e conduz a sessão é o comando <code>qa-scout mcp</code>.</div>
+    <div class="passos mcp-passos">
+      <div class="passo"><h3>Instale no Claude Code</h3><p>No terminal, uma vez só:</p>${cmd(MCP_INSTALAR,'o comando de instalação')}<small>Claude Desktop: veja o guia</small></div>
+      <div class="passo"><h3>Confira a conexão</h3><p>O <code>qa-scout</code> deve aparecer como conectado.</p>${cmd('claude mcp list','o comando de conferência')}<small>Primeira vez: o Chromium é baixado</small></div>
+      <div class="passo"><h3>Peça a sessão</h3><p>Abra o Claude Code e diga o que explorar, com o quê, para descobrir o quê e por quanto tempo.</p><small>O charter, como você já faz</small></div>
+    </div>
+    <div class="section-head" style="margin:26px 0 12px"><div><div class="eyebrow">Como pedir</div><h2>Exemplos de pedido</h2></div></div>
+    <div class="mcp-pedidos">${MCP_PEDIDOS.map(([t,txt])=>`<div class="card"><h3>${t}</h3><p>${esc(txt)}</p><button class="btn" type="button" data-copiar="${esc(txt)}" aria-label="Copiar pedido: ${t}">Copiar pedido</button></div>`).join('')}</div>
+    <div class="mcp-grade">
+      <div class="card"><div class="eyebrow">O que o Claude usa</div><h3>Ferramentas</h3>
+        <ul class="mcp-lista"><li><b>iniciar_sessao</b> charter, tempo e endereço</li><li><b>ver_pagina</b> lê a tela atual</li><li><b>clicar · preencher · escolher_opcao · navegar</b></li><li><b>ver_capturas</b> erros de JS, console e rede</li><li><b>anotar</b> bug, dúvida, ideia, risco, observação</li><li><b>sugerir_heuristica</b> uma carta do baralho</li><li><b>encerrar_sessao</b> debriefing e relatório</li></ul></div>
+      <div class="card"><div class="eyebrow">Antes de começar</div><h3>Cuidados</h3>
+        <ul class="mcp-lista"><li>Use só ambientes e dados de teste, nunca produção.</li><li>O Claude lê o texto das páginas que visita (inclusive campos preenchidos). A sessão e os prints ficam só no seu computador.</li><li>As notas automáticas chegam <b>a revisar</b>: o julgamento do que importa continua com você.</li><li>Cada passo lê a tela, então sessões longas gastam mais tokens.</li></ul></div>
+    </div>
+    <p class="hint" style="margin-top:18px"><a href="${MCP_DOC}" target="_blank" rel="noopener">Guia completo do MCP no GitHub ↗</a></p>
+  </section>`;
+}
+
 function viewMetodo(){
   return `<section class="view">
     <div class="metodo-hero">
@@ -801,6 +837,7 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('button,[data-open]'); if(!t) return;
   if(t.dataset.go){ if(view==='new') { state.draft=readDraft(); save(); } go(t.dataset.go==='active' && !getActive() ? 'new' : t.dataset.go, t.dataset.arg||null); return; }
   if(t.dataset.open){ go('report',t.dataset.open); return; }
+  if(t.dataset.copiar){ copy(t.dataset.copiar,'Copiado'); return; }
   if(t.dataset.type){ setType(t.dataset.type); $('#note-in')?.focus(); return; }
   if(t.dataset.filter){ filter=t.dataset.filter; const s=getActive(); $('#log').innerHTML=logHtml(s); refreshSessionCounts(s); return; }
   if(t.dataset.cat){ deckCat=t.dataset.cat; puxarCarta(); render(); return; }
