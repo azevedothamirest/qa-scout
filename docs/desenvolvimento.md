@@ -23,7 +23,9 @@ Para testar o navegador de teste: `npm run navegador -- https://endereco-do-sist
 index.html          estrutura da página (site, painel da extensão e navegador de teste)
 app.css             todo o visual: tokens de cor, componentes, impressão do relatório
 app.js              a aplicação inteira, em JavaScript puro, sem framework e sem build
-privacidade.html    política de privacidade (publicada no GitHub Pages)
+i18n.js, i18n/      idiomas: troca de idioma e dicionários (pt-PT, en, es)
+_locales/           nome e descrição da extensão em cada idioma
+privacidade*.html   política de privacidade, um arquivo por idioma (publicada no GitHub Pages)
 manifest.json       manifesto da extensão do Chrome (Manifest V3)
 extensao/           captura automática: service worker, script de conteúdo e script da página
 icones/             ícones da extensão (16, 32, 48 e 128 px)

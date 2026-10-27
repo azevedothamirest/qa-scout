@@ -14,7 +14,7 @@ test.describe('Navegador de teste (comando qa-scout)', () => {
 
   test.beforeEach(async () => {
     perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-'));
-    aberto = await abrir({ url: LOJA, perfil, headless: true });
+    aberto = await abrir({ url: LOJA, perfil, headless: true, locale: 'pt-BR' });
   });
 
   test.afterEach(async () => {
@@ -58,7 +58,7 @@ test.describe('Navegador de teste · atualização', () => {
     const manifesto = JSON.parse(fs.readFileSync(path.join(antiga, 'manifest.json'), 'utf8'));
     delete manifesto.key;
     fs.writeFileSync(path.join(antiga, 'manifest.json'), JSON.stringify(manifesto));
-    const velho = await chromium.launchPersistentContext(perfil, { channel: 'chromium', args: [`--disable-extensions-except=${antiga}`, `--load-extension=${antiga}`] });
+    const velho = await chromium.launchPersistentContext(perfil, { channel: 'chromium', locale: 'pt-BR', args: [`--disable-extensions-except=${antiga}`, `--load-extension=${antiga}`] });
     let [sw] = velho.serviceWorkers();
     if (!sw) sw = await velho.waitForEvent('serviceworker');
     expect(new URL(sw.url()).host).not.toBe(ID_FIXO);

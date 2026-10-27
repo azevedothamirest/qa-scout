@@ -19,8 +19,65 @@
     return (espaco > 40 ? corte.slice(0, espaco) : corte).replace(/[\s,.;:–-]+$/, '') + '…';
   };
 
-  // Tipos de campo que não têm rótulo próprio na nota: o tipo vira a descrição.
-  const TIPO_CAMPO = { date: 'de data', 'datetime-local': 'de data e hora', time: 'de hora', month: 'de mês', week: 'de semana', range: 'deslizante', color: 'de cor', number: 'numérico', email: 'de e-mail', tel: 'de telefone', url: 'de endereço', search: 'de busca' };
+  // Frases das notas no idioma escolhido no painel (qascout.idioma). Papéis e tipos de campo usam
+  // chaves internas; cada idioma monta a frase do seu jeito.
+  const q = n => n ? ` “${n}”` : '';
+  const FRASES = {
+    'pt-BR': {
+      papel: { botao: 'botão', link: 'link', aba: 'aba', caixa: 'caixa de seleção', menu: 'item de menu', opcao: 'opção', chave: 'chave', campo: 'campo', lista: 'lista', imagem: 'imagem' },
+      tipo: { date: 'de data', 'datetime-local': 'de data e hora', time: 'de hora', month: 'de mês', week: 'de semana', range: 'deslizante', color: 'de cor', number: 'numérico', email: 'de e-mail', tel: 'de telefone', url: 'de endereço', search: 'de busca', texto: 'de texto', longo: 'de texto longo' },
+      clique: (k, p, n) => `Clicou ${/^(botao|link|campo)$/.test(k) ? 'no' : 'em'} ${p}${q(n)}`,
+      cliqueSem: n => `Clicou em “${n}”`,
+      senha: 'Preencheu um campo de senha',
+      anexo: (qtd, n) => `Anexou ${qtd > 1 ? `${qtd} arquivos` : 'um arquivo'}${n ? ` em “${n}”` : ''}`,
+      escolheu: (o, n) => o ? `Escolheu “${o}” em “${n || 'lista'}”` : `Escolheu uma opção em “${n || 'lista'}”`,
+      campo: (tp, n) => n ? `Preencheu o campo${tp ? ` ${tp}` : ''} “${n}”` : `Preencheu um campo ${tp}`,
+      marcas: { bug: 'Bug marcado neste momento', duv: 'Dúvida marcada neste momento', ide: 'Ideia marcada neste momento', ris: 'Risco marcado neste momento', obs: 'Observação marcada neste momento' },
+      marcou: 'Marcou este momento', js: 'Erro de JavaScript', console: 'Erro no console',
+    },
+    'pt-PT': {
+      papel: { botao: 'botão', link: 'link', aba: 'separador', caixa: 'caixa de verificação', menu: 'item de menu', opcao: 'opção', chave: 'interruptor', campo: 'campo', lista: 'lista', imagem: 'imagem' },
+      tipo: { date: 'de data', 'datetime-local': 'de data e hora', time: 'de hora', month: 'de mês', week: 'de semana', range: 'deslizante', color: 'de cor', number: 'numérico', email: 'de e-mail', tel: 'de telefone', url: 'de endereço', search: 'de pesquisa', texto: 'de texto', longo: 'de texto longo' },
+      clique: (k, p, n) => `Clicou ${/^(botao|link|campo|separador|interruptor)$/.test(k) ? 'no' : 'em'} ${p}${q(n)}`,
+      cliqueSem: n => `Clicou em “${n}”`,
+      senha: 'Preencheu um campo de palavra-passe',
+      anexo: (qtd, n) => `Anexou ${qtd > 1 ? `${qtd} ficheiros` : 'um ficheiro'}${n ? ` em “${n}”` : ''}`,
+      escolheu: (o, n) => o ? `Escolheu “${o}” em “${n || 'lista'}”` : `Escolheu uma opção em “${n || 'lista'}”`,
+      campo: (tp, n) => n ? `Preencheu o campo${tp ? ` ${tp}` : ''} “${n}”` : `Preencheu um campo ${tp}`,
+      marcas: { bug: 'Bug marcado neste momento', duv: 'Dúvida marcada neste momento', ide: 'Ideia marcada neste momento', ris: 'Risco marcado neste momento', obs: 'Observação marcada neste momento' },
+      marcou: 'Marcou este momento', js: 'Erro de JavaScript', console: 'Erro na consola',
+    },
+    en: {
+      papel: { botao: 'button', link: 'link', aba: 'tab', caixa: 'checkbox', menu: 'menu item', opcao: 'option', chave: 'switch', campo: 'field', lista: 'list', imagem: 'image' },
+      tipo: { date: 'date', 'datetime-local': 'date and time', time: 'time', month: 'month', week: 'week', range: 'slider', color: 'color', number: 'number', email: 'email', tel: 'phone', url: 'URL', search: 'search', texto: 'text', longo: 'long text' },
+      clique: (k, p, n) => `Clicked the ${p}${q(n)}`,
+      cliqueSem: n => `Clicked “${n}”`,
+      senha: 'Filled in a password field',
+      anexo: (qtd, n) => `Attached ${qtd > 1 ? `${qtd} files` : 'a file'}${n ? ` to “${n}”` : ''}`,
+      escolheu: (o, n) => o ? `Chose “${o}” in “${n || 'list'}”` : `Chose an option in “${n || 'list'}”`,
+      campo: (tp, n) => n ? `Filled in the${tp ? ` ${tp}` : ''} field “${n}”` : `Filled in a ${tp} field`,
+      marcas: { bug: 'Bug marked at this moment', duv: 'Question marked at this moment', ide: 'Idea marked at this moment', ris: 'Risk marked at this moment', obs: 'Observation marked at this moment' },
+      marcou: 'Marked this moment', js: 'JavaScript error', console: 'Console error',
+    },
+    es: {
+      papel: { botao: 'botón', link: 'enlace', aba: 'pestaña', caixa: 'casilla', menu: 'elemento de menú', opcao: 'opción', chave: 'interruptor', campo: 'campo', lista: 'lista', imagem: 'imagen' },
+      tipo: { date: 'de fecha', 'datetime-local': 'de fecha y hora', time: 'de hora', month: 'de mes', week: 'de semana', range: 'deslizante', color: 'de color', number: 'numérico', email: 'de correo', tel: 'de teléfono', url: 'de dirección', search: 'de búsqueda', texto: 'de texto', longo: 'de texto largo' },
+      clique: (k, p, n) => `Hizo clic en ${/^(aba|caixa|opcao|lista|imagem)$/.test(k) ? 'la' : 'el'} ${p}${q(n)}`,
+      cliqueSem: n => `Hizo clic en “${n}”`,
+      senha: 'Rellenó un campo de contraseña',
+      anexo: (qtd, n) => `Adjuntó ${qtd > 1 ? `${qtd} archivos` : 'un archivo'}${n ? ` en “${n}”` : ''}`,
+      escolheu: (o, n) => o ? `Eligió “${o}” en “${n || 'lista'}”` : `Eligió una opción en “${n || 'lista'}”`,
+      campo: (tp, n) => n ? `Rellenó el campo${tp ? ` ${tp}` : ''} “${n}”` : `Rellenó un campo ${tp}`,
+      marcas: { bug: 'Bug marcado en este momento', duv: 'Duda marcada en este momento', ide: 'Idea marcada en este momento', ris: 'Riesgo marcado en este momento', obs: 'Observación marcada en este momento' },
+      marcou: 'Marcó este momento', js: 'Error de JavaScript', console: 'Error en la consola',
+    },
+  };
+  let F = FRASES['pt-BR'];
+  const usaIdioma = id => { if (FRASES[id]) F = FRASES[id]; };
+  try {
+    chrome.storage.local.get('qascout.idioma').then(r => usaIdioma(r['qascout.idioma'])).catch(() => {});
+    chrome.storage.onChanged.addListener((m, area) => { if (area === 'local' && m['qascout.idioma']) usaIdioma(m['qascout.idioma'].newValue); });
+  } catch (e) {}
 
   function rotuloDoCampo(el) {
     if (el.labels && el.labels[0]) return limpa(el.labels[0].innerText);
@@ -49,12 +106,12 @@
 
   function papelDe(el) {
     const role = el.getAttribute('role');
-    if (role) return { button: 'botão', link: 'link', tab: 'aba', checkbox: 'caixa de seleção', menuitem: 'item de menu', option: 'opção', switch: 'chave' }[role] || role;
+    if (role) return { button: 'botao', link: 'link', tab: 'aba', checkbox: 'caixa', menuitem: 'menu', option: 'opcao', switch: 'chave' }[role] || role;
     const t = el.tagName;
     if (t === 'A') return 'link';
-    if (t === 'BUTTON' || (t === 'INPUT' && /^(button|submit|reset)$/.test(el.type))) return 'botão';
-    if (t === 'INPUT' && el.type === 'checkbox') return 'caixa de seleção';
-    if (t === 'INPUT' && el.type === 'radio') return 'opção';
+    if (t === 'BUTTON' || (t === 'INPUT' && /^(button|submit|reset)$/.test(el.type))) return 'botao';
+    if (t === 'INPUT' && el.type === 'checkbox') return 'caixa';
+    if (t === 'INPUT' && el.type === 'radio') return 'opcao';
     if (/^(INPUT|TEXTAREA)$/.test(t)) return 'campo';
     if (t === 'SELECT') return 'lista';
     if (t === 'IMG') return 'imagem';
@@ -77,8 +134,7 @@
     const alvo = t.closest && t.closest(ALVO);
     const el = alvo || t;
     const papel = papelDe(el), nome = nomeDe(el, !!alvo);
-    const desc = papel ? `Clicou ${papel === 'campo' || papel === 'link' || papel === 'botão' ? 'no' : 'em'} ${papel}${nome ? ` “${nome}”` : ''}`
-      : `Clicou em “${nome || el.tagName.toLowerCase()}”`;
+    const desc = papel ? F.clique(papel, F.papel[papel] || papel, nome) : F.cliqueSem(nome || el.tagName.toLowerCase());
     // Dentro de iframe as coordenadas não batem com o print da aba: vai sem a marca do clique.
     envia(emQuadro ? { tipo: 'clique', desc } : { tipo: 'clique', desc, x: e.clientX, y: e.clientY, vw: innerWidth, vh: innerHeight });
   }, true);
@@ -92,14 +148,15 @@
     if (/^(button|submit|reset|checkbox|radio|hidden)$/.test(el.type)) return;
     const nome = rotuloDoCampo(el);
     let desc;
-    if (el.type === 'password') desc = 'Preencheu um campo de senha';
-    else if (el.type === 'file') desc = `Anexou ${el.files && el.files.length > 1 ? `${el.files.length} arquivos` : 'um arquivo'}${nome ? ` em “${nome}”` : ''}`;
+    if (el.type === 'password') desc = F.senha;
+    else if (el.type === 'file') desc = F.anexo(el.files ? el.files.length : 1, nome);
     else if (el.tagName === 'SELECT') {
       const opcao = SENSIVEL.test(el.autocomplete || '') ? '' : limpa([...el.selectedOptions].map(o => o.label || o.text).join(', '));
-      desc = opcao ? `Escolheu “${opcao}” em “${nome || 'lista'}”` : `Escolheu uma opção em “${nome || 'lista'}”`;
+      desc = F.escolheu(opcao, nome);
     } else {
-      const tipo = TIPO_CAMPO[el.type];
-      desc = nome ? `Preencheu o campo${tipo ? ` ${tipo}` : ''} “${nome}”` : `Preencheu um campo ${tipo || (el.tagName === 'TEXTAREA' ? 'de texto longo' : 'de texto')}`;
+      // Tipos de campo que não têm rótulo próprio na nota: o tipo vira a descrição.
+      const tipo = F.tipo[el.type];
+      desc = F.campo(nome ? tipo : tipo || F.tipo[el.tagName === 'TEXTAREA' ? 'longo' : 'texto'], nome);
     }
     envia({ tipo: 'campo', desc });
   }
@@ -127,12 +184,12 @@
 
   // Alt+1 a Alt+5 no sistema em teste: marca o momento já com o tipo (bug, dúvida, ideia, risco,
   // observação), com print, sem precisar voltar ao painel.
-  const TIPOS = { Digit1: ['bug', 'Bug'], Digit2: ['duv', 'Dúvida'], Digit3: ['ide', 'Ideia'], Digit4: ['ris', 'Risco'], Digit5: ['obs', 'Observação'] };
+  const TIPOS = { Digit1: 'bug', Digit2: 'duv', Digit3: 'ide', Digit4: 'ris', Digit5: 'obs' };
   document.addEventListener('keydown', e => {
     const tipo = TIPOS[e.code];
     if (tipo && e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
       e.preventDefault();
-      envia({ tipo: 'marca', nota: tipo[0], desc: `${tipo[1]} marcado neste momento` });
+      envia({ tipo: 'marca', nota: tipo, desc: F.marcas[tipo] });
     }
   }, true);
 
@@ -140,14 +197,14 @@
   document.addEventListener('keydown', e => {
     if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyM') {
       e.preventDefault();
-      envia({ tipo: 'marca', desc: 'Marcou este momento' });
+      envia({ tipo: 'marca', desc: F.marcou });
     }
   }, true);
 
   // Erros de JavaScript e console.error, repassados pelo pagina.js (que roda no contexto da página).
   document.addEventListener('qascout:erro', e => {
     let det; try { det = JSON.parse(e.detail); } catch (err) { return; }
-    const desc = det.tipo === 'js' ? `Erro de JavaScript: ${det.msg}` : `Erro no console: ${det.msg}`;
+    const desc = `${det.tipo === 'js' ? F.js : F.console}: ${det.msg}`;
     envia({ tipo: 'erro', grave: det.tipo === 'js', desc, chave: det.chave, vezes: det.vezes, repete: det.repete });
   });
   document.dispatchEvent(new CustomEvent('qascout:pronto'));

@@ -1,0 +1,8 @@
+{
+  "descricao": {
+    "message": "Exploratory testing with a mission: records clicks, screenshots, console and network errors in the tabs you follow and builds the report."
+  },
+  "abrir": {
+    "message": "Open QA Scout"
+  }
+}

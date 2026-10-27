@@ -1,5 +1,7 @@
 # QA Scout
 
+[![Português (Brasil)](https://img.shields.io/badge/Portugu%C3%AAs%20%28Brasil%29-3DF5A7?style=for-the-badge)](README.md) [![Português (Portugal)](https://img.shields.io/badge/Portugu%C3%AAs%20%28Portugal%29-296F82?style=for-the-badge)](README.pt-PT.md) [![English](https://img.shields.io/badge/English-296F82?style=for-the-badge)](README.en.md) [![Español](https://img.shields.io/badge/Espa%C3%B1ol-296F82?style=for-the-badge)](README.es.md)
+
 **Explore com missão. Volte com evidência.**
 
 QA Scout é um companheiro de teste exploratório baseado em sessões (SBTM). Você escreve o charter, liga o cronômetro, anota o que encontra no ritmo da exploração e, no fim, sai com um relatório pronto para o time.
@@ -19,6 +21,7 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - Charter, cronômetro e notas por tipo (bug, dúvida, ideia, risco, observação) com atalhos e prints.
 - Captura automática de cliques, campos, páginas e erros de console e rede, com passos para reproduzir.
 - Relatório em Markdown ou PDF e bug pronto para o Jira ou GitHub.
+- Quatro idiomas: português do Brasil, português de Portugal, inglês e espanhol.
 
 Lista completa em [funcionalidades](docs/funcionalidades.md).
 
@@ -38,10 +41,6 @@ Tudo fica salvo no navegador de quem usa. Não há servidor, conta ou envio de d
 ## Ideias e feedback
 
 Bugs, ideias e críticas: [abra uma issue](https://github.com/azevedothamirest/qa-scout/issues/new/choose) ou veja [como me mandar](CONTRIBUTING.md).
-
-## English
-
-QA Scout is a free, open source companion for session-based exploratory testing (SBTM): write a charter, run a timer, log typed notes with screenshots, and export a Markdown or PDF session report. The [Chrome extension](https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin) captures clicks, fields, pages, JavaScript errors and failed requests as notes to review. No server, no account: data stays on your machine.
 
 ---
 

@@ -1,0 +1,8 @@
+{
+  "descricao": {
+    "message": "Teste exploratório com missão: regista cliques, capturas de ecrã, erros de consola e de rede dos separadores que acompanhar e gera o relatório."
+  },
+  "abrir": {
+    "message": "Abrir o QA Scout"
+  }
+}

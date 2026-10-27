@@ -27,7 +27,7 @@ test.describe('Pacote da Chrome Web Store', () => {
     execFileSync(process.execPath, [path.join(RAIZ, 'scripts', 'empacotar.js')], { cwd: RAIZ });
     const nomes = nomesDoZip(fs.readFileSync(path.join(RAIZ, 'dist', `qa-scout-extensao-${version}.zip`)));
 
-    expect(nomes).toEqual(expect.arrayContaining(['manifest.json', 'index.html', 'app.css', 'app.js', 'extensao/background.js', 'extensao/content.js', 'extensao/pagina.js']));
+    expect(nomes).toEqual(expect.arrayContaining(['manifest.json', 'index.html', 'app.css', 'app.js', 'extensao/background.js', 'extensao/content.js', 'extensao/pagina.js', 'i18n.js', 'i18n/en.js', 'i18n/es.js', 'i18n/pt-PT.js', '_locales/pt_BR/messages.json', '_locales/en/messages.json']));
     for (const icone of Object.values(manifesto.icons)) expect(nomes).toContain(icone);
     // Na loja, o acesso aos sites é opcional (pedido no primeiro uso) e o id vem da própria loja.
     expect(manifesto.host_permissions).toBeUndefined();

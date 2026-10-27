@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacidade · QA Scout</title>
+<meta name="description" content="Política de privacidade do QA Scout: o que a extensão regista, onde os dados ficam e o que nunca sai do seu computador.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Mesmo visual do app: fundo escuro com toques sutis de cor, granulado, Plus Jakarta Sans. */
+:root{--paper:#0B0B12;--surface:#16161F;--surface-2:#1E1E2A;--ink:#F4F3FF;--muted:#9C9AB3;--line:#2A2A38;--accent:#3DF5A7;--teal:#8AE3D7;
+  --g:linear-gradient(90deg,#3DF5A7,#3BC9F5,#FF79C6);--f:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;--m:"JetBrains Mono",ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(50% 35% at 95% 0%,rgba(139,92,246,.16),transparent 70%),radial-gradient(55% 40% at 0% 100%,rgba(41,111,130,.2),transparent 70%),var(--paper);background-attachment:fixed}
+body::after{content:"";position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.08;pointer-events:none}
+main{max-width:780px;margin:0 auto;padding:44px 20px 80px;position:relative;z-index:1}
+.brand{display:flex;width:max-content;align-items:center;gap:12px;font-weight:800;font-size:20px;color:var(--ink);text-decoration:none;margin-bottom:44px}
+.brand svg{width:36px;height:36px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:7px 15px;font-size:13px;font-weight:600;color:var(--muted)}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal)}
+h1{font-size:clamp(36px,7vw,58px);line-height:1.03;letter-spacing:-.035em;font-weight:800;margin:20px 0 16px}
+h1 em{font-style:normal;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--muted);font-size:18px;margin:0;max-width:60ch}
+.selos{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 8px}
+.selos span{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-weight:700;font-size:14px}
+.selos span::before{content:"✓";display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#0B0B12;font-size:12px;font-weight:800}
+.card{position:relative;background:var(--surface);border-radius:22px;padding:22px 26px;margin-top:28px;border:1px solid transparent;background-clip:padding-box}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:23px;padding:1px;background:var(--g);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.card p{margin:0}
+h2{display:flex;align-items:center;gap:12px;font-size:22px;letter-spacing:-.02em;margin:46px 0 10px;font-weight:800}
+h2::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--teal);transform:rotate(45deg);flex:none}
+p{color:#D9D7EA}
+ul{padding:0;list-style:none;display:grid;gap:10px}
+li{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:0;color:#D9D7EA}
+li b,p b{color:var(--ink)}
+code{font-family:var(--m);font-size:.86em;background:var(--surface-2);border:1px solid var(--line);padding:1px 7px;border-radius:7px;color:var(--teal)}
+a{color:var(--teal)}
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.idiomas{margin-top:10px}.idiomas b{color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="./"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#0F2B33"/><circle cx="32" cy="32" r="25" fill="none" stroke="#296F82" stroke-width="4.3"/><circle cx="32" cy="32" r="15" fill="none" stroke="#1B4E5C" stroke-width="2.6"/><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#06171C" opacity=".75" transform="translate(1.8 2.4) rotate(40 32 32)"/><g transform="rotate(40 32 32)"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#296F82"/><path d="M32 32 L38.5 32 L32 52 Z" fill="#8AE3D7"/></g></svg>QA Scout</a>
+  <div class="eyebrow">Política de privacidade · atualizada a 27 de outubro de 2026</div>
+  <h1>Os seus dados ficam <em>no seu computador.</em></h1>
+  <p class="lead">O QA Scout não tem servidor, conta nem envio de dados. Esta página explica o que a extensão regista, onde guarda e o que nunca faz.</p>
+  <div class="selos"><span>Sem servidor</span><span>Sem conta</span><span>Nada do que escreve é lido</span><span>Código aberto</span></div>
+
+  <div class="card"><p><b>Resumo:</b> nada do que o QA Scout regista sai do seu navegador. Não recolhemos, vendemos nem partilhamos dados com ninguém, e não usamos ferramentas de análise nem anúncios.</p></div>
+
+  <h2>O que a extensão regista</h2>
+  <p>Só durante uma sessão de teste em curso e só nos separadores que escolhe acompanhar (incluindo iframes do mesmo site; iframes de outros sites, como anúncios, ficam de fora). No navegador de teste aberto pelo comando <code>qa-scout</code>, todos os separadores desse navegador à parte:</p>
+  <ul>
+    <li><b>Cliques</b>: o tipo e o nome do elemento clicado (por exemplo, “botão Pagar com MB WAY”), com uma captura do separador visível.</li>
+    <li><b>Campos preenchidos</b>: só o rótulo do campo. <b>O valor escrito nunca é lido nem guardado.</b> Em campos de palavra-passe, a nota diz apenas “Preencheu um campo de palavra-passe”. Em anexos, só que foi escolhido um ficheiro, nunca o nome nem o conteúdo.</li>
+    <li><b>Listas de opções (<code>select</code>)</b>: o texto da opção escolhida, que vem da própria página (por exemplo, “Escolheu Porto em Distrito”). Listas marcadas como dados de cartão, nascimento ou palavra-passe (<code>autocomplete</code>) registam só que foi escolhida uma opção.</li>
+    <li><b>Páginas abertas</b>: título e endereço.</li>
+    <li><b>Erros de JavaScript, <code>console.error</code> e falhas de rede</b>: a mensagem de erro, o método, o caminho do pedido e o código de resposta. O conteúdo dos pedidos e respostas não é lido.</li>
+    <li><b>Atalhos <code>Alt+Shift+M</code> e <code>Alt+1</code> a <code>Alt+5</code></b>: uma captura do separador visível no momento, já com o tipo da nota quando é <code>Alt+número</code>.</li>
+  </ul>
+  <p>Com a sessão em pausa ou terminada, nada é registado.</p>
+
+  <h2>Explorar com o Claude (servidor MCP, opcional)</h2>
+  <p>Quem instala o servidor MCP do QA Scout no Claude Code ou no Claude Desktop pode pedir ao Claude que conduza uma sessão no navegador de teste. Neste modo, a sessão, as notas e as capturas continuam só no seu computador, mas o Claude precisa de ler o ecrã para explorar: o texto e os campos das páginas visitadas (incluindo valores já preenchidos) são enviados ao Claude, como em qualquer conversa com ele. Use apenas ambientes e dados de teste. A extensão da Chrome Web Store não usa este modo.</p>
+
+  <h2>Onde ficam os dados</h2>
+  <p>Sessões, notas e capturas ficam no armazenamento local do navegador (<code>chrome.storage.local</code> na extensão, <code>localStorage</code> na versão web). Nada é enviado para servidores do QA Scout nem de terceiros. Os dados só saem do seu computador quando <b>você</b> copia um relatório, copia um bug ou transfere uma cópia de segurança.</p>
+
+  <h2>Atenção às capturas</h2>
+  <p>As capturas mostram o que está no ecrã no momento do clique. Se explorar um sistema com dados reais de clientes, estes podem aparecer nas imagens. Prefira ambientes de teste com dados fictícios e reveja as capturas antes de partilhar um relatório.</p>
+
+  <h2>Porque é que a extensão pede cada permissão</h2>
+  <ul>
+    <li><b>Acesso aos sites (<code>&lt;all_urls&gt;</code>), opcional</b>: não é pedido na instalação. O Chrome pergunta na primeira vez que clica em “Acompanhar o separador atual”, porque o sistema em teste pode estar em qualquer endereço e a captura do separador exige esse acesso. Pode retirá-lo quando quiser em <code>chrome://extensions</code>. Mesmo com o acesso concedido, a captura só corre nos separadores acompanhados e com a sessão em curso.</li>
+    <li><b><code>tabs</code> e <code>scripting</code></b>: saber que separador marcou, tirar-lhe a captura e registar cliques e campos.</li>
+    <li><b><code>webRequest</code></b>: detetar respostas com erro (4xx e 5xx) e falhas de ligação nos separadores acompanhados. Só leitura; nenhum pedido é bloqueado nem alterado.</li>
+    <li><b><code>storage</code> e <code>unlimitedStorage</code></b>: guardar as sessões e as capturas no seu computador.</li>
+    <li><b><code>sidePanel</code></b>: abrir o QA Scout no painel lateral do Chrome.</li>
+  </ul>
+
+  <h2>Como apagar tudo</h2>
+  <p>Desinstale a extensão ou limpe os dados dela em <code>chrome://extensions</code>. No navegador de teste, apague a pasta <code>~/.qa-scout/perfil</code>. Na versão web, limpe os dados do site no navegador.</p>
+
+  <h2>Código aberto</h2>
+  <p>O código do QA Scout é aberto (licença MIT): pode verificar tudo o que ele faz. Dúvidas sobre privacidade: <a href="mailto:contato.qascout@gmail.com">contato.qascout@gmail.com</a>.</p>
+
+  <h2>Alterações a esta política</h2>
+  <p>Se o QA Scout passar a enviar qualquer dado para fora do seu computador (por exemplo, numa futura sincronização opcional), esta página será atualizada antes, e a funcionalidade só será ativada com o seu consentimento.</p>
+
+  <footer>QA Scout · feito por Thamires Azevedo, QA Sénior.
+    <nav class="idiomas" aria-label="Idiomas"><a href="privacidade.html" lang="pt-BR" hreflang="pt-BR">Português (Brasil)</a> · <b lang="pt-PT">Português (Portugal)</b> · <a href="privacidade.en.html" lang="en" hreflang="en">English</a> · <a href="privacidade.es.html" lang="es" hreflang="es">Español</a></nav></footer>
+</main>
+</body>
+</html>

@@ -13,7 +13,7 @@ test.describe('MCP · sessão conduzida pelo Claude', () => {
   let perfil, f;
   test.beforeEach(() => {
     perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-mcp-'));
-    f = criarFerramentas({ perfil, headless: true });
+    f = criarFerramentas({ perfil, headless: true, locale: 'pt-BR' });
   });
   test.afterEach(async () => {
     await f.fechar();

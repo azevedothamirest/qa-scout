@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const RAIZ = path.join(__dirname, '..');
-const ARQUIVOS = ['manifest.json', 'index.html', 'app.css', 'app.js', 'extensao', 'icones'];
+const ARQUIVOS = ['manifest.json', '_locales', 'index.html', 'app.css', 'i18n.js', 'i18n', 'app.js', 'extensao', 'icones'];
 
 function lista(rel) {
   const abs = path.join(RAIZ, rel);

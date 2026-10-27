@@ -9,6 +9,8 @@ module.exports = defineConfig({
   reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL: 'http://localhost:4173',
+    // O app segue o idioma do navegador; os testes de sempre rodam em pt-BR.
+    locale: 'pt-BR',
     trace: 'on-first-retry',
   },
   projects: [

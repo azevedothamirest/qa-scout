@@ -19,6 +19,7 @@ const test = base.extend({
   },
   context: async ({ pasta }, use) => {
     const context = await chromium.launchPersistentContext('', {
+      locale: 'pt-BR',
       channel: 'chromium',
       args: [`--disable-extensions-except=${pasta}`, `--load-extension=${pasta}`],
     });
@@ -260,6 +261,7 @@ test.describe('Acesso aos sites', () => {
   const testLoja = base.extend({
     context: async ({}, use) => {
       const context = await chromium.launchPersistentContext('', {
+      locale: 'pt-BR',
         channel: 'chromium',
         args: [`--disable-extensions-except=${RAIZ}`, `--load-extension=${RAIZ}`],
       });
@@ -292,7 +294,7 @@ test.describe('Atalhos no sistema em teste', () => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.locator('body').press('Alt+Digit2');
-    const nota = painel.locator('.note.t-duv.pendente', { hasText: 'Dúvida marcado neste momento' });
+    const nota = painel.locator('.note.t-duv.pendente', { hasText: 'Dúvida marcada neste momento' });
     await expect(nota).toBeVisible();
     await expect(nota.locator('.imgs img')).toHaveCount(1);
   });
@@ -456,5 +458,21 @@ test.describe('Cobertura da captura', () => {
     await vezes('Escolheu uma opção em “Validade do cartão”').toBe(1);
     await vezes('Clicou no botão “Excluir item”').toBe(1);
     await vezes('Clicou no botão “Confirmar a contratação do plano anual com renovação automática e cobrança no…”').toBe(1);
+  });
+});
+
+test.describe('Idioma da captura', () => {
+  test('Registrar clique e campo em inglês quando o painel está em inglês', async ({ context, painel }) => {
+    await painel.getByRole('button', { name: /Trocar idioma/ }).click();
+    await painel.getByRole('menuitemradio', { name: 'English' }).click();
+    await expect(painel.getByRole('button', { name: 'Start a new session' })).toBeVisible();
+    await painel.getByRole('button', { name: 'Start a new session' }).click();
+    await painel.getByLabel('Explore').fill('the checkout');
+    await painel.getByLabel('to discover').fill('payment failures');
+    await painel.getByRole('button', { name: 'Start session' }).click();
+    const loja = await acompanharLoja(context, painel);
+    await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
+    await expect(painel.locator('.note', { hasText: 'Clicked the button “Pagar com Pix”' })).toBeVisible();
+    await expect(painel.locator('.note', { hasText: 'Opened the page “Loja fictícia · Checkout”' })).toHaveCount(1);
   });
 });

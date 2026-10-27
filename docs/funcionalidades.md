@@ -33,3 +33,4 @@ Na [extensão do Chrome](extensao.md) e no [navegador de teste](navegador.md):
 - **Histórico com busca** por área, charter ou conteúdo das notas.
 - **Backup das sessões** em JSON: baixe e importe pelo histórico (sessões repetidas são ignoradas).
 - **Tema claro e escuro**, com botão para alternar.
+- **Quatro idiomas:** português do Brasil, português de Portugal, inglês e espanhol, no globo do cabeçalho. Na primeira visita segue o idioma do navegador; a escolha fica salva, e a captura automática escreve as notas no mesmo idioma.

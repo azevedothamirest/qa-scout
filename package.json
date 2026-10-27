@@ -1,6 +1,6 @@
 {
   "name": "qa-scout",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "private": true,
   "description": "Companheiro de teste exploratório baseado em sessões (SBTM): extensão do Chrome, versão web, navegador de teste e servidor MCP para o Claude.",
   "homepage": "https://azevedothamirest.github.io/qa-scout/",
@@ -33,9 +33,12 @@
     "bin/",
     "extensao/",
     "icones/",
+    "_locales/",
+    "i18n/",
     "manifest.json",
     "index.html",
     "app.css",
+    "i18n.js",
     "app.js"
   ],
   "scripts": {

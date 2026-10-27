@@ -122,7 +122,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
   await injeta(tabId);
   tab = await tituloAtualizado(tabId, tab);
   ultimaPagina.set(tabId, { url: tab.url, titulo: tab.title });
-  if (capturando) await guardaEvento({ tipo: 'pagina', desc: `Abriu a página “${(tab.title || '').slice(0, 80)}”`, url: tab.url, titulo: tab.title, ts: Date.now() });
+  if (capturando) await guardaEvento({ tipo: 'pagina', desc: `${(await frases()).pagina} “${(tab.title || '').slice(0, 80)}”`, url: tab.url, titulo: tab.title, ts: Date.now() });
 });
 
 chrome.tabs.onRemoved.addListener(async tabId => {
@@ -138,6 +138,17 @@ const IGNORA_REDE = /\/favicon\.ico(\?|$)/;
 function caminho(url) {
   try { const u = new URL(url); return (u.pathname + u.search).slice(0, 90); } catch (e) { return String(url).slice(0, 90); }
 }
+// Frases das notas no idioma escolhido no painel (qascout.idioma).
+const FRASES = {
+  'pt-BR': { pagina: 'Abriu a página', erro: 'Requisição com erro', falhou: 'Requisição falhou' },
+  'pt-PT': { pagina: 'Abriu a página', erro: 'Pedido com erro', falhou: 'Pedido falhou' },
+  en: { pagina: 'Opened the page', erro: 'Request error', falhou: 'Request failed' },
+  es: { pagina: 'Abrió la página', erro: 'Solicitud con error', falhou: 'Solicitud fallida' },
+};
+async function frases() {
+  const { 'qascout.idioma': id } = await chrome.storage.local.get('qascout.idioma');
+  return FRASES[id] || FRASES['pt-BR'];
+}
 async function falhaDeRede(det, status, erro) {
   if (det.tabId < 0 || IGNORA_REDE.test(det.url)) return;
   const chave = `rede:${det.method} ${caminho(det.url)} ${status || erro}`;
@@ -146,8 +157,9 @@ async function falhaDeRede(det, status, erro) {
   if (!capturando) return;
   const tab = await chrome.tabs.get(det.tabId).catch(() => null);
   if (!tab || !acompanha(tab)) return;
-  const desc = status ? `Requisição com erro: ${det.method} ${caminho(det.url)} → ${status}`
-    : `Requisição falhou: ${det.method} ${caminho(det.url)} (${erro.replace(/^net::/, '')})`;
+  const F = await frases();
+  const desc = status ? `${F.erro}: ${det.method} ${caminho(det.url)} → ${status}`
+    : `${F.falhou}: ${det.method} ${caminho(det.url)} (${erro.replace(/^net::/, '')})`;
   await guardaEvento({ tipo: 'rede', nota: !status || status >= 500 ? 'bug' : 'ris', desc, chave, vezes: 1, url: tab.url, titulo: tab.title, ts: agora });
 }
 const FILTRO_REDE = { urls: ['http://*/*', 'https://*/*'] };
