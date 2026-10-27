@@ -51,7 +51,7 @@ test.describe('MCP · sessão conduzida pelo Claude', () => {
 });
 
 test.describe('MCP · protocolo', () => {
-  test('Listar as ferramentas e responder pelo protocolo MCP via stdio', { tag: '@regressao' }, async () => {
+  test('Listar as ferramentas e responder pelo protocolo MCP via stdio', async () => {
     const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
     const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');
     const perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-mcp-'));

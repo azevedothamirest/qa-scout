@@ -1,8 +1,8 @@
 // @ts-check
-// Suíte de regressão: os fluxos críticos do QA Scout, de ponta a ponta.
-// Roda em toda subida (push e pull request) pelo workflow .github/workflows/ci.yml,
-// que publica o título de cada teste no resumo da execução.
-// Testes de outras suítes que também protegem fluxo crítico levam a tag @regressao.
+// Jornadas de ponta a ponta do QA Scout. Só as marcadas com a tag @regressao
+// bloqueiam o pull request (job "Regressão · fluxos críticos" do ci.yml); as demais
+// rodam na "Suíte completa". A tag fica para o que, se quebrar, impede o uso:
+// sessão até o relatório, captura, dados da pessoa e privacidade.
 const { test, expect } = require('@playwright/test');
 
 const regressao = { tag: '@regressao' };
@@ -58,7 +58,7 @@ test.describe('Regressão · jornada da sessão', () => {
     await expect(linha).toContainText('1 bug');
   });
 
-  test('Trocar o tipo da nota pelos atalhos Alt+1 a Alt+5', regressao, async ({ page }) => {
+  test('Trocar o tipo da nota pelos atalhos Alt+1 a Alt+5', async ({ page }) => {
     await iniciarSessao(page);
     const esperado = ['Bug', 'Dúvida', 'Ideia', 'Risco', 'Observação'];
     for (let i = 0; i < 5; i++) {
@@ -70,7 +70,7 @@ test.describe('Regressão · jornada da sessão', () => {
     }
   });
 
-  test('Retomar o cronômetro depois de pausar e recarregar a página', regressao, async ({ page }) => {
+  test('Retomar o cronômetro depois de pausar e recarregar a página', async ({ page }) => {
     await iniciarSessao(page);
     await registrar(page, 'Antes da pausa');
     await page.getByRole('button', { name: 'Pausar' }).click();
@@ -82,13 +82,13 @@ test.describe('Regressão · jornada da sessão', () => {
     await expect(page.locator('#clock')).not.toHaveText(parado || '', { timeout: 3000 });
   });
 
-  test('Ignorar nota só com espaços', regressao, async ({ page }) => {
+  test('Ignorar nota só com espaços', async ({ page }) => {
     await iniciarSessao(page);
     await registrar(page, '     ');
     await expect(page.locator('.note')).toHaveCount(0);
   });
 
-  test('Reabrir pelo histórico o relatório de uma sessão concluída', regressao, async ({ page }) => {
+  test('Reabrir pelo histórico o relatório de uma sessão concluída', async ({ page }) => {
     await iniciarSessao(page, { area: 'Login social' });
     await registrar(page, 'Google login falha no Safari');
     await encerrar(page);
@@ -100,7 +100,7 @@ test.describe('Regressão · jornada da sessão', () => {
 });
 
 test.describe('Regressão · segurança e dados', () => {
-  test('Mostrar HTML digitado como texto, sem executar', regressao, async ({ page }) => {
+  test('Mostrar HTML digitado como texto, sem executar', async ({ page }) => {
     await iniciarSessao(page, { area: '<img src=x onerror="window.__xss=1">' });
     await registrar(page, '<img src=x onerror="window.__xss=2"><b>negrito</b>');
     await expect(page.locator('.note .txt').first()).toHaveText('<img src=x onerror="window.__xss=2"><b>negrito</b>');
@@ -110,7 +110,7 @@ test.describe('Regressão · segurança e dados', () => {
     await expect(page.locator('.row img, .note img, h1 img')).toHaveCount(0);
   });
 
-  test('Continuar funcionando em memória quando o armazenamento está bloqueado', regressao, async ({ page }) => {
+  test('Continuar funcionando em memória quando o armazenamento está bloqueado', async ({ page }) => {
     await page.addInitScript(() => {
       Storage.prototype.setItem = () => { throw new DOMException('bloqueado', 'SecurityError'); };
     });
@@ -135,7 +135,7 @@ test.describe('Regressão · segurança e dados', () => {
 });
 
 test.describe('Regressão · navegação e layout', () => {
-  test('Abrir todas as abas sem erro de JavaScript', regressao, async ({ page }) => {
+  test('Abrir todas as abas sem erro de JavaScript', async ({ page }) => {
     const erros = [];
     page.on('pageerror', (e) => erros.push(e.message));
     await page.reload();
@@ -147,7 +147,7 @@ test.describe('Regressão · navegação e layout', () => {
     expect(erros).toEqual([]);
   });
 
-  test('Manter a página sem rolagem horizontal em todas as telas', regressao, async ({ page }) => {
+  test('Manter a página sem rolagem horizontal em todas as telas', async ({ page }) => {
     const semRolagem = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await semRolagem();
     for (const aba of ['Heurísticas', 'Método']) {
@@ -165,7 +165,7 @@ test.describe('Regressão · navegação e layout', () => {
 
 test.describe('Regressão · correções da 0.6.2', () => {
   // #20
-  test('Manter a página sem rolagem horizontal com texto longo sem espaços', regressao, async ({ page }) => {
+  test('Manter a página sem rolagem horizontal com texto longo sem espaços', async ({ page }) => {
     const longo = 'https://exemplo.com/' + 'a'.repeat(3000);
     await iniciarSessao(page, { area: longo, explorar: longo });
     await registrar(page, longo);
@@ -180,7 +180,7 @@ test.describe('Regressão · correções da 0.6.2', () => {
   });
 
   // #21
-  test('Manter as notas registradas em duas abas abertas', regressao, async ({ page, context }) => {
+  test('Manter as notas registradas em duas abas abertas', async ({ page, context }) => {
     await iniciarSessao(page);
     const outra = await context.newPage();
     await outra.goto('/');
@@ -192,7 +192,7 @@ test.describe('Regressão · correções da 0.6.2', () => {
     await expect(page.locator('.note .txt')).toHaveText(['Nota da aba 1', 'Nota da aba 2']);
   });
 
-  test('Preservar o texto que está sendo digitado quando a outra aba salva', regressao, async ({ page, context }) => {
+  test('Preservar o texto que está sendo digitado quando a outra aba salva', async ({ page, context }) => {
     await iniciarSessao(page);
     await page.locator('#note-in').fill('Rascunho em andamento');
     const outra = await context.newPage();
@@ -221,7 +221,7 @@ test.describe('Regressão · correções da 0.6.2', () => {
 
 test.describe('Regressão · correções da 0.6.3', () => {
   // #22
-  test('Exportar nota com HTML e várias linhas sem quebrar o Markdown', regressao, async ({ page }) => {
+  test('Exportar nota com HTML e várias linhas sem quebrar o Markdown', async ({ page }) => {
     await iniciarSessao(page, { area: 'Área <b>teste</b>' });
     await registrar(page, '<img src=x onerror=alert(1)> [link](javascript:alert(2))');
     await page.locator('#note-in').fill('# título\n- item\n| a | b |');

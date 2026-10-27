@@ -99,7 +99,7 @@ test.describe('Captura automática', () => {
     expect(guardado).not.toContain('segredo-de-teste');
   });
 
-  test('Ignorar cliques enquanto a sessão está pausada', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Ignorar cliques enquanto a sessão está pausada', async ({ context, painel }) => {
     await iniciarSessao(painel);
     await painel.getByRole('button', { name: 'Pausar' }).click();
     const loja = await acompanharLoja(context, painel);
@@ -148,7 +148,7 @@ test.describe('Revisão das notas automáticas', () => {
     await expect(nota).not.toHaveClass(/pendente/);
   });
 
-  test('Deixar notas não revisadas fora do Markdown do relatório', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Deixar notas não revisadas fora do Markdown do relatório', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
@@ -212,7 +212,7 @@ test.describe('Marcar o momento', () => {
 });
 
 test.describe('Passos para reproduzir', () => {
-  test('Incluir na nota de bug as ações registradas até ela', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Incluir na nota de bug as ações registradas até ela', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.getByLabel('CPF').fill('123.456.789-09');
@@ -299,7 +299,7 @@ test.describe('Atalhos no sistema em teste', () => {
 });
 
 test.describe('Salvar em PDF', () => {
-  test('Abrir o relatório numa aba própria e imprimir de lá', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Abrir o relatório numa aba própria e imprimir de lá', async ({ context, painel }) => {
     await context.addInitScript(() => { window.print = () => { document.documentElement.dataset.imprimiu = '1'; }; });
     await painel.getByText('Checkout · pagamento com Pix').click();
     const [aba] = await Promise.all([context.waitForEvent('page'), painel.getByRole('button', { name: 'Salvar em PDF' }).click()]);
@@ -333,7 +333,7 @@ test.describe('Captura automática por padrão', () => {
 
 test.describe('Privacidade da captura', () => {
   // #10
-  test('Descrever clique em área sem interação sem copiar o texto da página', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Descrever clique em área sem interação sem copiar o texto da página', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.evaluate(() => {
@@ -352,7 +352,7 @@ test.describe('Privacidade da captura', () => {
 
 test.describe('Erros repetidos', () => {
   // #11
-  test('Agrupar rajada do mesmo erro numa nota com contador e registrar erro diferente depois', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Agrupar rajada do mesmo erro numa nota com contador e registrar erro diferente depois', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     await loja.evaluate(() => {
@@ -366,7 +366,7 @@ test.describe('Erros repetidos', () => {
   });
 
   // #12
-  test('Somar na mesma nota a falha de rede que se repete', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Somar na mesma nota a falha de rede que se repete', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const loja = await acompanharLoja(context, painel);
     for (let i = 0; i < 3; i++) {
@@ -396,7 +396,7 @@ async function acompanharCaptura(context, painel) {
 
 test.describe('Cobertura da captura', () => {
   // #15
-  test('Registrar o título novo ao navegar numa SPA com pushState', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Registrar o título novo ao navegar numa SPA com pushState', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const pagina = await acompanharCaptura(context, painel);
     await pagina.getByRole('button', { name: 'Ir para Pagamento' }).click();
@@ -404,7 +404,7 @@ test.describe('Cobertura da captura', () => {
   });
 
   // #13
-  test('Descrever clique e campo dentro do shadow DOM', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Descrever clique e campo dentro do shadow DOM', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const pagina = await acompanharCaptura(context, painel);
     await pagina.getByRole('button', { name: 'Aplicar no shadow' }).click();
@@ -416,7 +416,7 @@ test.describe('Cobertura da captura', () => {
   });
 
   // #14
-  test('Registrar clique e campo dentro de iframe do mesmo site', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Registrar clique e campo dentro de iframe do mesmo site', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const pagina = await acompanharCaptura(context, painel);
     const quadro = pagina.frameLocator('#quadro');
@@ -428,7 +428,7 @@ test.describe('Cobertura da captura', () => {
   });
 
   // #16 #17 #18 #19
-  test('Descrever upload, campos sem rótulo, opção do select e botões de ícone ou texto longo', { tag: '@regressao' }, async ({ context, painel }) => {
+  test('Descrever upload, campos sem rótulo, opção do select e botões de ícone ou texto longo', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const pagina = await acompanharCaptura(context, painel);
     await pagina.getByLabel('Comprovante').setInputFiles({ name: 'segredo-do-cliente.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });

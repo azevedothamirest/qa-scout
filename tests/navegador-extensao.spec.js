@@ -50,7 +50,7 @@ test.describe('Navegador de teste (comando qa-scout)', () => {
 });
 
 test.describe('Navegador de teste · atualização', () => {
-  test('Recuperar as sessões guardadas sob o id antigo da extensão', { tag: '@regressao' }, async () => {
+  test('Recuperar as sessões guardadas sob o id antigo da extensão', async () => {
     const perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-'));
     const antiga = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-antiga-'));
     // Versão antiga: mesma extensão sem a chave fixa, então com outro id (como acontecia com o npx).

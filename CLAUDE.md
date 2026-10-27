@@ -42,7 +42,7 @@ npm run mcp    # servidor MCP (o Claude conduz a sessão exploratória)
 - Agrupar com `test.describe` por área da tela (Histórico, Charter, Sessão em campo, Debriefing).
 - Preferir seletores acessíveis (`getByRole`, `getByLabel`); usar `data-*` e ids só quando não houver alternativa.
 - `beforeEach` limpa o `localStorage` para cada teste começar das sessões de exemplo.
-- Regressão: `tests/regressao.spec.js` cobre as jornadas críticas de ponta a ponta, e testes de outras suítes que protegem fluxo crítico levam `{ tag: '@regressao' }`. A CI (`ci.yml`) roda uma vez por pull request, com o nome "Testes · PR #n": primeiro o job "Regressão · fluxos críticos" (`--grep @regressao`), depois "Suíte completa" com o resto; `scripts/resumo-testes.js` publica o título de cada teste no resumo da execução. Fluxo crítico novo ou bug corrigido entra com teste `@regressao`.
+- Regressão: `tests/regressao.spec.js` cobre as jornadas críticas de ponta a ponta, e testes de outras suítes que protegem fluxo crítico levam `{ tag: '@regressao' }`. A CI (`ci.yml`) roda uma vez por pull request, com o nome "Testes · PR #n": primeiro o job "Regressão · fluxos críticos" (`--grep @regressao`), depois "Suíte completa" com o resto; `scripts/resumo-testes.js` publica o título de cada teste no resumo da execução. A tag `@regressao` é curta de propósito (cerca de 12 testes): só entra o que, se quebrar, impede o uso (sessão até o relatório, captura, perda de dados, privacidade). Bug corrigido ganha teste, mas sem a tag por padrão; para pôr um teste novo na tag, tire outro ou justifique no PR.
 - Toda funcionalidade nova entra com teste. Rodar `npm test` antes de qualquer commit.
 
 ## Como trabalhar com a Thamires
