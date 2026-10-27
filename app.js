@@ -740,10 +740,16 @@ const CARTAS_METODO = [
 // Só explica e dá os comandos: o servidor MCP roda no computador da pessoa (qa-scout mcp), não aqui.
 const MCP_INSTALAR = 'claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp';
 const MCP_PEDIDOS = [
-  ['Sessão com charter', 'Use o QA Scout para uma sessão exploratória de 20 minutos em https://homolog.minhaloja.com: explorar o checkout, com cupons e Pix, para descobrir cobranças erradas. Anote o que encontrar e me mostre o relatório.'],
-  ['Foco em erros', 'Com o QA Scout, explore o cadastro de https://homolog.meusistema.com por 15 minutos procurando erros de validação, mensagens confusas e falhas de rede. Use dados de teste e consulte as capturas depois de cada envio.'],
-  ['Com heurística', 'Abra uma sessão do QA Scout em https://homolog.meusistema.com, sorteie uma heurística do baralho e explore a busca por 10 minutos seguindo ela.'],
+  {t:'Sessão com charter', cls:'t-obs', tags:['20 min','checkout'], txt:'Use o QA Scout para uma sessão exploratória de 20 minutos em https://homolog.minhaloja.com: explorar o checkout, com cupons e Pix, para descobrir cobranças erradas. Anote o que encontrar e me mostre o relatório.'},
+  {t:'Foco em erros', cls:'t-bug', tags:['15 min','cadastro'], txt:'Com o QA Scout, explore o cadastro de https://homolog.meusistema.com por 15 minutos procurando erros de validação, mensagens confusas e falhas de rede. Use dados de teste e consulte as capturas depois de cada envio.'},
+  {t:'Com heurística', cls:'t-ris', tags:['10 min','busca'], txt:'Abra uma sessão do QA Scout em https://homolog.meusistema.com, sorteie uma heurística do baralho e explore a busca por 10 minutos seguindo ela.'},
 ];
+const MCP_FERRAMENTAS = [
+  ['Sessão', [['iniciar_sessao','charter, tempo e endereço'],['encerrar_sessao','debriefing e relatório']]],
+  ['Navegar', [['ver_pagina','lê a tela atual'],['navegar','abre um endereço'],['clicar','botões e links'],['preencher','campos com dados de teste'],['escolher_opcao','listas']]],
+  ['Registrar', [['anotar','bug, dúvida, ideia, risco'],['ver_capturas','erros de JS, console e rede'],['sugerir_heuristica','uma carta do baralho']]],
+];
+const ICONE_COPIAR = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
 const MCP_DOC = 'https://github.com/azevedothamirest/qa-scout/blob/main/docs/mcp.md';
 function viewMcp(){
   const cmd = (txt, rotulo) => `<div class="mcp-cmd"><code>${esc(txt)}</code><button class="btn" type="button" data-copiar="${esc(txt)}" aria-label="Copiar ${rotulo}">Copiar</button></div>`;
@@ -760,14 +766,23 @@ function viewMcp(){
       <div class="passo"><h3>Peça a sessão</h3><p>Abra o Claude Code e diga o que explorar, com o quê, para descobrir o quê e por quanto tempo.</p><small>O charter, como você já faz</small></div>
     </div>
     <div class="section-head" style="margin:26px 0 12px"><div><div class="eyebrow">Como pedir</div><h2>Exemplos de pedido</h2></div></div>
-    <div class="mcp-pedidos">${MCP_PEDIDOS.map(([t,txt])=>`<div class="card"><h3>${t}</h3><p>${esc(txt)}</p><button class="btn" type="button" data-copiar="${esc(txt)}" aria-label="Copiar pedido: ${t}">Copiar pedido</button></div>`).join('')}</div>
+    <div class="mcp-pedidos">${MCP_PEDIDOS.map(p=>`<article class="mcp-pedido ${p.cls}">
+        <div class="mcp-pedido-topo"><h3>${p.t}</h3><div class="mcp-tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div></div>
+        <blockquote>${esc(p.txt)}</blockquote>
+        <button class="btn mcp-copiar" type="button" data-copiar="${esc(p.txt)}" aria-label="Copiar pedido: ${p.t}">${ICONE_COPIAR}Copiar pedido</button>
+      </article>`).join('')}</div>
     <div class="mcp-grade">
       <div class="card"><div class="eyebrow">O que o Claude usa</div><h3>Ferramentas</h3>
-        <ul class="mcp-lista"><li><b>iniciar_sessao</b> charter, tempo e endereço</li><li><b>ver_pagina</b> lê a tela atual</li><li><b>clicar · preencher · escolher_opcao · navegar</b></li><li><b>ver_capturas</b> erros de JS, console e rede</li><li><b>anotar</b> bug, dúvida, ideia, risco, observação</li><li><b>sugerir_heuristica</b> uma carta do baralho</li><li><b>encerrar_sessao</b> debriefing e relatório</li></ul></div>
+        ${MCP_FERRAMENTAS.map(([g,fs])=>`<div class="mcp-grupo"><span class="mcp-grupo-nome">${g}</span><div class="mcp-chips">${fs.map(([n,d])=>`<div class="mcp-chip"><code>${n}</code><span>${d}</span></div>`).join('')}</div></div>`).join('')}</div>
       <div class="card"><div class="eyebrow">Antes de começar</div><h3>Cuidados</h3>
-        <ul class="mcp-lista"><li>Use só ambientes e dados de teste, nunca produção.</li><li>O Claude lê o texto das páginas que visita (inclusive campos preenchidos). A sessão e os prints ficam só no seu computador.</li><li>As notas automáticas chegam <b>a revisar</b>: o julgamento do que importa continua com você.</li><li>Cada passo lê a tela, então sessões longas gastam mais tokens.</li></ul></div>
+        <ul class="mcp-cuidados">
+          <li class="t-bug"><i aria-hidden="true">!</i><span><b>Só ambientes e dados de teste</b>, nunca produção.</span></li>
+          <li class="t-duv"><i aria-hidden="true">◎</i><span><b>O Claude lê a tela</b> das páginas que visita, inclusive campos preenchidos. A sessão e os prints ficam só no seu computador.</span></li>
+          <li class="t-obs"><i aria-hidden="true">✓</i><span>As notas automáticas chegam <span class="tag-auto">a revisar</span>: o julgamento do que importa continua com você.</span></li>
+          <li class="t-ide"><i aria-hidden="true">≈</i><span><b>Cada passo lê a tela</b>, então sessões de 10 a 30 minutos rendem mais e gastam menos tokens.</span></li>
+        </ul></div>
     </div>
-    <p class="hint" style="margin-top:18px"><a href="${MCP_DOC}" target="_blank" rel="noopener">Guia completo do MCP no GitHub ↗</a></p>
+    <a class="btn mcp-guia" href="${MCP_DOC}" target="_blank" rel="noopener">Guia completo do MCP no GitHub ↗</a>
   </section>`;
 }
 
