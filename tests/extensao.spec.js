@@ -19,6 +19,7 @@ const test = base.extend({
   },
   context: async ({ pasta }, use) => {
     const context = await chromium.launchPersistentContext('', {
+      locale: 'pt-BR',
       channel: 'chromium',
       args: [`--disable-extensions-except=${pasta}`, `--load-extension=${pasta}`],
     });
@@ -260,6 +261,7 @@ test.describe('Acesso aos sites', () => {
   const testLoja = base.extend({
     context: async ({}, use) => {
       const context = await chromium.launchPersistentContext('', {
+      locale: 'pt-BR',
         channel: 'chromium',
         args: [`--disable-extensions-except=${RAIZ}`, `--load-extension=${RAIZ}`],
       });

@@ -1,0 +1,8 @@
+{
+  "descricao": {
+    "message": "Testing exploratorio con misión: registra clics, capturas, errores de consola y de red de las pestañas que sigas y genera el informe."
+  },
+  "abrir": {
+    "message": "Abrir QA Scout"
+  }
+}

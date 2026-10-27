@@ -22,13 +22,13 @@ const TIPOS = { bug: 'bug', duvida: 'duv', ideia: 'ide', risco: 'ris', observaca
 
 // As ferramentas são funções comuns sobre um navegador aberto sob demanda; o servidor MCP só as
 // expõe. Assim os testes chamam as mesmas funções sem passar pelo protocolo.
-function criarFerramentas({ perfil, headless = false } = {}) {
+function criarFerramentas({ perfil, headless = false, locale } = {}) {
   let aberto = null;
 
   async function navegador() {
     if (aberto && !aberto.context.pages().includes(aberto.painel)) aberto = null;
     if (!aberto) {
-      aberto = await abrir({ perfil, headless });
+      aberto = await abrir({ perfil, headless, locale });
       // Abas novas (target=_blank, popups) viram a aba em teste.
       aberto.context.on('page', p => { if (p !== aberto.painel) aberto.site = p; });
     }
@@ -49,10 +49,11 @@ function criarFerramentas({ perfil, headless = false } = {}) {
     const st = await estadoApp();
     return st.sessions.find(s => s.id === st.activeId && s.status !== 'done') || null;
   }
+  // Os botões do painel são achados por id e data-*, não pelo texto: o painel pode estar em qualquer idioma.
   async function irParaPainel(aba) {
     const { painel } = await navegador();
     await painel.bringToFront();
-    await painel.getByRole('button', { name: aba, exact: true }).click();
+    await painel.locator({ Sessões: '#tab-home', 'Em campo': '#tab-active' }[aba]).click();
     return painel;
   }
   // Elemento por papel + nome acessível (como o resumo da tela mostra) ou, na falta, por texto.
@@ -71,14 +72,14 @@ function criarFerramentas({ perfil, headless = false } = {}) {
     async iniciar_sessao({ explorar, com = '', descobrir, minutos = 30, url, area, ambiente }) {
       if (await sessaoAtiva()) return 'Já existe uma sessão em andamento. Encerre com encerrar_sessao antes de começar outra.';
       const painel = await irParaPainel('Sessões');
-      await painel.getByRole('button', { name: 'Começar nova sessão' }).click();
+      await painel.locator('.hero-actions [data-go="new"]').click();
       if (area) await painel.locator('#c-area').fill(area);
       if (ambiente) await painel.locator('#c-amb').fill(ambiente);
       await painel.locator('#c-exp').fill(explorar);
       await painel.locator('#c-com').fill(com);
       await painel.locator('#c-des').fill(descobrir);
       await painel.locator('#c-dur').fill(String(minutos));
-      await painel.getByRole('button', { name: 'Iniciar sessão' }).click();
+      await painel.locator('#charter-form [type="submit"]').click();
       await painel.locator('#note-in').waitFor();
       let texto = `Sessão iniciada: Explorar ${explorar}${com ? ` com ${com}` : ''} para descobrir ${descobrir} (${minutos} min). A captura automática está ligada.`;
       if (url) { const p = await site(); await p.goto(url); texto += `\n\n${await resumoDaTela(p)}`; }
@@ -155,8 +156,8 @@ function criarFerramentas({ perfil, headless = false } = {}) {
     async encerrar_sessao({ cobertura, proximos } = {}) {
       if (!await sessaoAtiva()) return 'Nenhuma sessão em andamento.';
       const painel = await irParaPainel('Em campo');
-      await painel.getByRole('button', { name: 'Encerrar' }).click();
-      await painel.getByRole('button', { name: 'Sim, encerrar' }).click();
+      await painel.locator('[data-act="end"]').click();
+      await painel.locator('[data-act="end-yes"]').click();
       const md = painel.locator('#md-out');
       await md.waitFor();
       if (cobertura) await painel.locator('#db-cov').fill(cobertura);

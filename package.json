@@ -33,9 +33,12 @@
     "bin/",
     "extensao/",
     "icones/",
+    "_locales/",
+    "i18n/",
     "manifest.json",
     "index.html",
     "app.css",
+    "i18n.js",
     "app.js"
   ],
   "scripts": {
