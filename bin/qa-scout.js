@@ -13,8 +13,9 @@ const PERFIL_PADRAO = path.join(os.homedir(), '.qa-scout', 'perfil');
 
 function garanteNavegador() {
   if (fs.existsSync(chromium.executablePath())) return;
-  console.log('Baixando o navegador de teste (só na primeira vez)...');
-  const r = spawnSync('npx', ['playwright', 'install', 'chromium'], { stdio: 'inherit', shell: true, cwd: RAIZ });
+  // Mensagens e saída do download vão para a saída de erro: no modo MCP, a saída padrão é o protocolo.
+  console.error('Baixando o navegador de teste (só na primeira vez)...');
+  const r = spawnSync('npx', ['playwright', 'install', 'chromium'], { stdio: ['ignore', 2, 2], shell: true, cwd: RAIZ });
   if (r.status !== 0) throw new Error('Não foi possível baixar o Chromium. Rode "npx playwright install chromium" e tente de novo.');
 }
 

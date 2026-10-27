@@ -97,7 +97,9 @@ function criarFerramentas({ perfil, headless = false } = {}) {
 
     async clicar(alvo) {
       const p = await site();
-      await localizar(p, alvo).click({ timeout: 5000 });
+      const el = localizar(p, alvo);
+      if (!await el.count()) return `Não encontrei o elemento ${JSON.stringify(alvo)} nesta tela. Confira papel e nome no resumo abaixo.\n\n${await resumoDaTela(p)}`;
+      await el.click({ timeout: 5000 });
       await p.waitForLoadState('domcontentloaded').catch(() => {});
       await p.waitForTimeout(400);
       return resumoDaTela(await site());

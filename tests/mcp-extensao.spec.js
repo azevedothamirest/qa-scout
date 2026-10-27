@@ -48,6 +48,13 @@ test.describe('MCP · sessão conduzida pelo Claude', () => {
     await f.iniciar_sessao({ explorar: 'a loja', descobrir: 'erros' });
     expect(await f.iniciar_sessao({ explorar: 'outra', descobrir: 'coisa' })).toContain('Já existe uma sessão');
   });
+
+  test('Explicar quando o elemento a clicar não existe na tela', async () => {
+    await f.iniciar_sessao({ explorar: 'a loja', descobrir: 'erros', url: LOJA });
+    const r = await f.clicar({ texto: 'botão que não existe' });
+    expect(r).toContain('Não encontrei o elemento');
+    expect(r).toContain('button "Pagar com Pix"');
+  });
 });
 
 test.describe('MCP · protocolo', () => {
