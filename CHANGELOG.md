@@ -1,5 +1,9 @@
 # Notas de atualização
 
+## 0.8.2 · Aba MCP mais caprichada
+- Exemplos de pedido com cor, etiquetas de tempo e foco e o pedido em destaque.
+- Ferramentas agrupadas em Sessão, Navegar e Registrar; cuidados com ícones; botão para o guia completo.
+
 ## 0.8.1 · Páginas na ordem certa
 - Ao navegar rápido entre páginas com o mesmo título, a nota "Abriu a página" podia ganhar o título da página seguinte, sumindo uma e duplicando a outra (#31).
 

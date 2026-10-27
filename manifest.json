@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "QA Scout",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Teste exploratório com missão: registra cliques, prints, erros de console e rede das abas que você acompanhar e gera o relatório.",
   "icons": {
     "16": "icones/icone-16.png",
