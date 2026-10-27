@@ -1,18 +1,22 @@
 name: Testes
 run-name: "Testes · ${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || github.ref_name }}"
 
-# Uma execução por pull request (e a cada novo push nele). Também dá para rodar à mão.
+# No pull request roda só a regressão (fluxos críticos), que é o que bloqueia o merge.
+# A suíte completa roda depois do merge, na main. À mão (workflow_dispatch), rodam as duas.
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
   group: testes-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   regressao:
     name: Regressão · fluxos críticos
+    if: github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,7 +42,7 @@ jobs:
 
   completa:
     name: Suíte completa
-    needs: regressao
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
