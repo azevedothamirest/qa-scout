@@ -1,5 +1,18 @@
 # Notas de atualização
 
+## 0.9.0 · Quatro idiomas
+
+**Novidades**
+- **Português do Brasil, português de Portugal, inglês e espanhol** em toda a interface: charter, sessão, notas, debriefing, relatório em Markdown e PDF, bug copiado, heurísticas, Método e MCP.
+- **Globo no cabeçalho** com o código do idioma (PT-BR, PT-PT, EN, ES) e os nomes de cada idioma na própria língua. Ao trocar, a tela recarrega com a abertura já no idioma novo, e a escolha fica salva até você trocar de novo.
+- **Primeira visita segue o navegador:** português de Portugal só para Portugal, outro português vai para o do Brasil, e idiomas sem tradução abrem em inglês.
+- **Captura automática no idioma escolhido:** "Clicked the button…", "Hizo clic en el botón…", "Pedido com erro…". No português de Portugal, separador, palavra-passe, ficheiro e consola.
+- Nome e descrição da extensão nos quatro idiomas na Chrome Web Store, README e política de privacidade traduzidos.
+
+**Correções**
+- Marcar com `Alt+2`, `Alt+3` ou `Alt+5` dizia "Dúvida marcado"; agora concorda no feminino.
+- Comandos de nota aceitos em qualquer idioma: `/question`, `/pregunta`, `/risk`, `/riesgo`, `/idea`, `/note`.
+
 ## 0.8.2 · Aba MCP mais caprichada
 - Exemplos de pedido com cor, etiquetas de tempo e foco e o pedido em destaque.
 - Ferramentas agrupadas em Sessão, Navegar e Registrar; cuidados com ícones; botão para o guia completo.

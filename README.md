@@ -1,5 +1,7 @@
 # QA Scout
 
+[![Português (Brasil)](https://img.shields.io/badge/Portugu%C3%AAs%20%28Brasil%29-3DF5A7?style=for-the-badge)](README.md) [![Português (Portugal)](https://img.shields.io/badge/Portugu%C3%AAs%20%28Portugal%29-296F82?style=for-the-badge)](README.pt-PT.md) [![English](https://img.shields.io/badge/English-296F82?style=for-the-badge)](README.en.md) [![Español](https://img.shields.io/badge/Espa%C3%B1ol-296F82?style=for-the-badge)](README.es.md)
+
 **Explore com missão. Volte com evidência.**
 
 QA Scout é um companheiro de teste exploratório baseado em sessões (SBTM). Você escreve o charter, liga o cronômetro, anota o que encontra no ritmo da exploração e, no fim, sai com um relatório pronto para o time.
@@ -33,6 +35,7 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - **Copiar bug** pronto para o Jira ou GitHub: título, ambiente, navegador, página, passos para reproduzir, resultado obtido e esperado, e os erros de console e rede do mesmo minuto.
 - **Backup das sessões** em JSON: baixe e importe pelo histórico (sessões repetidas são ignoradas).
 - **Tema claro e escuro**, com botão para alternar.
+- **Quatro idiomas:** português do Brasil, português de Portugal, inglês e espanhol, no globo do cabeçalho. Na primeira visita segue o idioma do navegador; a escolha fica salva, e a captura automática escreve as notas no mesmo idioma.
 - **Histórico com busca** por área, charter ou conteúdo das notas.
 
 ## Extensão do Chrome
@@ -78,7 +81,7 @@ Use só ambientes e dados de teste: o Claude lê o texto das páginas que visita
 
 ## Privacidade
 
-Política completa: [`privacidade.html`](privacidade.html).
+Política completa: [`privacidade.html`](privacidade.html) (também em [Portugal](privacidade.pt-PT.html), [inglês](privacidade.en.html) e [espanhol](privacidade.es.html)).
 
 Tudo fica salvo no navegador de quem usa: `localStorage` na versão web e o armazenamento local do navegador de teste. Não há servidor, conta ou envio de dados.
 
@@ -97,6 +100,8 @@ Sem framework e sem build: o que está no repositório é o que roda. `npm run p
 index.html          estrutura da página (site, painel da extensão e navegador de teste)
 app.css             visual: tokens de cor, componentes e impressão do relatório
 app.js              a aplicação, em JavaScript puro
+i18n.js, i18n/      idiomas: troca de idioma e dicionários (pt-PT, en, es)
+_locales/           nome e descrição da extensão em cada idioma
 privacidade.html    política de privacidade (GitHub Pages)
 manifest.json       manifesto da extensão do Chrome (Manifest V3)
 extensao/           captura automática (service worker, script de conteúdo, script da página)
@@ -112,7 +117,7 @@ Quer contribuir? Veja o [guia de contribuição](CONTRIBUTING.md).
 
 ## Testes
 
-A suíte e2e usa **Playwright** e roda a cada push pelo GitHub Actions, em três perfis: desktop, celular (Pixel 7) e navegador de teste (Chromium real com a captura carregada).
+A suíte e2e usa **Playwright** e roda a cada pull request pelo GitHub Actions (a regressão), em três perfis: desktop, celular (Pixel 7) e navegador de teste (Chromium real com a captura carregada).
 
 ```bash
 npx playwright install chromium
@@ -128,10 +133,6 @@ Cobertura atual: histórico e busca, validação do charter, registro de notas p
 - [ ] Resumo da sessão e sugestão de cenários com IA
 - [ ] Métricas acumuladas por área
 - [ ] Sessões em dupla
-
-## English
-
-QA Scout is a free, open source companion for session-based exploratory testing (SBTM): write a charter, run a timer, log typed notes (bug, question, idea, risk, observation) with screenshots, draw testing heuristics when stuck, and export a Markdown or PDF session report. Install the [Chrome extension](https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin) and, in the side panel, clicks, filled fields, visited pages, JavaScript errors and failed requests of the tab you follow become notes for you to review, with one-click reproduction steps, a Jira/GitHub-ready bug and `Alt+1`–`Alt+5` shortcuts. Prefer a dedicated browser? Run `npx github:azevedothamirest/qa-scout <url>`. Want Claude to explore with you? Add the MCP server: `claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp`. No server, no account: data stays on your machine. Tested end to end with Playwright. Contributions welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 

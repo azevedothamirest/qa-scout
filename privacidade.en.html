@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy · QA Scout</title>
+<meta name="description" content="QA Scout privacy policy: what the extension records, where the data lives and what never leaves your computer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Mesmo visual do app: fundo escuro com toques sutis de cor, granulado, Plus Jakarta Sans. */
+:root{--paper:#0B0B12;--surface:#16161F;--surface-2:#1E1E2A;--ink:#F4F3FF;--muted:#9C9AB3;--line:#2A2A38;--accent:#3DF5A7;--teal:#8AE3D7;
+  --g:linear-gradient(90deg,#3DF5A7,#3BC9F5,#FF79C6);--f:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;--m:"JetBrains Mono",ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(50% 35% at 95% 0%,rgba(139,92,246,.16),transparent 70%),radial-gradient(55% 40% at 0% 100%,rgba(41,111,130,.2),transparent 70%),var(--paper);background-attachment:fixed}
+body::after{content:"";position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.08;pointer-events:none}
+main{max-width:780px;margin:0 auto;padding:44px 20px 80px;position:relative;z-index:1}
+.brand{display:flex;width:max-content;align-items:center;gap:12px;font-weight:800;font-size:20px;color:var(--ink);text-decoration:none;margin-bottom:44px}
+.brand svg{width:36px;height:36px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:7px 15px;font-size:13px;font-weight:600;color:var(--muted)}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal)}
+h1{font-size:clamp(36px,7vw,58px);line-height:1.03;letter-spacing:-.035em;font-weight:800;margin:20px 0 16px}
+h1 em{font-style:normal;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--muted);font-size:18px;margin:0;max-width:60ch}
+.selos{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 8px}
+.selos span{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-weight:700;font-size:14px}
+.selos span::before{content:"✓";display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#0B0B12;font-size:12px;font-weight:800}
+.card{position:relative;background:var(--surface);border-radius:22px;padding:22px 26px;margin-top:28px;border:1px solid transparent;background-clip:padding-box}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:23px;padding:1px;background:var(--g);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.card p{margin:0}
+h2{display:flex;align-items:center;gap:12px;font-size:22px;letter-spacing:-.02em;margin:46px 0 10px;font-weight:800}
+h2::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--teal);transform:rotate(45deg);flex:none}
+p{color:#D9D7EA}
+ul{padding:0;list-style:none;display:grid;gap:10px}
+li{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:0;color:#D9D7EA}
+li b,p b{color:var(--ink)}
+code{font-family:var(--m);font-size:.86em;background:var(--surface-2);border:1px solid var(--line);padding:1px 7px;border-radius:7px;color:var(--teal)}
+a{color:var(--teal)}
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.idiomas{margin-top:10px}.idiomas b{color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="./"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#0F2B33"/><circle cx="32" cy="32" r="25" fill="none" stroke="#296F82" stroke-width="4.3"/><circle cx="32" cy="32" r="15" fill="none" stroke="#1B4E5C" stroke-width="2.6"/><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#06171C" opacity=".75" transform="translate(1.8 2.4) rotate(40 32 32)"/><g transform="rotate(40 32 32)"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#296F82"/><path d="M32 32 L38.5 32 L32 52 Z" fill="#8AE3D7"/></g></svg>QA Scout</a>
+  <div class="eyebrow">Privacy policy · updated October 27, 2026</div>
+  <h1>Your data stays <em>on your computer.</em></h1>
+  <p class="lead">QA Scout has no server, no account and sends no data. This page explains what the extension records, where it stores it and what it never does.</p>
+  <div class="selos"><span>No server</span><span>No account</span><span>Nothing you type is read</span><span>Open source</span></div>
+
+  <div class="card"><p><b>Summary:</b> nothing QA Scout records leaves your browser. We do not collect, sell or share data with anyone, and we use no analytics or ads.</p></div>
+
+  <h2>What the extension records</h2>
+  <p>Only during a test session in progress and only in the tabs you choose to follow (including same-site iframes; iframes from other sites, such as ads, are left out). In the test browser opened by the <code>qa-scout</code> command, every tab of that separate browser:</p>
+  <ul>
+    <li><b>Clicks</b>: the type and name of the clicked element (for example, “button Pay by card”), with a screenshot of the visible tab.</li>
+    <li><b>Filled fields</b>: only the field label. <b>The typed value is never read or stored.</b> In password fields, the note only says “Filled in a password field”. For attachments, only that a file was chosen, never its name or content.</li>
+    <li><b>Option lists (<code>select</code>)</b>: the text of the chosen option, which comes from the page itself (for example, “Chose CA in State”). Lists marked as card, birth date or password data (<code>autocomplete</code>) only record that an option was chosen.</li>
+    <li><b>Opened pages</b>: title and address.</li>
+    <li><b>JavaScript errors, <code>console.error</code> and network failures</b>: the error message, method, request path and response code. Request and response bodies are not read.</li>
+    <li><b><code>Alt+Shift+M</code> and <code>Alt+1</code> to <code>Alt+5</code> shortcuts</b>: a screenshot of the visible tab at that moment, with the note type when it is <code>Alt+number</code>.</li>
+  </ul>
+  <p>With the session paused or finished, nothing is recorded.</p>
+
+  <h2>Exploring with Claude (MCP server, optional)</h2>
+  <p>Anyone who installs the QA Scout MCP server in Claude Code or Claude Desktop can ask Claude to run a session in the test browser. In this mode, the session, notes and screenshots still stay only on your computer, but Claude needs to read the screen to explore: the text and fields of visited pages (including values already filled in) are sent to Claude, as in any conversation with it. Use only test environments and test data. The Chrome Web Store extension does not use this mode.</p>
+
+  <h2>Where the data lives</h2>
+  <p>Sessions, notes and screenshots stay in the browser's local storage (<code>chrome.storage.local</code> in the extension, <code>localStorage</code> on the web version). Nothing is sent to QA Scout or third-party servers. Data only leaves your computer when <b>you</b> copy a report, copy a bug or download a backup.</p>
+
+  <h2>A word about screenshots</h2>
+  <p>Screenshots show what is on screen at the moment of the click. If you explore a system with real customer data, it may appear in the images. Prefer test environments with fake data and review the screenshots before sharing a report.</p>
+
+  <h2>Why the extension asks for each permission</h2>
+  <ul>
+    <li><b>Site access (<code>&lt;all_urls&gt;</code>), optional</b>: not requested at install. Chrome asks the first time you click “Follow the current tab”, because the system under test can be at any address and the tab screenshot requires this access. You can revoke it any time in <code>chrome://extensions</code>. Even with access granted, the capture only runs in followed tabs while a session is in progress.</li>
+    <li><b><code>tabs</code> and <code>scripting</code></b>: know which tab you marked, take its screenshot and record clicks and fields.</li>
+    <li><b><code>webRequest</code></b>: notice error responses (4xx and 5xx) and connection failures in followed tabs. Read only; no request is blocked or changed.</li>
+    <li><b><code>storage</code> and <code>unlimitedStorage</code></b>: keep sessions and screenshots on your computer.</li>
+    <li><b><code>sidePanel</code></b>: open QA Scout in Chrome's side panel.</li>
+  </ul>
+
+  <h2>How to delete everything</h2>
+  <p>Uninstall the extension or clear its data in <code>chrome://extensions</code>. In the test browser, delete the <code>~/.qa-scout/perfil</code> folder. On the web version, clear the site data in your browser.</p>
+
+  <h2>Open source</h2>
+  <p>QA Scout's code is open (MIT license): you can check everything it does. Privacy questions: <a href="mailto:contato.qascout@gmail.com">contato.qascout@gmail.com</a>.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If QA Scout ever sends any data off your computer (for example, in a future optional sync), this page will be updated first, and the feature will only be turned on with your consent.</p>
+
+  <footer>QA Scout · made by Thamires Azevedo, Senior QA.
+    <nav class="idiomas" aria-label="Languages"><a href="privacidade.html" lang="pt-BR" hreflang="pt-BR">Português (Brasil)</a> · <a href="privacidade.pt-PT.html" lang="pt-PT" hreflang="pt-PT">Português (Portugal)</a> · <b lang="en">English</b> · <a href="privacidade.es.html" lang="es" hreflang="es">Español</a></nav></footer>
+</main>
+</body>
+</html>

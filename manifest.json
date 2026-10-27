@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "QA Scout",
-  "version": "0.8.2",
+  "version": "0.9.0",
   "description": "__MSG_descricao__",
   "default_locale": "pt_BR",
   "icons": {
