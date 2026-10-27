@@ -85,6 +85,8 @@ Depois é só pedir, por exemplo: *"Use o QA Scout para explorar o checkout de h
 
 Ferramentas: `iniciar_sessao`, `navegar`, `ver_pagina`, `clicar`, `preencher`, `escolher_opcao`, `anotar`, `ver_capturas`, `sugerir_heuristica` e `encerrar_sessao`. Use só ambientes e dados de teste; o Claude é um par de exploração, e a revisão das notas e o julgamento do que importa continuam com você.
 
+**Privacidade no modo MCP:** a sessão e os prints continuam só no seu computador, mas o Claude precisa ler a tela para explorar: o texto e os campos de cada página que ele visita (inclusive valores já preenchidos) vão para o Claude como em qualquer conversa. Por isso, nada de produção nem de dados reais de clientes.
+
 ## Privacidade
 
 Política completa: [`privacidade.html`](privacidade.html).
