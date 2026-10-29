@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Separar arquivos do site
-        run: mkdir _site && cp index.html app.css app.js i18n.js privacidade*.html _site/ && cp -r icones i18n _site/
+        run: mkdir _site && cp -r app/index.html app/app.css app/app.js app/i18n.js app/i18n app/icones site/*.html _site/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

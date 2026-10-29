@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 // Gera o .zip da extensão para enviar à Chrome Web Store: dist/qa-scout-extensao-<versão>.zip
-// Só entra o que a extensão usa; testes, docs e o comando qa-scout ficam de fora.
+// Entra a pasta app/ inteira (é a raiz da extensão); testes, docs e o comando qa-scout ficam de fora.
 // Zip sem compressão (método "store"), escrito à mão para não depender de pacote extra.
 const fs = require('fs');
 const path = require('path');
 
 const RAIZ = path.join(__dirname, '..');
-const ARQUIVOS = ['manifest.json', '_locales', 'index.html', 'app.css', 'i18n.js', 'i18n', 'app.js', 'extensao', 'icones'];
+const APP = path.join(RAIZ, 'app');
 
 function lista(rel) {
-  const abs = path.join(RAIZ, rel);
+  const abs = path.join(APP, rel);
   if (fs.statSync(abs).isDirectory()) return fs.readdirSync(abs).sort().flatMap(n => lista(path.posix.join(rel, n)));
   return [rel];
 }
@@ -29,7 +29,7 @@ function zip(arquivos) {
   const partes = [], central = [];
   let offset = 0;
   for (const nome of arquivos) {
-    const dados = fs.readFileSync(path.join(RAIZ, nome));
+    const dados = fs.readFileSync(path.join(APP, nome));
     const nomeBuf = Buffer.from(nome, 'utf8');
     const crc = crc32(dados);
     const local = Buffer.alloc(30);
@@ -51,8 +51,8 @@ function zip(arquivos) {
   return Buffer.concat([...partes, ...central, fim]);
 }
 
-const { version } = JSON.parse(fs.readFileSync(path.join(RAIZ, 'manifest.json'), 'utf8'));
-const arquivos = ARQUIVOS.flatMap(lista);
+const { version } = JSON.parse(fs.readFileSync(path.join(APP, 'manifest.json'), 'utf8'));
+const arquivos = fs.readdirSync(APP).sort().flatMap(lista);
 fs.mkdirSync(path.join(RAIZ, 'dist'), { recursive: true });
 const destino = path.join(RAIZ, 'dist', `qa-scout-extensao-${version}.zip`);
 fs.writeFileSync(destino, zip(arquivos));

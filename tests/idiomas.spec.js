@@ -45,7 +45,7 @@ test.describe('Dicionários', () => {
   // O pt-PT só guarda o que muda em relação ao pt-BR; inglês e espanhol precisam de todas as chaves.
   test('Traduzir todos os textos da interface em inglês e espanhol', () => {
     global.window = { QAS_I18N: { dic: {} } };
-    require('../i18n/en.js'); require('../i18n/es.js');
+    require('../app/i18n/en.js'); require('../app/i18n/es.js');
     const { dic } = global.window.QAS_I18N;
     const chaves = chaves18n();
     expect(chaves.filter(k => !dic.en[k])).toEqual([]);

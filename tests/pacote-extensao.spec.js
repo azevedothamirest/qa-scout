@@ -21,7 +21,7 @@ function nomesDoZip(buf) {
 test.describe('Pacote da Chrome Web Store', () => {
   test('Gerar zip só com os arquivos da extensão e a versão do package.json', { tag: '@regressao' }, () => {
     const { version } = JSON.parse(fs.readFileSync(path.join(RAIZ, 'package.json'), 'utf8'));
-    const manifesto = JSON.parse(fs.readFileSync(path.join(RAIZ, 'manifest.json'), 'utf8'));
+    const manifesto = JSON.parse(fs.readFileSync(path.join(RAIZ, 'app', 'manifest.json'), 'utf8'));
     expect(manifesto.version).toBe(version);
 
     execFileSync(process.execPath, [path.join(RAIZ, 'scripts', 'empacotar.js')], { cwd: RAIZ });
