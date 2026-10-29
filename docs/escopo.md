@@ -53,7 +53,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 
 - [x] Acesso aos sites opcional: pedido no primeiro "Acompanhar a aba atual", não na instalação (o print exige acesso a todos os sites, então não dá para pedir site a site)
 - [x] Navegador de teste com id fixo da extensão e recuperação das sessões guardadas sob o id antigo (até a 0.5, trocar o comando para `#main` escondia as sessões)
-- [ ] Domínio próprio para o site em três perfis: desktop, celular e navegador de teste
+- [ ] Domínio próprio para o site
 
 ## Fora do MVP (próximas versões)
 
@@ -94,9 +94,17 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 
 - [x] Servidor MCP (`qa-scout mcp`) com ferramentas para iniciar a sessão, navegar, ler a tela, clicar, preencher, anotar, ver capturas, sortear heurística e encerrar
 - [x] Aba MCP no app e na extensão (0.8.0) e guia em `docs/mcp.md`
+- [x] Notas de atualização de cada versão em `CHANGELOG.md` (desde a 0.6.2)
 - [ ] Ponte para o Claude in Chrome (extensão da loja, com confirmação no painel)
 - [ ] Publicar na Edge Add-ons
 - [ ] Firefox
+
+## Versão 0.9.0 · idiomas
+
+- [x] Interface em português do Brasil, português de Portugal, inglês e espanhol, com globo no cabeçalho; primeira visita segue o navegador
+- [x] Captura automática escreve as notas no idioma escolhido
+- [x] README, política de privacidade e ficha da Chrome Web Store nos quatro idiomas
+- [x] Pastas reorganizadas: a extensão inteira em `app/`, política em `site/`
 
 ## Decisões tomadas
 
