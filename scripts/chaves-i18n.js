@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 function chaves() {
-  const js = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const js = fs.readFileSync(path.join(__dirname, '..', 'app', 'app.js'), 'utf8');
   const out = new Set();
   // t('...') com aspas simples; aceita \' dentro.
   for (const m of js.matchAll(/(?<![\w.])t\('((?:[^'\\]|\\.)*)'/g)) out.add(m[1].replace(/\\'/g, "'").replace(/\\\\/g, '\\'));
@@ -28,7 +28,7 @@ function chaves() {
   Object.values(bloco('SALVO')).forEach(add);
   ['Todas', 'Teste', 'Bug', 'Setup', 'o comando de instalação', 'o comando de conferência'].forEach(add);
   // Textos do index.html marcados com data-i18n.
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const html = fs.readFileSync(path.join(__dirname, '..', 'app', 'index.html'), 'utf8');
   for (const m of html.matchAll(/data-i18n(?:-[a-z]+)?="([^"]+)"/g)) add(m[1]);
   return [...out].sort();
 }

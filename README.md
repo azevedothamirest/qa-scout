@@ -1,6 +1,6 @@
 # QA Scout
 
-[![Português (Brasil)](https://img.shields.io/badge/Portugu%C3%AAs%20%28Brasil%29-3DF5A7?style=for-the-badge)](README.md) [![Português (Portugal)](https://img.shields.io/badge/Portugu%C3%AAs%20%28Portugal%29-296F82?style=for-the-badge)](README.pt-PT.md) [![English](https://img.shields.io/badge/English-296F82?style=for-the-badge)](README.en.md) [![Español](https://img.shields.io/badge/Espa%C3%B1ol-296F82?style=for-the-badge)](README.es.md)
+[![Português (Brasil)](https://img.shields.io/badge/Portugu%C3%AAs%20%28Brasil%29-3DF5A7?style=for-the-badge)](README.md) [![Português (Portugal)](https://img.shields.io/badge/Portugu%C3%AAs%20%28Portugal%29-296F82?style=for-the-badge)](docs/readme/README.pt-PT.md) [![English](https://img.shields.io/badge/English-296F82?style=for-the-badge)](docs/readme/README.en.md) [![Español](https://img.shields.io/badge/Espa%C3%B1ol-296F82?style=for-the-badge)](docs/readme/README.es.md)
 
 **Explore com missão. Volte com evidência.**
 
@@ -36,7 +36,7 @@ Lista completa em [funcionalidades](docs/funcionalidades.md).
 
 ## Privacidade
 
-Tudo fica salvo no navegador de quem usa. Não há servidor, conta ou envio de dados. Política completa: [`privacidade.html`](privacidade.html).
+Tudo fica salvo no navegador de quem usa. Não há servidor, conta ou envio de dados. Política completa: [`privacidade.html`](site/privacidade.html).
 
 ## Ideias e feedback
 

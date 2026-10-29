@@ -5,7 +5,7 @@ const os = require('os');
 const path = require('path');
 const { prepararExtensao } = require('../bin/qa-scout');
 
-const RAIZ = path.join(__dirname, '..');
+const RAIZ = path.join(__dirname, '..', 'app');
 const LOJA = 'http://localhost:4173/tests/fixtures/loja.html';
 
 // Cada teste ganha um Chromium com a extensão carregada e o painel aberto numa aba.

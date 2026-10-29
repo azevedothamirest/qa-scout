@@ -20,7 +20,7 @@ module.exports = defineConfig({
     { name: 'extensao', testMatch: /extensao/ },
   ],
   webServer: {
-    command: 'npx http-server . -p 4173 -s -c-1',
+    command: 'node scripts/servidor.js',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,
   },

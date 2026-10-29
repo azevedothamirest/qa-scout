@@ -13,27 +13,28 @@ npm start                         # versão web em http://localhost:4173
 npm test                          # testes e2e (desktop, celular e extensão)
 ```
 
-Para testar a extensão no seu Chrome: abra `chrome://extensions`, ligue o **Modo do desenvolvedor**, clique em **Carregar sem compactação** e escolha a pasta do projeto. Na primeira vez que clicar em "Acompanhar a aba atual", o Chrome vai pedir acesso aos sites.
+Para testar a extensão no seu Chrome: abra `chrome://extensions`, ligue o **Modo do desenvolvedor**, clique em **Carregar sem compactação** e escolha a pasta `app/` do projeto. Na primeira vez que clicar em "Acompanhar a aba atual", o Chrome vai pedir acesso aos sites.
 
 Para testar o navegador de teste: `npm run navegador -- https://endereco-do-sistema`.
 
 ## Estrutura
 
 ```
-index.html          estrutura da página (site, painel da extensão e navegador de teste)
-app.css             todo o visual: tokens de cor, componentes, impressão do relatório
-app.js              a aplicação inteira, em JavaScript puro, sem framework e sem build
-i18n.js, i18n/      idiomas: troca de idioma e dicionários (pt-PT, en, es)
-_locales/           nome e descrição da extensão em cada idioma
-privacidade*.html   política de privacidade, um arquivo por idioma (publicada no GitHub Pages)
-manifest.json       manifesto da extensão do Chrome (Manifest V3)
-extensao/           captura automática: service worker, script de conteúdo e script da página
-icones/             ícones da extensão (16, 32, 48 e 128 px)
-bin/qa-scout.js     comando "qa-scout": abre o navegador de teste com a extensão carregada
-bin/mcp.js          servidor MCP (qa-scout mcp): o Claude conduz a sessão pelas ferramentas
-scripts/            utilitários: empacotar a extensão e montar o resumo dos testes na CI
-tests/              testes e2e em Playwright (regressao.spec.js: fluxos críticos) e a loja fictícia usada neles
-docs/               tutorial, escopo e roadmap, textos e imagens da Chrome Web Store
+app/                 a extensão inteira (é a raiz do zip da Chrome Web Store) e o site
+  manifest.json      manifesto da extensão (Manifest V3)
+  index.html         estrutura da página (site, painel da extensão e navegador de teste)
+  app.css            todo o visual: tokens de cor, componentes, impressão do relatório
+  app.js             a aplicação inteira, em JavaScript puro, sem framework e sem build
+  i18n.js, i18n/     idiomas: troca de idioma e dicionários (pt-PT, en, es)
+  _locales/          nome e descrição da extensão em cada idioma
+  extensao/          captura automática: service worker, script de conteúdo e script da página
+  icones/            ícones da extensão (16, 32, 48 e 128 px)
+site/                política de privacidade, um arquivo por idioma (publicada no GitHub Pages)
+bin/qa-scout.js      comando "qa-scout": abre o navegador de teste com a extensão carregada
+bin/mcp.js           servidor MCP (qa-scout mcp): o Claude conduz a sessão pelas ferramentas
+scripts/             utilitários: servidor local, empacotar a extensão, chaves de tradução, resumo dos testes na CI
+tests/               testes e2e em Playwright (regressao.spec.js: fluxos críticos) e as páginas de teste em fixtures/
+docs/                guias, tutorial, escopo e roadmap, material da Chrome Web Store; docs/readme/ tem o README em outros idiomas
 ```
 
 Não há etapa de build: o que está no repositório é o que roda.

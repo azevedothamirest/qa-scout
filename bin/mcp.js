@@ -13,7 +13,7 @@ const MAX_PAGINA = 12000; // caracteres do resumo da tela devolvidos por vez (o 
 
 // Baralho de heurísticas do próprio app (HEUR em app.js), lido do arquivo para não duplicar.
 function heuristicas() {
-  const js = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
+  const js = fs.readFileSync(path.join(__dirname, '..', 'app', 'app.js'), 'utf8');
   const m = js.match(/const HEUR = (\[[\s\S]*?\n\]);/);
   return m ? Function(`"use strict"; return ${m[1]}`)() : [];
 }
