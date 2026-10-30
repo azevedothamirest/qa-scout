@@ -4,18 +4,27 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
-| [1.0.2](#102--captura-sem-ruído-e-mcp-mais-preciso) | 30/10/2026 | Captura sem ruído e MCP mais preciso |
+| [1.0.3](#103--captura-sem-ruído-e-mcp-mais-preciso) | 30/10/2026 | Captura sem ruído e MCP mais preciso |
+| [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
-| [1.0.0](#100--versão-estável) | 30/10/2026 | Versão estável |
 
 ---
 
-## 1.0.2 · Captura sem ruído e MCP mais preciso
+## 1.0.3 · Captura sem ruído e MCP mais preciso
 _30/10/2026_
 
 **🐞 Correções**
 - **Captura:** falha de rede `ERR_CACHE_MISS` (preload e cache, como as fontes) não vira mais bug no diário: o recurso carrega normalmente depois. ([#50](https://github.com/azevedothamirest/qa-scout/issues/50))
 - **MCP:** `preencher` acha o campo pelo rótulo exato e só aceita elementos editáveis. "Nota" não cai mais no grupo "Tipo da nota", e campo inexistente devolve uma explicação com o resumo da tela em vez de erro do Playwright. ([#57](https://github.com/azevedothamirest/qa-scout/issues/57))
+
+---
+
+## 1.0.2 · Tokens fora das notas
+_30/10/2026_
+
+**🔒 Segurança**
+- **URLs sem segredos:** antes de virar nota, relatório ou bug copiado, o endereço perde usuário e senha, e tokens, códigos de redefinição, JWTs e outros valores com cara de segredo viram `***`, na query, no caminho e no fragmento (`#access_token=`). Parâmetros comuns, como `?cep=01001000`, continuam para ajudar a reproduzir. ([GHSA-cfw4-mm55-5g5v](https://github.com/azevedothamirest/qa-scout/security/advisories/GHSA-cfw4-mm55-5g5v))
+- Notas gravadas antes desta versão não são alteradas: revise as antigas antes de compartilhar.
 
 ---
 
@@ -33,25 +42,12 @@ _30/10/2026_
 
 ---
 
-## 1.0.0 · Versão estável
-_30/10/2026_
-
-A primeira versão estável do QA Scout reúne tudo o que veio até aqui:
-
-- 🧭 **Sessões completas:** charter, cronômetro, notas por tipo, baralho de heurísticas e debriefing com TBS.
-- 📸 **Captura automática** na extensão do Chrome: cliques, campos, páginas e erros de console e rede viram notas com print.
-- 🐞 **Do achado ao ticket:** passos para reproduzir, bug pronto para o Jira ou GitHub e relatório em Markdown ou PDF.
-- 🤖 **Navegador de teste** com um comando e **servidor MCP** para explorar com o Claude.
-- 🌍 **Quatro idiomas:** português do Brasil, português de Portugal, inglês e espanhol.
-- 🛡️ **Pronto para empresas:** nenhuma requisição de rede, termos de uso e material de segurança para homologação.
-
----
-
 ## Versões anteriores (resumo)
 
 | Versão | Data | O que trouxe |
 |---|---|---|
-| 0.9.1 · Pronto para o compliance | 30/10/2026 | Fontes no próprio pacote, CSP sem rede, termos de uso, material de segurança e SHA-256 do pacote. |
+| 1.0.0 · Versão estável | 30/10/2026 | Primeira versão estável: sessões, captura automática com print, bug pronto para o ticket, navegador de teste, MCP e quatro idiomas. |
+| 0.9.1 · Pronto para o compliance | 30/10/2026 | Nenhuma requisição de rede (fontes no pacote e CSP com `connect-src 'none'`), termos de uso, material de segurança e canal para reportar vulnerabilidades. |
 | 0.9.0 · Quatro idiomas | 27/10/2026 | Interface, captura, relatórios e ficha da loja em pt-BR, pt-PT, inglês e espanhol, com globo no cabeçalho e primeira visita no idioma do navegador. |
 | 0.8.2 · Aba MCP mais caprichada | 26/10/2026 | Exemplos de pedido destacados e ferramentas agrupadas em Sessão, Navegar e Registrar. |
 | 0.8.1 · Páginas na ordem certa | 26/10/2026 | "Abriu a página" não troca mais o título ao navegar rápido (#31). |

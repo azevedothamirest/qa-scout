@@ -41,8 +41,8 @@ Só durante uma sessão em andamento e só nas abas acompanhadas:
 - **Cliques:** tipo e nome do elemento ("botão Pagar"), com print da aba visível. Em áreas sem interação, só o texto do próprio elemento, nunca o texto da área inteira.
 - **Campos:** só o rótulo. O valor nunca é lido. Senha aparece como "campo de senha"; anexo, só como "um arquivo", sem nome.
 - **Listas (`select`):** a opção escolhida, exceto em listas com `autocomplete` de cartão, nascimento ou senha.
-- **Páginas:** título e endereço.
-- **Erros:** mensagem de erro de JavaScript e `console.error`; método, caminho e código das requisições com falha. Corpo de requisição e resposta não é lido.
+- **Páginas:** título e endereço, sem usuário e senha e com tokens, códigos e outros valores com cara de segredo trocados por `***` (por exemplo, `?access_token=***`). Parâmetros comuns, como `?cep=` ou `?pagina=`, ficam.
+- **Erros:** mensagem de erro de JavaScript e `console.error`; método, caminho (com a mesma máscara de segredos) e código das requisições com falha. Corpo de requisição e resposta não é lido.
 
 Com a sessão pausada ou encerrada, nada é registrado. Iframes de outros sites ficam de fora.
 
