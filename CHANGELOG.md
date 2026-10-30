@@ -1,5 +1,13 @@
 # Notas de atualização
 
+## 1.0.1 · Correções de segurança
+
+**Segurança**
+- Backup importado não injeta mais HTML no painel: cada campo é conferido, prints só entram como imagem e tipo de nota desconhecido vira observação em vez de deixar a tela em branco (GHSA-6hxg-hmpc-459h).
+- A captura ignora cliques, campos e atalhos criados por script da própria página, limita os erros repassados a 20 por página e descarta rajadas acima de 60 eventos por segundo numa aba (GHSA-vh88-r3m4-957w).
+- MCP: `navegar` e `iniciar_sessao` só aceitam endereços http e https, e a aba volta para uma página em branco se um clique levar a `file://` ou `chrome-extension://` (GHSA-59wp-chfh-4c5f).
+- Servidor local (`npm start`): não serve mais arquivos de fora das pastas do projeto pelo caminho com `\` do Windows e só escuta em `127.0.0.1` (GHSA-v693-3724-qmx9).
+
 ## 1.0.0 · Versão estável
 
 A primeira versão estável do QA Scout reúne tudo o que veio até aqui:

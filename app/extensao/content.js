@@ -128,7 +128,10 @@
   // é o primeiro do composedPath().
   const alvoReal = e => (e.composedPath && e.composedPath()[0]) || e.target;
 
+  // Só ações reais de quem testa: eventos criados por script da página (isTrusted false) poderiam
+  // inventar cliques, campos e marcas com print (GHSA-vh88-r3m4-957w).
   document.addEventListener('click', e => {
+    if (!e.isTrusted) return;
     const t = alvoReal(e);
     if (!t || t.nodeType !== 1) return;
     const alvo = t.closest && t.closest(ALVO);
@@ -143,6 +146,7 @@
   const SENSIVEL = /^(cc-|bday|sex|transaction|one-time-code|new-password|current-password)/;
 
   function aoMudar(e) {
+    if (!e.isTrusted) return;
     const el = alvoReal(e);
     if (!el || !/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)) return;
     if (/^(button|submit|reset|checkbox|radio|hidden)$/.test(el.type)) return;
@@ -187,7 +191,7 @@
   const TIPOS = { Digit1: 'bug', Digit2: 'duv', Digit3: 'ide', Digit4: 'ris', Digit5: 'obs' };
   document.addEventListener('keydown', e => {
     const tipo = TIPOS[e.code];
-    if (tipo && e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+    if (tipo && e.isTrusted && e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
       e.preventDefault();
       envia({ tipo: 'marca', nota: tipo, desc: F.marcas[tipo] });
     }
@@ -195,15 +199,28 @@
 
   // Atalho para marcar o momento sem sair do sistema em teste: vira nota com print da tela.
   document.addEventListener('keydown', e => {
-    if (e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyM') {
+    if (e.isTrusted && e.altKey && e.shiftKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyM') {
       e.preventDefault();
       envia({ tipo: 'marca', desc: F.marcou });
     }
   }, true);
 
   // Erros de JavaScript e console.error, repassados pelo pagina.js (que roda no contexto da página).
+  // A página consegue disparar este evento por conta própria (ele vem do pagina.js, no mesmo mundo dela).
+  // Por isso o limite do pagina.js é repetido aqui: até 20 erros diferentes por página e repetições
+  // só como contagem de uma nota que já existe.
+  const errosVistos = new Set();
   document.addEventListener('qascout:erro', e => {
     let det; try { det = JSON.parse(e.detail); } catch (err) { return; }
+    if (!det || typeof det !== 'object') return;
+    det.msg = String(det.msg || '').slice(0, 160);
+    det.chave = String(det.chave || '').slice(0, 200);
+    det.vezes = Math.min(Math.max(1, Math.floor(+det.vezes) || 1), 10000);
+    if (!det.msg || !det.chave) return;
+    if (!errosVistos.has(det.chave)) {
+      if (det.repete || errosVistos.size >= 20) return;
+      errosVistos.add(det.chave);
+    } else if (!det.repete) return;
     const desc = `${det.tipo === 'js' ? F.js : F.console}: ${det.msg}`;
     envia({ tipo: 'erro', grave: det.tipo === 'js', desc, chave: det.chave, vezes: det.vezes, repete: det.repete });
   });

@@ -69,6 +69,14 @@ test.describe('MCP · sessão conduzida pelo Claude', () => {
 });
 
 test.describe('MCP · protocolo', () => {
+  test('Recusar endereços que não são http ou https', () => {
+    const { urlPermitida } = require('../bin/mcp');
+    for (const url of ['file:///C:/Windows/win.ini', 'chrome-extension://kmnlnoaakacblihodeehdlbbfcmjaaam/index.html', 'javascript:alert(1)', 'chrome://settings', 'não é url']) {
+      expect(() => urlPermitida(url), url).toThrow();
+    }
+    expect(urlPermitida('https://homolog.exemplo.com/checkout')).toBe('https://homolog.exemplo.com/checkout');
+  });
+
   test('Listar as ferramentas e responder pelo protocolo MCP via stdio', async () => {
     const { Client } = require('@modelcontextprotocol/sdk/client/index.js');
     const { StdioClientTransport } = require('@modelcontextprotocol/sdk/client/stdio.js');

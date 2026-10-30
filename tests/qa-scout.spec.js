@@ -88,6 +88,18 @@ test.describe('Backup das sessões', () => {
     await expect(page.locator('#toast')).toHaveText('Esse arquivo não é um backup do QA Scout.');
     await expect(page.locator('.row')).toHaveCount(2);
   });
+
+  test('Neutralizar HTML e tipos de nota inválidos vindos de um backup', async ({ page }) => {
+    const payload = 'x"><h1 id="injetado">HTML INJETADO</h1><a id="falso" href="https://example.com">Entrar</a><img src="x';
+    const backup = { app: 'qa-scout', formato: 1, sessions: [{ id: 'poc"><b id="id-injetado">', status: 'done', area: 'Backup malicioso', charter: { explorar: 'a', com: 'b', descobrir: 'c' },
+      plannedMin: '<b id="min-injetado">1</b>', elapsedMs: 60000, startedAt: Date.now(), debrief: { test: 50, bug: 25, setup: 25 },
+      notes: [{ id: 'n1', type: 'obs', t: 1000, text: 'nota com print falso', imgs: [payload] }, { id: 'n2', type: 'zzz', t: 2000, text: 'tipo desconhecido' }] }] };
+    await page.getByLabel('Importar backup').setInputFiles({ name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
+    await expect(page.locator('#toast')).toHaveText('1 sessão importada');
+    await page.locator('.row', { hasText: 'Backup malicioso' }).click();
+    await expect(page.locator('.note', { hasText: 'tipo desconhecido' }).first()).toBeVisible();
+    await expect(page.locator('#injetado, #falso, #id-injetado, #min-injetado')).toHaveCount(0);
+  });
 });
 
 test.describe('Copiar bug', () => {
@@ -319,5 +331,14 @@ test.describe('MCP', () => {
     await page.getByRole('button', { name: 'Copiar pedido: Sessão com charter' }).click();
     await expect(page.locator('#toast')).toHaveText(/Copiado|Ctrl\+C/);
     await expect(page.getByRole('link', { name: /Guia completo do MCP/ })).toHaveAttribute('href', /docs\/mcp\.md$/);
+  });
+});
+
+test.describe('Servidor local', () => {
+  test('Recusar caminhos que saem das pastas servidas', async ({ request }) => {
+    for (const url of ['/tests/fixtures/..%5c..%5cCLAUDE.md', '/..%5c..%5cpackage.json', '/tests/fixtures/..%2f..%2fCLAUDE.md', '/%E0%A4%A']) {
+      expect((await request.get(url)).status(), url).toBe(404);
+    }
+    expect((await request.get('/tests/fixtures/loja.html')).status()).toBe(200);
   });
 });

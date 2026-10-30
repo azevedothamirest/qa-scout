@@ -71,10 +71,20 @@ chrome.runtime.onMessage.addListener((msg, sender, responder) => {
   }
 });
 
+// No máximo LIMITE_TAXA eventos por aba a cada segundo; o que passar disso é descartado, para uma
+// página não encher o storage nem travar o painel (GHSA-vh88-r3m4-957w).
+const LIMITE_TAXA = 60;
+const taxa = new Map(); // tabId -> { inicio, n }
+function dentroDaTaxa(tabId) {
+  const agora = Date.now(), t = taxa.get(tabId);
+  if (!t || agora - t.inicio >= 1000) { taxa.set(tabId, { inicio: agora, n: 1 }); return true; }
+  return ++t.n <= LIMITE_TAXA;
+}
 async function registra(msg, tab) {
+  if (!dentroDaTaxa(tab.id)) return;
   const { capturando, acompanha } = await estado();
   if (!capturando || !acompanha(tab)) return;
-  const ev = { tipo: msg.tipo, desc: msg.desc, url: msg.url, titulo: msg.titulo, ts: msg.ts };
+  const ev = { tipo: String(msg.tipo).slice(0, 20), desc: String(msg.desc || '').slice(0, 300), url: msg.url, titulo: msg.titulo, ts: msg.ts };
   if (msg.chave) Object.assign(ev, { chave: msg.chave, vezes: msg.vezes || 1 });
   // Erro de JavaScript chega sugerido como bug; console.error, como risco. A testadora decide na revisão.
   if (msg.tipo === 'erro') ev.nota = msg.grave ? 'bug' : 'ris';
@@ -127,6 +137,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, info, tab) => {
 
 chrome.tabs.onRemoved.addListener(async tabId => {
   ultimaPagina.delete(tabId);
+  taxa.delete(tabId);
   const { abas } = await estado();
   if (abas.includes(tabId)) await chrome.storage.session.set({ abas: abas.filter(id => id !== tabId) });
 });
