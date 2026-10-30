@@ -4,13 +4,13 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
-| [1.0.3](#103--formulário-e-avisos-mais-claros) | 30/10/2026 | Formulário e avisos mais claros |
-| [1.0.2](#102--captura-sem-ruído-e-mcp-mais-preciso) | 30/10/2026 | Captura sem ruído e MCP mais preciso |
+| [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
+| [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
 
 ---
 
-## 1.0.3 · Formulário e avisos mais claros
+## 1.0.3 · Formulário, captura e MCP mais claros
 _30/10/2026_
 
 **🐞 Correções**
@@ -19,15 +19,17 @@ _30/10/2026_
 - **Navegação:** durante a sessão a aba se chama **Sessão ativa**, no lugar de "Em campo". ([#51](https://github.com/azevedothamirest/qa-scout/issues/51))
 - **Relatório:** sessão encerrada em segundos mostra 1 min, não "0 de 5 min". ([#52](https://github.com/azevedothamirest/qa-scout/issues/52))
 - **Avisos:** quando o aviso some, ele sai também da região de status e não fica preso em outras telas. ([#55](https://github.com/azevedothamirest/qa-scout/issues/55))
+- **Captura:** falha de rede `ERR_CACHE_MISS` (preload e cache, como as fontes) não vira mais bug no diário: o recurso carrega normalmente depois. ([#50](https://github.com/azevedothamirest/qa-scout/issues/50))
+- **MCP:** `preencher` acha o campo pelo rótulo exato e só aceita elementos editáveis. "Nota" não cai mais no grupo "Tipo da nota", e campo inexistente devolve uma explicação com o resumo da tela em vez de erro do Playwright. ([#57](https://github.com/azevedothamirest/qa-scout/issues/57))
 
 ---
 
-## 1.0.2 · Captura sem ruído e MCP mais preciso
+## 1.0.2 · Tokens fora das notas
 _30/10/2026_
 
-**🐞 Correções**
-- **Captura:** falha de rede `ERR_CACHE_MISS` (preload e cache, como as fontes) não vira mais bug no diário: o recurso carrega normalmente depois. ([#50](https://github.com/azevedothamirest/qa-scout/issues/50))
-- **MCP:** `preencher` acha o campo pelo rótulo exato e só aceita elementos editáveis. "Nota" não cai mais no grupo "Tipo da nota", e campo inexistente devolve uma explicação com o resumo da tela em vez de erro do Playwright. ([#57](https://github.com/azevedothamirest/qa-scout/issues/57))
+**🔒 Segurança**
+- **URLs sem segredos:** antes de virar nota, relatório ou bug copiado, o endereço perde usuário e senha, e tokens, códigos de redefinição, JWTs e outros valores com cara de segredo viram `***`, na query, no caminho e no fragmento (`#access_token=`). Parâmetros comuns, como `?cep=01001000`, continuam para ajudar a reproduzir. ([GHSA-cfw4-mm55-5g5v](https://github.com/azevedothamirest/qa-scout/security/advisories/GHSA-cfw4-mm55-5g5v))
+- Notas gravadas antes desta versão não são alteradas: revise as antigas antes de compartilhar.
 
 ---
 
