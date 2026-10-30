@@ -4,9 +4,21 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.0.3](#103--formulário-e-avisos-mais-claros) | 30/10/2026 | Formulário e avisos mais claros |
 | [1.0.2](#102--captura-sem-ruído-e-mcp-mais-preciso) | 30/10/2026 | Captura sem ruído e MCP mais preciso |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
-| [1.0.0](#100--versão-estável) | 30/10/2026 | Versão estável |
+
+---
+
+## 1.0.3 · Formulário e avisos mais claros
+_30/10/2026_
+
+**🐞 Correções**
+- **Charter:** o resumo de erro lista só os campos que falharam, incluindo a duração ("Confira os campos marcados: Explorar, Duração planejada."), sem depender de cor. O "!" das mensagens não é mais lido pelo leitor de tela. ([#46](https://github.com/azevedothamirest/qa-scout/issues/46))
+- **Charter:** os erros continuam marcados ao trocar de aba e voltar, junto com o rascunho. ([#47](https://github.com/azevedothamirest/qa-scout/issues/47))
+- **Navegação:** durante a sessão a aba se chama **Sessão ativa**, no lugar de "Em campo". ([#51](https://github.com/azevedothamirest/qa-scout/issues/51))
+- **Relatório:** sessão encerrada em segundos mostra 1 min, não "0 de 5 min". ([#52](https://github.com/azevedothamirest/qa-scout/issues/52))
+- **Avisos:** quando o aviso some, ele sai também da região de status e não fica preso em outras telas. ([#55](https://github.com/azevedothamirest/qa-scout/issues/55))
 
 ---
 
@@ -33,24 +45,11 @@ _30/10/2026_
 
 ---
 
-## 1.0.0 · Versão estável
-_30/10/2026_
-
-A primeira versão estável do QA Scout reúne tudo o que veio até aqui:
-
-- 🧭 **Sessões completas:** charter, cronômetro, notas por tipo, baralho de heurísticas e debriefing com TBS.
-- 📸 **Captura automática** na extensão do Chrome: cliques, campos, páginas e erros de console e rede viram notas com print.
-- 🐞 **Do achado ao ticket:** passos para reproduzir, bug pronto para o Jira ou GitHub e relatório em Markdown ou PDF.
-- 🤖 **Navegador de teste** com um comando e **servidor MCP** para explorar com o Claude.
-- 🌍 **Quatro idiomas:** português do Brasil, português de Portugal, inglês e espanhol.
-- 🛡️ **Pronto para empresas:** nenhuma requisição de rede, termos de uso e material de segurança para homologação.
-
----
-
 ## Versões anteriores (resumo)
 
 | Versão | Data | O que trouxe |
 |---|---|---|
+| 1.0.0 · Versão estável | 30/10/2026 | Primeira versão estável: sessões completas, captura automática, bug pronto para o ticket, navegador de teste e MCP, quatro idiomas e nenhuma requisição de rede. |
 | 0.9.1 · Pronto para o compliance | 30/10/2026 | Fontes no próprio pacote, CSP sem rede, termos de uso, material de segurança e SHA-256 do pacote. |
 | 0.9.0 · Quatro idiomas | 27/10/2026 | Interface, captura, relatórios e ficha da loja em pt-BR, pt-PT, inglês e espanhol, com globo no cabeçalho e primeira visita no idioma do navegador. |
 | 0.8.2 · Aba MCP mais caprichada | 26/10/2026 | Exemplos de pedido destacados e ferramentas agrupadas em Sessão, Navegar e Registrar. |

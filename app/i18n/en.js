@@ -1,5 +1,7 @@
 // English. Chave: o texto original em português do Brasil.
 window.QAS_I18N.dic["en"] = {
+  "Sessão ativa": "Active session",
+  "Confira os campos marcados:": "Check the marked fields:",
   "+{t} além do planejado": "+{t} over plan",
   "1 já existia": "1 already existed",
   "1 nota": "1 note",
@@ -35,7 +37,6 @@ window.QAS_I18N.dic["en"] = {
   "Ache o botão que cobra ou devolve dinheiro e tente executar duas vezes seguidas.": "Find the button that charges or refunds money and try to run it twice in a row.",
   "Acompanhar a aba atual": "Follow the current tab",
   "Agende algo para 29/02 e para meia-noite em ponto.": "Schedule something for Feb 29 and for exactly midnight.",
-  "Ajuste a duração planejada.": "Adjust the planned duration.",
   "Alt+1 a Alt+5, captura automática com print e baralho com 18 heurísticas.": "Alt+1 to Alt+5, automatic capture with screenshots and a deck of 18 heuristics.",
   "Ambiente": "Environment",
   "Ambiente e versão": "Environment and version",
@@ -160,7 +161,6 @@ window.QAS_I18N.dic["en"] = {
   "Editar": "Edit",
   "Elas só entram no relatório e no Markdown depois de confirmadas. Edite o texto ou o tipo se não for observação.": "They only go into the report and the Markdown once confirmed. Edit the text or the type if it is not an observation.",
   "Elisabeth Hendrickson · Explore It!": "Elisabeth Hendrickson · Explore It!",
-  "Em campo": "In the field",
   "Encerrar": "End",
   "Encerrar e ir para o relatório?": "End and go to the report?",
   "Entenda o método →": "Learn the method →",
@@ -300,7 +300,6 @@ window.QAS_I18N.dic["en"] = {
   "Permissões": "Permissions",
   "Peça a sessão": "Ask for the session",
   "Por que charter?": "Why a charter?",
-  "Preencha o que vai explorar e o que quer descobrir, destacados em vermelho.": "Fill in what you will explore and what you want to discover, highlighted in red.",
   "Prefere um navegador separado?": "Prefer a separate browser?",
   "Primeira vez: o Chromium é baixado": "First time: Chromium gets downloaded",
   "Print anexado {n}": "Attached screenshot {n}",

@@ -165,7 +165,9 @@ function charterHtml(c){ return t('Explorar {explorar} com {com} para descobrir 
 function charterText(c){ return t('Explorar {explorar} com {com} para descobrir {descobrir}', c); }
 function getActive(){ return state.sessions.find(s=>s.id===state.activeId && s.status!=='done') || null; }
 let toastT;
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(limpaToast,2600); }
+// Ao sumir, o aviso sai também da região de status: ela não fica mostrando o recado de outra tela (#55).
+function limpaToast(){ clearTimeout(toastT); const el=$('#toast'); el.classList.remove('show'); el.textContent=''; }
 async function copy(text, okMsg, fallbackEl){
   try{ await navigator.clipboard.writeText(text); toast(okMsg); }
   catch(e){ if(fallbackEl){ fallbackEl.focus(); fallbackEl.select(); } toast(t('Texto selecionado. Use Ctrl+C para copiar.')); }
@@ -182,6 +184,8 @@ function go(v,arg=null){
 const REGISTRADO = {bug:'Bug registrado',duv:'Dúvida registrada',ide:'Ideia registrada',ris:'Risco registrado',obs:'Observação registrada'};
 const SALVO = {bug:'Bug salvo',duv:'Dúvida salva',ide:'Ideia salva',ris:'Risco salvo',obs:'Observação salva'};
 function registrado(k){ return t(REGISTRADO[k]); }
+// Minutos da sessão para mostrar: quem explorou alguns segundos vê 1 min, não 0 (#52).
+function minReais(s){ return s.elapsedMs>0 ? Math.max(1,Math.round(s.elapsedMs/MIN)) : 0; }
 
 function render(){
   const active = getActive();
@@ -190,12 +194,12 @@ function render(){
     const cur = (k==='home' && (view==='home'||view==='report')) || (k==='active' && (view==='active'||view==='new')) || k===view;
     b.setAttribute('aria-current', cur ? 'page':'false');
   });
-  $('#tab-active').innerHTML = active ? `<span class="live"></span>${t('Em campo')}` : t('Nova sessão');
+  $('#tab-active').innerHTML = active ? `<span class="live"></span>${t('Sessão ativa')}` : t('Nova sessão');
   stopTick();
   syncCaptura();
   const app = $('#app');
   if(view==='home') app.innerHTML = viewHome();
-  else if(view==='new') app.innerHTML = viewNew();
+  else if(view==='new'){ app.innerHTML = viewNew(); if(charterTentado) validaCharter(); }
   else if(view==='active'){ if(!active){ view='new'; app.innerHTML = viewNew(); } else { app.innerHTML = viewSession(active); startTick(); } }
   else if(view==='report') app.innerHTML = viewReport(state.sessions.find(s=>s.id===viewArg));
   else if(view==='deck') app.innerHTML = viewDeck();
@@ -264,7 +268,7 @@ function rowHtml(s){
     <div class="date"><b>${pad(d.getDate())}</b>${mesCurto(d)}</div>
     <div style="min-width:0"><h3>${esc(s.area)}${s.example?`<span class="tag-ex">${t('exemplo')}</span>`:''}</h3><p>${esc(charterText(s.charter))}</p></div>
     <div class="chips">
-      <span class="chip">${Math.round(s.elapsedMs/MIN)}/${s.plannedMin} min</span>
+      <span class="chip">${minReais(s)}/${s.plannedMin} min</span>
       ${['bug','duv','ris'].filter(k=>c[k]).map(k=>`<span class="chip ${TYPES[k].cls}" style="color:var(--c)"><i></i><span style="color:var(--ink)">${c[k]} ${c[k]>1?plural(k).toLowerCase():rot(k).toLowerCase()}</span></span>`).join('')}
     </div>
   </button>`;
@@ -530,7 +534,7 @@ function atualizaNotas(s){
 const LOGO_DOC = `<svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#0F2B33"/><circle cx="32" cy="32" r="25" fill="none" stroke="#296F82" stroke-width="4.3"/><circle cx="32" cy="32" r="15" fill="none" stroke="#1B4E5C" stroke-width="2.6"/><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#06171C" opacity=".75" transform="translate(1.8 2.4) rotate(40 32 32)"/><g transform="rotate(40 32 32)"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#296F82"/><path d="M32 32 L38.5 32 L32 52 Z" fill="#8AE3D7"/></g></svg>`;
 function docImpressao(s){
   const c=counts(s), db=s.debrief||{}, notas=s.notes.filter(n=>!n.pending);
-  const real=Math.round(s.elapsedMs/MIN);
+  const real=minReais(s);
   const cor={bug:'#E0354F',duv:'#1688C4',ide:'#B97E00',ris:'#7247E0',obs:'#0E9F6E'};
   const meta=[[t('Data'),fmtDate(s.startedAt)],[t('Duração'),t('{real} de {plan} min',{real,plan:s.plannedMin})],[t('Ambiente'),s.ambiente||'—'],[t('Quem testou'),s.testadora||'—'],[t('Navegador'),s.navegador||'—']];
   const grupos=TYPE_ORDER.filter(k=>c[k]).map(k=>`<section class="doc-grupo" style="--c:${cor[k]}">
@@ -555,7 +559,7 @@ function docImpressao(s){
 function viewReport(s){
   if(!s) return `<div class="empty">${t('Sessão não encontrada.')} <button class="link-btn" data-go="home">${t('Voltar')}</button></div>`;
   const c=counts(s), db=s.debrief||(s.debrief={test:60,bug:25,setup:15,coverage:'',next:''});
-  const real=Math.round(s.elapsedMs/MIN);
+  const real=minReais(s);
   return `<section class="view">
     <div class="no-print"><button class="link-btn" data-go="home">${t('← Todas as sessões')}</button></div>
     <div class="report">
@@ -623,7 +627,7 @@ function toMarkdown(s, onlyBugs=false){
   }
   let md = `# ${t('Sessão exploratória')} · ${mdInline(s.area)}\n\n`;
   md += `**Charter:** ${mdInline(charterText(s.charter))}.\n\n`;
-  md += `| | |\n|---|---|\n| ${t('Data')} | ${fmtDate(s.startedAt)} |\n| ${t('Ambiente')} | ${mdInline(s.ambiente)||'-'} |\n| ${t('Quem testou')} | ${mdInline(s.testadora)||'-'} |\n| ${t('Duração')} | ${t('{real} de {plan} min',{real:Math.round(s.elapsedMs/MIN),plan:s.plannedMin})} |\n`;
+  md += `| | |\n|---|---|\n| ${t('Data')} | ${fmtDate(s.startedAt)} |\n| ${t('Ambiente')} | ${mdInline(s.ambiente)||'-'} |\n| ${t('Quem testou')} | ${mdInline(s.testadora)||'-'} |\n| ${t('Duração')} | ${t('{real} de {plan} min',{real:minReais(s),plan:s.plannedMin})} |\n`;
   if(db.test!=null) md += `| ${t('Divisão do tempo')} | ${t('Teste')} ${db.test}% · ${t('Bug')} ${db.bug}% · ${t('Setup')} ${db.setup}% |\n`;
   md += `\n**${t('Resumo:')}** ${TYPE_ORDER.map(k=>`${c[k]} ${(c[k]===1?rot(k):plural(k)).toLowerCase()}`).join(', ')}.\n`;
   TYPE_ORDER.forEach(k=>{ const ns=s.notes.filter(n=>n.type===k); if(ns.length) md += `\n## ${plural(k)}\n${ns.map(line).join('\n')}\n`; });
@@ -1000,17 +1004,8 @@ document.addEventListener('click',e=>{
 document.addEventListener('submit',e=>{
   if(e.target.id!=='charter-form') return;
   e.preventDefault();
+  if(!validaCharter({focar:true})) return;
   const d=readDraft();
-  const faltam=[['c-exp',!d.explorar],['c-des',!d.descobrir],['c-dur',!(Number.isInteger(d.plannedMin)&&d.plannedMin>=1&&d.plannedMin<=480)]];
-  faltam.forEach(([id,erro])=>marcaErro(id,erro));
-  const erros=faltam.filter(([,e])=>e);
-  if(erros.length){
-    const box=$('#form-err');
-    box.innerHTML=`<b>${t('Falta pouco para começar.')}</b> ${!d.explorar||!d.descobrir?t('Preencha o que vai explorar e o que quer descobrir, destacados em vermelho.'):t('Ajuste a duração planejada.')}`;
-    box.hidden=false;
-    $('#'+erros[0][0]).focus();
-    return;
-  }
   // Na extensão, a captura começa junto com a sessão: o pedido de acesso precisa sair deste clique.
   const pedidoAcesso = EXT && !modoNavegador ? chrome.permissions.request({origins:['<all_urls>']}).catch(()=>false) : null;
   const s={id:uid(),area:d.area||d.explorar,charter:{explorar:d.explorar,com:d.com||t('o que estiver à mão'),descobrir:d.descobrir},ambiente:d.ambiente,testadora:d.testadora,plannedMin:d.plannedMin,navegador:navegadorAtual(),status:'running',startedAt:Date.now(),runStartedAt:Date.now(),elapsedMs:0,notes:[]};
@@ -1018,6 +1013,23 @@ document.addEventListener('submit',e=>{
   save(); go('active'); setTimeout(()=>$('#note-in')?.focus(),50);
   if(pedidoAcesso) pedidoAcesso.then(ok=>ok ? acompanharAbaAtual({auto:true}) : toast(t('Sem acesso aos sites, a captura automática fica desligada. Dá para ligar em “Acompanhar a aba atual”.')));
 });
+// Marca cada campo e monta o resumo com os campos que falharam de fato (#46).
+// Fica guardado que já houve tentativa, para a tela voltar com os erros depois de trocar de aba (#47).
+let charterTentado=false;
+const CAMPOS_CHARTER={'c-exp':'Explorar','c-des':'para descobrir','c-dur':'Duração planejada'};
+function validaCharter({focar=false}={}){
+  const d=readDraft();
+  const faltam=[['c-exp',!d.explorar],['c-des',!d.descobrir],['c-dur',!(Number.isInteger(d.plannedMin)&&d.plannedMin>=1&&d.plannedMin<=480)]];
+  faltam.forEach(([id,erro])=>marcaErro(id,erro));
+  const erros=faltam.filter(([,e])=>e);
+  const box=$('#form-err');
+  charterTentado=erros.length>0;
+  if(!erros.length){ if(box) box.hidden=true; return true; }
+  box.innerHTML=`<b>${t('Falta pouco para começar.')}</b> ${t('Confira os campos marcados:')} ${erros.map(([id])=>esc(t(CAMPOS_CHARTER[id]))).join(', ')}.`;
+  box.hidden=false;
+  if(focar) $('#'+erros[0][0]).focus();
+  return false;
+}
 function marcaErro(id,erro){
   const el=$('#'+id), msg=$('#'+id+'-err'); if(!el) return;
   el.classList.toggle('invalido',erro); el.setAttribute('aria-invalid',erro);
