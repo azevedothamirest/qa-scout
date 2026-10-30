@@ -1,0 +1,33 @@
+name: Suíte completa
+run-name: "Suíte completa · ${{ github.ref_name }}"
+
+# Roda só à mão (Actions → Suíte completa → Run workflow): os testes que não têm a tag @regressao.
+# Fica fora do ci.yml para o pull request mostrar só o check da regressão.
+on:
+  workflow_dispatch:
+
+jobs:
+  completa:
+    name: Suíte completa
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Rodar os demais testes
+        run: npx playwright test --grep-invert @regressao --reporter=list,json,html
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: resultados.json
+      - name: Publicar os títulos dos testes no resumo
+        if: always()
+        run: node scripts/resumo-testes.js resultados.json "Suíte completa · demais testes"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-completo
+          path: playwright-report/
+          retention-days: 14

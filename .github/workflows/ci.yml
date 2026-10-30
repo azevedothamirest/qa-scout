@@ -2,7 +2,8 @@ name: Testes
 run-name: "Testes · ${{ github.event_name == 'pull_request' && format('PR #{0}', github.event.pull_request.number) || github.ref_name }}"
 
 # Testes só no pull request: roda a regressão (fluxos críticos), que é o que bloqueia o merge.
-# Nada roda depois do merge. A suíte completa roda à mão (Actions → Testes → Run workflow).
+# Nada roda depois do merge. A suíte completa fica num workflow separado (suite-completa.yml), só à mão,
+# para não aparecer como "skipped" nos checks do pull request.
 on:
   pull_request:
   workflow_dispatch:
@@ -37,28 +38,3 @@ jobs:
           path: playwright-report/
           retention-days: 14
 
-  completa:
-    name: Suíte completa
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium
-      - name: Rodar os demais testes
-        run: npx playwright test --grep-invert @regressao --reporter=list,json,html
-        env:
-          PLAYWRIGHT_JSON_OUTPUT_NAME: resultados.json
-      - name: Publicar os títulos dos testes no resumo
-        if: always()
-        run: node scripts/resumo-testes.js resultados.json "Suíte completa · demais testes"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: relatorio-completo
-          path: playwright-report/
-          retention-days: 14

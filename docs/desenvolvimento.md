@@ -55,5 +55,5 @@ Não há etapa de build: o que está no repositório é o que roda.
 - Agrupe com `test.describe` pela área da tela (Histórico, Charter, Sessão em campo, Debriefing...).
 - Prefira seletores acessíveis (`getByRole`, `getByLabel`); use ids e `data-*` só quando não houver alternativa.
 - **Regressão:** os fluxos críticos são os testes marcados com `{ tag: '@regressao' }`. Rode só eles com `npm run test:regressao`. A tag é curta de propósito: só entra o que, se quebrar, impede o uso do QA Scout. Corrigiu um bug? Escreva o teste, mas sem a tag; ele roda na suíte completa.
-- Rode `npm test` antes de subir. No pull request a CI roda só a regressão; a suíte completa roda à mão (workflow_dispatch). O resumo da execução no GitHub Actions lista o título e o resultado de cada teste.
+- Rode `npm test` antes de subir. No pull request a CI roda só a regressão; a suíte completa roda à mão, no workflow "Suíte completa" (`suite-completa.yml`). O resumo da execução no GitHub Actions lista o título e o resultado de cada teste.
 
