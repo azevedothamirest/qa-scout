@@ -114,7 +114,7 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 .obrig{font-family:var(--f-body);font-size:11px;font-weight:600;color:var(--danger);text-transform:none;letter-spacing:0;margin-left:6px;vertical-align:2px}
 .msg-erro[hidden],.form-err[hidden]{display:none}
 .msg-erro{display:flex;align-items:center;gap:6px;margin:-8px 0 12px;color:var(--danger);font-family:var(--f-body);font-size:14px;font-weight:600}
-.msg-erro::before{content:"!";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:12px;font-weight:800;flex:none}
+.msg-erro::before{content:"!";content:"!" / "";display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:12px;font-weight:800;flex:none}
 .field .msg-erro{margin:6px 0 0}
 .invalido{border-color:var(--danger)!important;background:color-mix(in srgb,var(--danger) 8%,transparent)!important}
 .charter-sentence textarea.invalido{border-bottom-width:3px;padding-left:8px;border-radius:6px 6px 0 0}

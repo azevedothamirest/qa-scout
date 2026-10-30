@@ -123,7 +123,7 @@ test.describe('Charter', () => {
     await page.getByRole('button', { name: 'Começar nova sessão' }).click();
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
     await expect(page.locator('#form-err')).toBeVisible();
-    await expect(page.locator('#form-err')).toContainText('Preencha o que vai explorar e o que quer descobrir');
+    await expect(page.locator('#form-err')).toContainText('Confira os campos marcados: Explorar, para descobrir.');
     await expect(page.locator('#c-exp')).toHaveAttribute('aria-invalid', 'true');
     await expect(page.locator('#c-des')).toHaveAttribute('aria-invalid', 'true');
     await expect(page.getByText('Diga o que você vai explorar.')).toBeVisible();
@@ -159,8 +159,29 @@ test.describe('Charter', () => {
     await page.getByLabel('Duração planejada').fill('0');
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
     await expect(page.getByText('Use um tempo entre 1 e 480 minutos.')).toBeVisible();
-    await expect(page.locator('#form-err')).toContainText('Ajuste a duração planejada');
+    await expect(page.locator('#form-err')).toHaveText('Falta pouco para começar. Confira os campos marcados: Duração planejada.');
     await expect(page.locator('.charter-card')).toHaveCount(0);
+  });
+
+  test('Listar no resumo só os campos que falharam, incluindo a duração', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.locator('#c-des').fill('bugs');
+    await page.getByLabel('Duração planejada').fill('-5');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await expect(page.locator('#form-err')).toHaveText('Falta pouco para começar. Confira os campos marcados: Explorar, Duração planejada.');
+    await expect(page.locator('#form-err')).not.toContainText('vermelho');
+  });
+
+  test('Manter os erros do charter ao trocar de aba e voltar', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.getByLabel('Duração planejada').fill('-5');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await page.getByRole('button', { name: 'Heurísticas' }).click();
+    await page.getByRole('navigation').getByRole('button', { name: 'Nova sessão' }).click();
+    await expect(page.getByLabel('Duração planejada')).toHaveValue('-5');
+    await expect(page.getByLabel('Duração planejada')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.getByText('Use um tempo entre 1 e 480 minutos.')).toBeVisible();
+    await expect(page.locator('#form-err')).toBeVisible();
   });
 });
 
@@ -192,6 +213,25 @@ test.describe('Sessão em campo', () => {
     await page.getByRole('button', { name: 'Registrar nota' }).click();
     await expect(page.locator('.note')).toHaveCount(0);
     await expect(page.locator('#toast')).toContainText('Escreva algo');
+  });
+
+  test('Chamar a aba da sessão de "Sessão ativa" enquanto ela roda', async ({ page }) => {
+    await expect(page.getByRole('navigation').getByRole('button', { name: 'Sessão ativa' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('Esvaziar a região de status quando o aviso some, mesmo depois de trocar de tela', async ({ page }) => {
+    await page.getByRole('button', { name: 'Registrar nota' }).click();
+    await expect(page.locator('#toast')).toContainText('Escreva algo');
+    await page.getByRole('button', { name: 'Heurísticas' }).click();
+    await expect(page.locator('#toast')).toHaveText('');
+  });
+
+  test('Mostrar 1 min no relatório de sessão encerrada em segundos', async ({ page }) => {
+    await page.locator('#note-in').fill('Bug rápido');
+    await page.locator('#note-in').press('Control+Enter');
+    await page.getByRole('button', { name: 'Encerrar' }).click();
+    await page.getByRole('button', { name: 'Sim, encerrar' }).click();
+    await expect(page.locator('#md-out')).toHaveValue(/\| Duração \| 1 de 60 min \|/);
   });
 
   test('Pausar e manter o cronômetro parado', async ({ page }) => {
@@ -264,7 +304,7 @@ test.describe('Baralho de heurísticas', () => {
     await page.getByRole('button', { name: 'Heurísticas', exact: true }).click();
     const titulo = await page.locator('.carta h3').textContent();
     await page.getByRole('button', { name: 'Anotar como ideia na sessão' }).click();
-    await page.getByRole('button', { name: 'Em campo' }).click();
+    await page.getByRole('button', { name: 'Sessão ativa' }).click();
     await expect(page.locator('.note.t-ide')).toContainText(`Heurística “${titulo}”`);
   });
 

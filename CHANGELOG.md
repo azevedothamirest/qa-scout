@@ -4,16 +4,21 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
-| [1.0.3](#103--captura-sem-ruído-e-mcp-mais-preciso) | 30/10/2026 | Captura sem ruído e MCP mais preciso |
+| [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
 | [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
 
 ---
 
-## 1.0.3 · Captura sem ruído e MCP mais preciso
+## 1.0.3 · Formulário, captura e MCP mais claros
 _30/10/2026_
 
 **🐞 Correções**
+- **Charter:** o resumo de erro lista só os campos que falharam, incluindo a duração ("Confira os campos marcados: Explorar, Duração planejada."), sem depender de cor. O "!" das mensagens não é mais lido pelo leitor de tela. ([#46](https://github.com/azevedothamirest/qa-scout/issues/46))
+- **Charter:** os erros continuam marcados ao trocar de aba e voltar, junto com o rascunho. ([#47](https://github.com/azevedothamirest/qa-scout/issues/47))
+- **Navegação:** durante a sessão a aba se chama **Sessão ativa**, no lugar de "Em campo". ([#51](https://github.com/azevedothamirest/qa-scout/issues/51))
+- **Relatório:** sessão encerrada em segundos mostra 1 min, não "0 de 5 min". ([#52](https://github.com/azevedothamirest/qa-scout/issues/52))
+- **Avisos:** quando o aviso some, ele sai também da região de status e não fica preso em outras telas. ([#55](https://github.com/azevedothamirest/qa-scout/issues/55))
 - **Captura:** falha de rede `ERR_CACHE_MISS` (preload e cache, como as fontes) não vira mais bug no diário: o recurso carrega normalmente depois. ([#50](https://github.com/azevedothamirest/qa-scout/issues/50))
 - **MCP:** `preencher` acha o campo pelo rótulo exato e só aceita elementos editáveis. "Nota" não cai mais no grupo "Tipo da nota", e campo inexistente devolve uma explicação com o resumo da tela em vez de erro do Playwright. ([#57](https://github.com/azevedothamirest/qa-scout/issues/57))
 
@@ -46,8 +51,8 @@ _30/10/2026_
 
 | Versão | Data | O que trouxe |
 |---|---|---|
-| 1.0.0 · Versão estável | 30/10/2026 | Primeira versão estável: sessões, captura automática com print, bug pronto para o ticket, navegador de teste, MCP e quatro idiomas. |
-| 0.9.1 · Pronto para o compliance | 30/10/2026 | Nenhuma requisição de rede (fontes no pacote e CSP com `connect-src 'none'`), termos de uso, material de segurança e canal para reportar vulnerabilidades. |
+| 1.0.0 · Versão estável | 30/10/2026 | Primeira versão estável: sessões completas, captura automática, bug pronto para o ticket, navegador de teste e MCP, quatro idiomas e nenhuma requisição de rede. |
+| 0.9.1 · Pronto para o compliance | 30/10/2026 | Fontes no próprio pacote, CSP sem rede, termos de uso, material de segurança e SHA-256 do pacote. |
 | 0.9.0 · Quatro idiomas | 27/10/2026 | Interface, captura, relatórios e ficha da loja em pt-BR, pt-PT, inglês e espanhol, com globo no cabeçalho e primeira visita no idioma do navegador. |
 | 0.8.2 · Aba MCP mais caprichada | 26/10/2026 | Exemplos de pedido destacados e ferramentas agrupadas em Sessão, Navegar e Registrar. |
 | 0.8.1 · Páginas na ordem certa | 26/10/2026 | "Abriu a página" não troca mais o título ao navegar rápido (#31). |

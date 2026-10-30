@@ -1,5 +1,7 @@
 // Español. Chave: o texto original em português do Brasil.
 window.QAS_I18N.dic["es"] = {
+  "Sessão ativa": "Sesión activa",
+  "Confira os campos marcados:": "Revisa los campos marcados:",
   "+{t} além do planejado": "+{t} sobre lo planificado",
   "1 já existia": "1 ya existía",
   "1 nota": "1 nota",
@@ -35,7 +37,6 @@ window.QAS_I18N.dic["es"] = {
   "Ache o botão que cobra ou devolve dinheiro e tente executar duas vezes seguidas.": "Encuentra el botón que cobra o devuelve dinero e intenta ejecutarlo dos veces seguidas.",
   "Acompanhar a aba atual": "Seguir la pestaña actual",
   "Agende algo para 29/02 e para meia-noite em ponto.": "Programa algo para el 29/02 y para la medianoche en punto.",
-  "Ajuste a duração planejada.": "Ajusta la duración planificada.",
   "Alt+1 a Alt+5, captura automática com print e baralho com 18 heurísticas.": "Alt+1 a Alt+5, captura automática con imagen y una baraja de 18 heurísticas.",
   "Ambiente": "Entorno",
   "Ambiente e versão": "Entorno y versión",
@@ -160,7 +161,6 @@ window.QAS_I18N.dic["es"] = {
   "Editar": "Editar",
   "Elas só entram no relatório e no Markdown depois de confirmadas. Edite o texto ou o tipo se não for observação.": "Solo entran en el informe y en el Markdown una vez confirmadas. Edita el texto o el tipo si no es una observación.",
   "Elisabeth Hendrickson · Explore It!": "Elisabeth Hendrickson · Explore It!",
-  "Em campo": "En campo",
   "Encerrar": "Finalizar",
   "Encerrar e ir para o relatório?": "¿Finalizar e ir al informe?",
   "Entenda o método →": "Conoce el método →",
@@ -300,7 +300,6 @@ window.QAS_I18N.dic["es"] = {
   "Permissões": "Permisos",
   "Peça a sessão": "Pide la sesión",
   "Por que charter?": "¿Por qué un charter?",
-  "Preencha o que vai explorar e o que quer descobrir, destacados em vermelho.": "Rellena lo que vas a explorar y lo que quieres descubrir, marcados en rojo.",
   "Prefere um navegador separado?": "¿Prefieres un navegador aparte?",
   "Primeira vez: o Chromium é baixado": "La primera vez se descarga Chromium",
   "Print anexado {n}": "Captura adjunta {n}",
