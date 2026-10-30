@@ -1,5 +1,15 @@
 # Notas de atualização
 
+## 1.0.0 · Versão estável
+
+A primeira versão estável do QA Scout reúne tudo o que veio até aqui:
+- Sessões com charter, cronômetro, notas por tipo, baralho de heurísticas e debriefing com TBS.
+- Captura automática na extensão do Chrome: cliques, campos, páginas e erros de console e rede viram notas com print.
+- Passos para reproduzir, bug pronto para o Jira ou GitHub e relatório em Markdown ou PDF.
+- Navegador de teste com um comando e servidor MCP para explorar com o Claude.
+- Quatro idiomas: português do Brasil, português de Portugal, inglês e espanhol.
+- Nenhuma requisição de rede, termos de uso e material de segurança para homologação em empresas.
+
 ## 0.9.1 · Pronto para o compliance
 
 **Segurança**
