@@ -40,7 +40,35 @@ async function injeta(tabId) {
   } catch (e) { return false; }
 }
 
+// Endereços vão para notas, relatório e bug copiado no Jira/GitHub: antes de gravar, some usuário e
+// senha da URL e os valores com cara de segredo viram "***" (GHSA-cfw4-mm55-5g5v). Parâmetros comuns,
+// como ?cep=01001000 ou ?pagina=2, ficam como estão, porque ajudam a reproduzir.
+const CHAVE_SENSIVEL = /token|code|secret|senha|pass|pwd|auth|session|sess|sid|key|sig|jwt|otp|nonce|state|cookie|bearer|credential|ticket|hash|email|cpf/i;
+const PARECE_SEGREDO = v => /^eyJ[\w-]+\.[\w-]+/.test(v) // JWT
+  || (v.length >= 24 && /[a-z]/i.test(v) && /\d/.test(v) && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v));
+function mascaraParams(texto) {
+  const params = new URLSearchParams(texto);
+  let mudou = false;
+  for (const [k, v] of [...params]) if (v && (CHAVE_SENSIVEL.test(k) || PARECE_SEGREDO(v))) { params.set(k, '***'); mudou = true; }
+  return mudou ? params.toString().replace(/%2A%2A%2A/g, '***') : texto;
+}
+function mascaraUrl(url) {
+  let u;
+  try { u = new URL(url); } catch (e) { return String(url || ''); }
+  u.username = ''; u.password = '';
+  u.pathname = u.pathname.split('/').map(seg => PARECE_SEGREDO(decodeURIComponentSeguro(seg)) ? '***' : seg).join('/');
+  if (u.search) u.search = mascaraParams(u.search.slice(1));
+  // No fragmento: rotas de SPA (#/checkout) ficam; parâmetros (#access_token=...) passam pela mesma máscara.
+  if (u.hash.includes('=')) {
+    const h = u.hash.slice(1), i = h.indexOf('?');
+    u.hash = i >= 0 ? h.slice(0, i + 1) + mascaraParams(h.slice(i + 1)) : mascaraParams(h);
+  }
+  return u.href;
+}
+function decodeURIComponentSeguro(s) { try { return decodeURIComponent(s); } catch (e) { return s; } }
+
 async function guardaEvento(ev) {
+  if (ev.url) ev.url = mascaraUrl(ev.url);
   const chave = `qascout.ev.${ev.ts}.${Math.random().toString(36).slice(2, 7)}`;
   await chrome.storage.local.set({ [chave]: ev });
 }
@@ -147,7 +175,7 @@ chrome.tabs.onRemoved.addListener(async tabId => {
 // mesma chave, e o painel soma na nota que já existe ("×N") em vez de criar outra.
 const IGNORA_REDE = /\/favicon\.ico(\?|$)/;
 function caminho(url) {
-  try { const u = new URL(url); return (u.pathname + u.search).slice(0, 90); } catch (e) { return String(url).slice(0, 90); }
+  try { const u = new URL(mascaraUrl(url)); return (u.pathname + u.search).slice(0, 90); } catch (e) { return String(url).slice(0, 90); }
 }
 // Frases das notas no idioma escolhido no painel (qascout.idioma).
 const FRASES = {

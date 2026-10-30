@@ -4,9 +4,18 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
 | [1.0.0](#100--versão-estável) | 30/10/2026 | Versão estável |
-| [0.9.1](#091--pronto-para-o-compliance) | 30/10/2026 | Pronto para o compliance |
+
+---
+
+## 1.0.2 · Tokens fora das notas
+_30/10/2026_
+
+**🔒 Segurança**
+- **URLs sem segredos:** antes de virar nota, relatório ou bug copiado, o endereço perde usuário e senha, e tokens, códigos de redefinição, JWTs e outros valores com cara de segredo viram `***`, na query, no caminho e no fragmento (`#access_token=`). Parâmetros comuns, como `?cep=01001000`, continuam para ajudar a reproduzir. ([GHSA-cfw4-mm55-5g5v](https://github.com/azevedothamirest/qa-scout/security/advisories/GHSA-cfw4-mm55-5g5v))
+- Notas gravadas antes desta versão não são alteradas: revise as antigas antes de compartilhar.
 
 ---
 
@@ -38,26 +47,11 @@ A primeira versão estável do QA Scout reúne tudo o que veio até aqui:
 
 ---
 
-## 0.9.1 · Pronto para o compliance
-_30/10/2026_
-
-**🔒 Segurança**
-- Fontes dentro do próprio pacote: o painel não busca mais nada no Google Fonts e não faz nenhuma requisição de rede.
-- Política de segurança de conteúdo (CSP) na extensão e no site, com `connect-src 'none'`: o app não consegue falar com nenhum servidor.
-- Teste automatizado que falha se o app fizer requisição para fora do site.
-
-**📄 Documentos**
-- Termos de uso nos quatro idiomas, com link no rodapé do app.
-- [Segurança e compliance](docs/seguranca.md): material para o time de segurança avaliar, com fluxo de dados, permissões, CSP e como liberar a extensão pela política do Chrome.
-- `SECURITY.md` com o canal para reportar vulnerabilidades.
-- `npm run pacote` mostra o SHA-256 do zip, para conferir a versão publicada.
-
----
-
 ## Versões anteriores (resumo)
 
 | Versão | Data | O que trouxe |
 |---|---|---|
+| 0.9.1 · Pronto para o compliance | 30/10/2026 | Nenhuma requisição de rede (fontes no pacote e CSP com `connect-src 'none'`), termos de uso, material de segurança e canal para reportar vulnerabilidades. |
 | 0.9.0 · Quatro idiomas | 27/10/2026 | Interface, captura, relatórios e ficha da loja em pt-BR, pt-PT, inglês e espanhol, com globo no cabeçalho e primeira visita no idioma do navegador. |
 | 0.8.2 · Aba MCP mais caprichada | 26/10/2026 | Exemplos de pedido destacados e ferramentas agrupadas em Sessão, Navegar e Registrar. |
 | 0.8.1 · Páginas na ordem certa | 26/10/2026 | "Abriu a página" não troca mais o título ao navegar rápido (#31). |

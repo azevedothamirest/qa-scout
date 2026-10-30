@@ -57,7 +57,7 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
     <li><b>Clicks</b>: the type and name of the clicked element (for example, “button Pay by card”), with a screenshot of the visible tab.</li>
     <li><b>Filled fields</b>: only the field label. <b>The typed value is never read or stored.</b> In password fields, the note only says “Filled in a password field”. For attachments, only that a file was chosen, never its name or content.</li>
     <li><b>Option lists (<code>select</code>)</b>: the text of the chosen option, which comes from the page itself (for example, “Chose CA in State”). Lists marked as card, birth date or password data (<code>autocomplete</code>) only record that an option was chosen.</li>
-    <li><b>Opened pages</b>: title and address.</li>
+    <li><b>Opened pages</b>: title and address. Usernames, passwords, tokens and codes in the address are replaced with <code>***</code> before saving.</li>
     <li><b>JavaScript errors, <code>console.error</code> and network failures</b>: the error message, method, request path and response code. Request and response bodies are not read.</li>
     <li><b><code>Alt+Shift+M</code> and <code>Alt+1</code> to <code>Alt+5</code> shortcuts</b>: a screenshot of the visible tab at that moment, with the note type when it is <code>Alt+number</code>.</li>
   </ul>

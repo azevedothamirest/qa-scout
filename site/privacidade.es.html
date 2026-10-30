@@ -57,7 +57,7 @@ footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:v
     <li><b>Clics</b>: el tipo y el nombre del elemento pulsado (por ejemplo, “botón Pagar con tarjeta”), con una captura de la pestaña visible.</li>
     <li><b>Campos rellenados</b>: solo la etiqueta del campo. <b>El valor escrito nunca se lee ni se guarda.</b> En campos de contraseña, la nota solo dice “Rellenó un campo de contraseña”. En adjuntos, solo que se eligió un archivo, nunca su nombre ni su contenido.</li>
     <li><b>Listas de opciones (<code>select</code>)</b>: el texto de la opción elegida, que viene de la propia página (por ejemplo, “Eligió Madrid en Provincia”). Las listas marcadas como datos de tarjeta, nacimiento o contraseña (<code>autocomplete</code>) solo registran que se eligió una opción.</li>
-    <li><b>Páginas abiertas</b>: título y dirección.</li>
+    <li><b>Páginas abiertas</b>: título y dirección. Usuarios, contraseñas, tokens y códigos que aparecen en la dirección se reemplazan por <code>***</code> antes de guardar.</li>
     <li><b>Errores de JavaScript, <code>console.error</code> y fallos de red</b>: el mensaje de error, el método, la ruta de la solicitud y el código de respuesta. El contenido de solicitudes y respuestas no se lee.</li>
     <li><b>Atajos <code>Alt+Shift+M</code> y <code>Alt+1</code> a <code>Alt+5</code></b>: una captura de la pestaña visible en ese momento, ya con el tipo de nota cuando es <code>Alt+número</code>.</li>
   </ul>

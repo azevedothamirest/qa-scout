@@ -190,6 +190,20 @@ test.describe('Erros de console e rede', () => {
     await expect(painel.locator('.note.t-bug.pendente', { hasText: 'Requisição falhou: GET /api/parcelas' })).toBeVisible();
   });
 
+  test('Esconder tokens e senhas das URLs gravadas nas notas', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.evaluate(() => fetch('/api/conta?access_token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.assinatura&pagina=2').catch(() => {}));
+    const nota = painel.locator('.note.t-ris.pendente', { hasText: 'GET /api/conta?access_token=***&pagina=2 → 404' });
+    await expect(nota).toBeVisible();
+    await expect(painel.locator('.note', { hasText: 'eyJhbGciOiJIUzI1NiJ9' })).toHaveCount(0);
+
+    await loja.goto('http://usuario:senha123@localhost:4173/tests/fixtures/loja.html?reset_code=abc&cep=01001000#access_token=segredo');
+    await loja.getByRole('button', { name: 'Consultar frete' }).click();
+    await expect(painel.locator('.note .url', { hasText: 'reset_code' }).first()).toHaveText('http://localhost:4173/tests/fixtures/loja.html?reset_code=***&cep=01001000#access_token=***');
+    await expect(painel.locator('.note', { hasText: /senha123|segredo|reset_code=abc/ })).toHaveCount(0);
+  });
+
   test('Ignorar erros enquanto a sessão está pausada', async ({ context, painel }) => {
     await iniciarSessao(painel);
     await painel.getByRole('button', { name: 'Pausar' }).click();
