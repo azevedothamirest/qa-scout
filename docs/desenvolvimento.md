@@ -29,7 +29,8 @@ app/                 a extensão inteira (é a raiz do zip da Chrome Web Store) 
   _locales/          nome e descrição da extensão em cada idioma
   extensao/          captura automática: service worker, script de conteúdo e script da página
   icones/            ícones da extensão (16, 32, 48 e 128 px)
-site/                política de privacidade, um arquivo por idioma (publicada no GitHub Pages)
+  fontes/            Plus Jakarta Sans e JetBrains Mono (woff2, licença SIL OFL): nada vem do Google Fonts
+site/                política de privacidade e termos de uso, um arquivo por idioma (publicados no GitHub Pages)
 bin/qa-scout.js      comando "qa-scout": abre o navegador de teste com a extensão carregada
 bin/mcp.js           servidor MCP (qa-scout mcp): o Claude conduz a sessão pelas ferramentas
 scripts/             utilitários: servidor local, empacotar a extensão, chaves de tradução, resumo dos testes na CI

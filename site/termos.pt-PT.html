@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; script-src 'none'">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Termos de utilização · QA Scout</title>
+<meta name="description" content="Termos de utilização do QA Scout: licença, utilização responsável, dados, garantia e segurança.">
+<link rel="stylesheet" href="fontes/fontes.css">
+<style>
+/* Mesmo visual do app: fundo escuro com toques sutis de cor, granulado, Plus Jakarta Sans. */
+:root{--paper:#0B0B12;--surface:#16161F;--surface-2:#1E1E2A;--ink:#F4F3FF;--muted:#9C9AB3;--line:#2A2A38;--accent:#3DF5A7;--teal:#8AE3D7;
+  --g:linear-gradient(90deg,#3DF5A7,#3BC9F5,#FF79C6);--f:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;--m:"JetBrains Mono",ui-monospace,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased;
+  background:radial-gradient(50% 35% at 95% 0%,rgba(139,92,246,.16),transparent 70%),radial-gradient(55% 40% at 0% 100%,rgba(41,111,130,.2),transparent 70%),var(--paper);background-attachment:fixed}
+body::after{content:"";position:fixed;inset:0;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.08;pointer-events:none}
+main{max-width:780px;margin:0 auto;padding:44px 20px 80px;position:relative;z-index:1}
+.brand{display:flex;width:max-content;align-items:center;gap:12px;font-weight:800;font-size:20px;color:var(--ink);text-decoration:none;margin-bottom:44px}
+.brand svg{width:36px;height:36px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:7px 15px;font-size:13px;font-weight:600;color:var(--muted)}
+.eyebrow::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--teal)}
+h1{font-size:clamp(36px,7vw,58px);line-height:1.03;letter-spacing:-.035em;font-weight:800;margin:20px 0 16px}
+h1 em{font-style:normal;background:var(--g);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--muted);font-size:18px;margin:0;max-width:60ch}
+.selos{display:flex;flex-wrap:wrap;gap:10px;margin:26px 0 8px}
+.selos span{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-weight:700;font-size:14px}
+.selos span::before{content:"✓";display:grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#0B0B12;font-size:12px;font-weight:800}
+.card{position:relative;background:var(--surface);border-radius:22px;padding:22px 26px;margin-top:28px;border:1px solid transparent;background-clip:padding-box}
+.card::before{content:"";position:absolute;inset:-1px;border-radius:23px;padding:1px;background:var(--g);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+.card p{margin:0}
+h2{display:flex;align-items:center;gap:12px;font-size:22px;letter-spacing:-.02em;margin:46px 0 10px;font-weight:800}
+h2::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--teal);transform:rotate(45deg);flex:none}
+p{color:#D9D7EA}
+ul{padding:0;list-style:none;display:grid;gap:10px}
+li{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 16px;margin:0;color:#D9D7EA}
+li b,p b{color:var(--ink)}
+code{font-family:var(--m);font-size:.86em;background:var(--surface-2);border:1px solid var(--line);padding:1px 7px;border-radius:7px;color:var(--teal)}
+a{color:var(--teal)}
+footer{margin-top:56px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+.idiomas{margin-top:10px}.idiomas b{color:var(--ink)}
+</style>
+</head>
+<body>
+<main>
+  <a class="brand" href="./"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#0F2B33"/><circle cx="32" cy="32" r="25" fill="none" stroke="#296F82" stroke-width="4.3"/><circle cx="32" cy="32" r="15" fill="none" stroke="#1B4E5C" stroke-width="2.6"/><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#06171C" opacity=".75" transform="translate(1.8 2.4) rotate(40 32 32)"/><g transform="rotate(40 32 32)"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#296F82"/><path d="M32 32 L38.5 32 L32 52 Z" fill="#8AE3D7"/></g></svg>QA Scout</a>
+  <div class="eyebrow">Termos de utilização · atualizados a 30 de outubro de 2026</div>
+  <h1>Regras simples, <em>sem letras pequenas.</em></h1>
+  <p class="lead">O QA Scout é gratuito e de código aberto. Estes termos aplicam-se à extensão do Chrome, ao site, ao navegador de teste e ao servidor MCP.</p>
+  <div class="selos"><span>Gratuito</span><span>Licença MIT</span><span>Sem registo</span><span>Sem recolha de dados</span></div>
+  <div class="card"><p><b>Resumo:</b> pode usar o QA Scout, incluindo no trabalho e para fins comerciais. Os seus dados ficam no seu computador, e a responsabilidade pelo que testa e regista é sua.</p></div>
+  <h2>Licença</h2>
+  <p>O código é aberto, sob a <a href="https://github.com/azevedothamirest/qa-scout/blob/main/LICENSE">licença MIT</a> (© 2026 Thamires Azevedo). Qualquer pessoa ou empresa pode usar, copiar, modificar e distribuir, desde que mantenha o aviso de copyright e a licença.</p>
+  <h2>Quem pode usar</h2>
+  <p>Qualquer pessoa, sem registo e sem custo. Não há conta, plano pago nem limite de utilização.</p>
+  <h2>Os seus dados</h2>
+  <p>Sessões, notas e capturas ficam só no armazenamento local do seu navegador. O QA Scout não tem servidor e não recebe nenhum dado seu. Detalhes na <a href="privacidade.pt-PT.html">política de privacidade</a>.</p>
+  <h2>Utilização responsável</h2>
+  <ul>
+    <li>Use o QA Scout apenas em sistemas que tem autorização para testar.</li>
+    <li>Prefira ambientes de teste com dados fictícios: as capturas mostram o que está no ecrã.</li>
+    <li>Reveja as notas e as capturas antes de partilhar um relatório.</li>
+    <li>Siga as regras da sua empresa sobre ferramentas e dados. O material para a equipa de segurança está em <a href="https://github.com/azevedothamirest/qa-scout/blob/main/docs/seguranca.md">docs/seguranca.md</a>.</li>
+  </ul>
+  <h2>Modo com o Claude (MCP, opcional)</h2>
+  <p>O servidor MCP corre no seu computador e só funciona se o instalar. Neste modo, o texto das páginas visitadas é enviado ao Claude, da Anthropic, e segue os termos da Anthropic. A extensão da Chrome Web Store não usa este modo.</p>
+  <h2>Sem garantia</h2>
+  <p>O QA Scout é fornecido “tal como está”, sem garantia de qualquer tipo. A autora não responde por perdas ou danos decorrentes da utilização, nos termos da licença MIT. Faça cópias de segurança das sessões importantes.</p>
+  <h2>Segurança</h2>
+  <p>Encontrou uma vulnerabilidade? Reporte em privado para <a href="mailto:contato.qascout@gmail.com">contato.qascout@gmail.com</a> ou pelo <a href="https://github.com/azevedothamirest/qa-scout/security">GitHub</a>. A primeira resposta sai em até 7 dias.</p>
+  <h2>Alterações</h2>
+  <p>As alterações a estes termos aparecem nesta página, com a data no topo, e no <a href="https://github.com/azevedothamirest/qa-scout/blob/main/CHANGELOG.md">histórico de versões</a>. Dúvidas: <a href="mailto:contato.qascout@gmail.com">contato.qascout@gmail.com</a>.</p>
+
+  <footer>QA Scout · feito por Thamires Azevedo, QA Sénior.
+    <nav class="idiomas" aria-label="Idiomas"><a href="termos.html" lang="pt-BR" hreflang="pt-BR">Português (Brasil)</a> · <b lang="pt-PT">Português (Portugal)</b> · <a href="termos.en.html" lang="en" hreflang="en">English</a> · <a href="termos.es.html" lang="es" hreflang="es">Español</a></nav></footer>
+</main>
+</body>
+</html>

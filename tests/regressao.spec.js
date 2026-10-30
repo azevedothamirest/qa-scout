@@ -125,12 +125,29 @@ test.describe('Regressão · segurança e dados', () => {
     const externas = [];
     page.on('request', (r) => {
       const u = new URL(r.url());
-      if (!['localhost', 'fonts.googleapis.com', 'fonts.gstatic.com'].includes(u.hostname) && u.protocol.startsWith('http')) externas.push(r.url());
+      if (u.hostname !== 'localhost' && u.protocol.startsWith('http')) externas.push(r.url());
     });
     await iniciarSessao(page);
     await registrar(page, 'Dado sensível: 123.456.789-00');
     await encerrar(page);
     expect(externas).toEqual([]);
+  });
+});
+
+test.describe('Requisições externas', () => {
+  test('Abrir todas as telas e a política de privacidade sem requisição para fora do site', async ({ page }) => {
+    const externas = [];
+    page.on('request', (r) => { if (!r.url().startsWith('http://localhost') && /^https?:/.test(r.url())) externas.push(r.url()); });
+    await page.reload();
+    for (const aba of ['Heurísticas', 'Método', 'MCP', 'Sessões']) await page.getByRole('button', { name: aba, exact: true }).click();
+    await page.goto('/privacidade.html');
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    expect(externas).toEqual([]);
+  });
+
+  test('Carregar as fontes do próprio app', async ({ page }) => {
+    await page.reload();
+    await expect.poll(() => page.evaluate(() => document.fonts.check('16px "Plus Jakarta Sans"') && [...document.fonts].some(f => f.family.includes('Plus Jakarta Sans') && f.status === 'loaded'))).toBe(true);
   });
 });
 

@@ -3,6 +3,7 @@
 // Entra a pasta app/ inteira (é a raiz da extensão); testes, docs e o comando qa-scout ficam de fora.
 // Zip sem compressão (método "store"), escrito à mão para não depender de pacote extra.
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 
 const RAIZ = path.join(__dirname, '..');
@@ -55,5 +56,9 @@ const { version } = JSON.parse(fs.readFileSync(path.join(APP, 'manifest.json'), 
 const arquivos = fs.readdirSync(APP).sort().flatMap(lista);
 fs.mkdirSync(path.join(RAIZ, 'dist'), { recursive: true });
 const destino = path.join(RAIZ, 'dist', `qa-scout-extensao-${version}.zip`);
-fs.writeFileSync(destino, zip(arquivos));
-console.log(`${path.relative(RAIZ, destino)} (${arquivos.length} arquivos)`);
+const conteudo = zip(arquivos);
+fs.writeFileSync(destino, conteudo);
+// Hash para conferir que o zip publicado é igual ao gerado a partir do código.
+const hash = crypto.createHash('sha256').update(conteudo).digest('hex');
+fs.writeFileSync(destino + '.sha256', `${hash}  ${path.basename(destino)}\n`);
+console.log(`${path.relative(RAIZ, destino)} (${arquivos.length} arquivos)\nSHA-256: ${hash}`);

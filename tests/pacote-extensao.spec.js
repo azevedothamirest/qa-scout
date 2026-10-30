@@ -34,6 +34,9 @@ test.describe('Pacote da Chrome Web Store', () => {
     expect(manifesto.content_scripts).toBeUndefined();
     expect(manifesto.optional_host_permissions).toEqual(['<all_urls>']);
     expect(manifesto.key).toBeUndefined();
+    // Política de segurança: o painel não fala com nenhum servidor.
+    expect(manifesto.content_security_policy.extension_pages).toContain("connect-src 'none'");
+    expect(nomes).toEqual(expect.arrayContaining(['fontes/fontes.css', 'fontes/OFL-plus-jakarta-sans.txt']));
     expect(nomes.filter(n => /^(tests|docs|bin|scripts|node_modules)\//.test(n) || n === 'package.json')).toEqual([]);
   });
 });

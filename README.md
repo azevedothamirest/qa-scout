@@ -36,7 +36,7 @@ Lista completa em [funcionalidades](docs/funcionalidades.md).
 
 ## Privacidade
 
-Tudo fica salvo no navegador de quem usa. Não há servidor, conta ou envio de dados. Política completa: [`privacidade.html`](site/privacidade.html).
+Tudo fica salvo no navegador de quem usa. Não há servidor, conta ou envio de dados. Política completa: [`privacidade.html`](site/privacidade.html). Termos de uso: [`termos.html`](site/termos.html). Para o time de segurança da sua empresa: [segurança e compliance](docs/seguranca.md).
 
 ## Ideias e feedback
 

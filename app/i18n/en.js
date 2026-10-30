@@ -307,6 +307,7 @@ window.QAS_I18N.dic["en"] = {
   "Print anexado à nota": "Screenshot attached to the note",
   "Print da nota": "Note screenshot",
   "Privacidade ↗": "Privacy ↗",
+  "Termos ↗": "Terms ↗",
   "Provoque 3 erros diferentes e leia cada mensagem como se fosse o cliente.": "Trigger 3 different errors and read each message as if you were the customer.",
   "Prévia do Markdown": "Markdown preview",
   "Próximas sessões": "Next sessions",

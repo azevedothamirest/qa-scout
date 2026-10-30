@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "QA Scout",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "__MSG_descricao__",
   "default_locale": "pt_BR",
   "icons": {
@@ -33,5 +33,8 @@
   ],
   "optional_host_permissions": [
     "<all_urls>"
-  ]
+  ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'"
+  }
 }
