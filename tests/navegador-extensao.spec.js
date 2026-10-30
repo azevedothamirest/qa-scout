@@ -47,6 +47,24 @@ test.describe('Navegador de teste (comando qa-scout)', () => {
     await outra.locator('body').click({ position: { x: 5, y: 5 } });
     await expect(painel.locator('.note', { hasText: 'Preencheu o campo “CPF”' })).toBeVisible();
   });
+
+  test('Ignorar cliques, atalhos e erros forjados por script da página', async () => {
+    const { painel, site } = aberto;
+    await painel.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await painel.getByLabel('Explorar').fill('o checkout');
+    await painel.getByLabel('para descobrir').fill('falhas no pagamento');
+    await painel.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await site.bringToFront();
+    await site.evaluate(() => {
+      document.querySelector('button').dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      document.dispatchEvent(new KeyboardEvent('keydown', { code: 'KeyM', altKey: true, shiftKey: true }));
+      for (let i = 0; i < 60; i++) document.dispatchEvent(new CustomEvent('qascout:erro', { detail: JSON.stringify({ tipo: 'js', msg: 'falso ' + i, chave: 'falso-' + i, vezes: 1 }) }));
+    });
+    await site.getByRole('button', { name: 'Pagar com Pix' }).click();
+    await expect(painel.locator('.note.pendente', { hasText: 'Clicou no botão “Pagar com Pix”' })).toHaveCount(1);
+    await expect(painel.locator('.note', { hasText: 'Marcou este momento' })).toHaveCount(0);
+    await expect.poll(() => painel.locator('.note', { hasText: 'Erro de JavaScript: falso' }).count()).toBeLessThanOrEqual(20);
+  });
 });
 
 test.describe('Navegador de teste · atualização', () => {

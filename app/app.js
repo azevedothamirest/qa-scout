@@ -10,7 +10,7 @@ const TYPES = {
 };
 const TYPE_ORDER = ['bug','duv','ide','ris','obs'];
 const PLURAL = {bug:'Bugs',duv:'Dúvidas',ide:'Ideias',ris:'Riscos',obs:'Observações'};
-const rot = k => t(TYPES[k].label), plural = k => t(PLURAL[k]);
+const rot = k => t((TYPES[k]||TYPES.obs).label), plural = k => t(PLURAL[k]);
 
 const HEUR = [
   {cat:'Tours',t:'Tour do dinheiro',p:'Siga o caminho que gera receita ou mexe com saldo. Onde um erro aqui custaria dinheiro a alguém?'},
@@ -96,7 +96,32 @@ const EXT = (()=>{ try{ return !!(window.chrome && chrome.runtime && chrome.runt
 const EV_PREFIX = 'qascout.ev.';
 function fresh(){ return {sessions:[ex1(),ex2()],activeId:null,draft:null}; }
 // Dados ilegíveis não são descartados: vão para KEY.corrompido e o app avisa ao abrir.
-const estadoValido = s => !!s && typeof s==='object' && Array.isArray(s.sessions) && s.sessions.every(x=>x && typeof x==='object' && x.id && x.charter && Array.isArray(x.notes));
+const estadoValido = s => !!s && typeof s==='object' && Array.isArray(s.sessions) && s.sessions.every(x=>x && typeof x==='object' && x.id && x.charter && Array.isArray(x.notes)) && (s.sessions.forEach(normalizaSessao), true);
+// Sessões que chegam de fora (backup, storage, outra aba) vão para o innerHTML: cada campo é forçado ao
+// tipo esperado, ids só com letras e números, prints só como data:image e tipo de nota conhecido
+// (GHSA-6hxg-hmpc-459h).
+const ID_OK = /^[\w-]{1,40}$/;
+const imgOk = src => typeof src==='string' && /^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(src);
+const num = (v, padrao=0) => Number.isFinite(+v) ? +v : padrao;
+const txt = v => v==null ? '' : String(v);
+function normalizaSessao(s){
+  if(!ID_OK.test(s.id)) s.id = Math.random().toString(36).slice(2,10);
+  ['area','ambiente','testadora','status','navegador'].forEach(k=>{ if(k in s) s[k]=txt(s[k]); });
+  ['plannedMin','elapsedMs','startedAt','endedAt','segStart'].forEach(k=>{ if(k in s) s[k]=num(s[k]); });
+  if(!s.plannedMin) s.plannedMin=30;
+  const c = s.charter && typeof s.charter==='object' ? s.charter : {};
+  s.charter = {explorar:txt(c.explorar), com:txt(c.com), descobrir:txt(c.descobrir)};
+  if(s.debrief && typeof s.debrief==='object'){
+    const d=s.debrief; s.debrief={test:num(d.test),bug:num(d.bug),setup:num(d.setup),coverage:txt(d.coverage),next:txt(d.next)};
+  } else delete s.debrief;
+  s.notes = s.notes.filter(n=>n && typeof n==='object').map(n=>({...n,
+    id: ID_OK.test(n.id) ? n.id : Math.random().toString(36).slice(2,10),
+    type: TYPES[n.type] && TYPE_ORDER.includes(n.type) ? n.type : 'obs',
+    t: num(n.t), text: txt(n.text), url: txt(n.url),
+    imgs: Array.isArray(n.imgs) ? n.imgs.filter(imgOk) : [],
+  }));
+  return s;
+}
 let corrompido = false;
 function load(){
   if(EXT) return fresh();
@@ -341,7 +366,7 @@ function heurHtml(){
   return `<div class="heur-head"><span class="eyebrow">${t('Travou? Tente isto')}</span><button class="link-btn" data-act="heur">${t('Outra ideia ↻')}</button></div>
     <div class="cat">${esc(t(h.cat))}</div><h3>${esc(t(h.t))}</h3><p>${esc(t(h.p))}</p>`;
 }
-function thumbsHtml(){ return pendingImgs.map((src,i)=>`<div class="thumb"><img src="${src}" alt="${t('Print anexado {n}',{n:i+1})}"><button data-rmimg="${i}" aria-label="${t('Remover print')}">×</button></div>`).join(''); }
+function thumbsHtml(){ return pendingImgs.map((src,i)=>`<div class="thumb"><img src="${esc(src)}" alt="${t('Print anexado {n}',{n:i+1})}"><button data-rmimg="${i}" aria-label="${t('Remover print')}">×</button></div>`).join(''); }
 function logHtml(s){
   const notes = s.notes.filter(n=>filter==='all'||(filter==='rev'?n.pending:(!n.pending&&n.type===filter))).slice().reverse();
   if(!notes.length) return `<div style="padding:28px 4px;color:var(--muted);text-align:center">${s.notes.length?(filter==='rev'?t('Nada para revisar.'):t('Nenhuma nota desse tipo.')):t('Sua primeira nota aparece aqui. Comece pelo que chamou sua atenção nos primeiros minutos.')}</div>`;
@@ -392,7 +417,7 @@ function noteHtml(n){
         <div class="edit-foot">${temPassos(n.text)?'':`<button class="btn ghost" data-passos="${n.id}">${t('Incluir passos para reproduzir')}</button>`}<button class="btn ghost" data-cancel-edit>${t('Cancelar')}</button><button class="btn primary" data-saveedit="${n.id}">${n.pending?t('Salvar e confirmar'):t('Salvar')}</button></div>
       </div>`
     : `<p class="txt">${esc(n.text)}</p>${n.url?`<p class="url">${esc(n.url)}</p>`:''}
-      ${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.map(src=>`<img src="${src}" alt="${t('Print da nota')}">`).join('')}</div>`:''}
+      ${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}
       <div class="note-actions">${confirmDel===n.id?`<button class="confirm" data-delnote="${n.id}" data-sure="1">${t('Confirmar exclusão')}</button><button data-cancel-del>${t('Cancelar')}</button>`
         :`${n.pending?`<button class="ok" data-oknote="${n.id}">${t('Confirmar')}</button>`:''}${n.type==='bug'&&!n.pending?`<button data-copybug="${n.id}">${t('Copiar bug')}</button>`:''}<button data-editnote="${n.id}">${t('Editar')}</button><button data-delnote="${n.id}">${t('Excluir')}</button>`}</div>`;
   return `<article class="note ${TYPES[n.type].cls}${n.pending?' pendente':''}" data-note="${n.id}">
@@ -510,7 +535,7 @@ function docImpressao(s){
   const meta=[[t('Data'),fmtDate(s.startedAt)],[t('Duração'),t('{real} de {plan} min',{real,plan:s.plannedMin})],[t('Ambiente'),s.ambiente||'—'],[t('Quem testou'),s.testadora||'—'],[t('Navegador'),s.navegador||'—']];
   const grupos=TYPE_ORDER.filter(k=>c[k]).map(k=>`<section class="doc-grupo" style="--c:${cor[k]}">
       <h3><span>${plural(k)}</span><b>${c[k]}</b></h3>
-      ${notas.filter(n=>n.type===k).map(n=>`<div class="doc-nota"><time>${fmtT(n.t)}</time><div><p>${esc(n.text)}</p>${n.url?`<small>${esc(n.url)}</small>`:''}${n.imgs&&n.imgs.length?`<div class="doc-imgs">${n.imgs.map(src=>`<img src="${src}" alt="">`).join('')}</div>`:''}</div></div>`).join('')}
+      ${notas.filter(n=>n.type===k).map(n=>`<div class="doc-nota"><time>${fmtT(n.t)}</time><div><p>${esc(n.text)}</p>${n.url?`<small>${esc(n.url)}</small>`:''}${n.imgs&&n.imgs.length?`<div class="doc-imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="">`).join('')}</div>`:''}</div></div>`).join('')}
     </section>`).join('') || `<p class="doc-vazio">${t('Nenhuma nota registrada nessa sessão.')}</p>`;
   return `<article class="doc" aria-hidden="true">
     <header class="doc-topo">${LOGO_DOC}<div><b>QA Scout</b><span>${t('Relatório de sessão exploratória')}</span></div><div class="doc-data">${fmtDate(s.startedAt)}</div></header>
@@ -548,7 +573,7 @@ function viewReport(s){
           <p class="hint" style="margin:0 0 6px">${t('Elas só entram no relatório e no Markdown depois de confirmadas. Edite o texto ou o tipo se não for observação.')}</p>
           ${(vis=>loteHtml(s,vis)+`<div class="rev-lista">${vis.map(noteHtml).join('')}</div>`)(paginaDe('rev',pendentes(s)))}${pagerHtml('rev',pendentes(s).length)}</div>`:''}
         ${TYPE_ORDER.filter(k=>c[k]).map(k=>`<div class="group ${TYPES[k].cls}"><h3><i></i>${plural(k)}</h3>
-          ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.map(src=>`<img src="${src}" alt="${t('Print da nota')}">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}">${t('Copiar bug')}</button></div>`:''}</div></div>`).join('')}
+          ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}">${t('Copiar bug')}</button></div>`:''}</div></div>`).join('')}
         </div>`).join('') || `<p class="hint">${t('Nenhuma nota registrada nessa sessão.')}</p>`}
       </div>
       <aside style="display:grid;gap:16px;min-width:0">
@@ -654,7 +679,7 @@ function importarBackup(txt){
   let dados; try{ dados=JSON.parse(txt); }catch(e){ toast(t('Esse arquivo não é um backup do QA Scout.')); return; }
   if(!dados || dados.app!=='qa-scout' || !Array.isArray(dados.sessions)){ toast(t('Esse arquivo não é um backup do QA Scout.')); return; }
   const ids = new Set(state.sessions.map(x=>x.id));
-  const validas = dados.sessions.filter(x=>x && x.id && x.charter && Array.isArray(x.notes) && x.status==='done');
+  const validas = dados.sessions.filter(x=>x && x.id && x.charter && Array.isArray(x.notes) && x.status==='done').map(normalizaSessao);
   const novas = validas.filter(x=>!ids.has(x.id));
   if(!novas.length){ toast(validas.length?t('Todas as sessões desse backup já estão aqui.'):t('Nenhuma sessão encontrada no backup.')); return; }
   state.sessions.push(...novas);

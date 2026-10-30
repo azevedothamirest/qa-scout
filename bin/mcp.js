@@ -18,6 +18,15 @@ function heuristicas() {
   return m ? Function(`"use strict"; return ${m[1]}`)() : [];
 }
 
+// Só endereços web: file://, chrome-extension:// e afins deixariam um texto da página em teste
+// (prompt injection) levar o Claude a ler arquivos do computador ou as sessões salvas (GHSA-59wp-chfh-4c5f).
+function urlPermitida(url) {
+  let u;
+  try { u = new URL(url); } catch (e) { throw new Error(`Endereço inválido: ${url}`); }
+  if (!/^https?:$/.test(u.protocol)) throw new Error(`Só endereços http e https são permitidos (recebi ${u.protocol}).`);
+  return u.href;
+}
+
 const TIPOS = { bug: 'bug', duvida: 'duv', ideia: 'ide', risco: 'ris', observacao: 'obs' };
 
 // As ferramentas são funções comuns sobre um navegador aberto sob demanda; o servidor MCP só as
@@ -37,6 +46,9 @@ function criarFerramentas({ perfil, headless = false, locale } = {}) {
   async function site() {
     const a = await navegador();
     if (a.site.isClosed()) a.site = a.context.pages().filter(p => p !== a.painel).pop() || await a.context.newPage();
+    // Um clique ou redirecionamento também pode levar a file:// ou chrome-extension://: aí a aba volta
+    // para about:blank em vez de mostrar o conteúdo ao Claude.
+    if (!/^(https?:|about:blank)/.test(a.site.url())) await a.site.goto('about:blank');
     await a.site.bringToFront(); // o print da extensão é da aba visível
     return a.site;
   }
@@ -82,13 +94,13 @@ function criarFerramentas({ perfil, headless = false, locale } = {}) {
       await painel.locator('#charter-form [type="submit"]').click();
       await painel.locator('#note-in').waitFor();
       let texto = `Sessão iniciada: Explorar ${explorar}${com ? ` com ${com}` : ''} para descobrir ${descobrir} (${minutos} min). A captura automática está ligada.`;
-      if (url) { const p = await site(); await p.goto(url); texto += `\n\n${await resumoDaTela(p)}`; }
+      if (url) { const p = await site(); await p.goto(urlPermitida(url)); texto += `\n\n${await resumoDaTela(p)}`; }
       return texto;
     },
 
     async navegar({ url }) {
       const p = await site();
-      await p.goto(url);
+      await p.goto(urlPermitida(url));
       return resumoDaTela(p);
     },
 
@@ -118,7 +130,7 @@ function criarFerramentas({ perfil, headless = false, locale } = {}) {
     async escolher_opcao({ campo, opcao }) {
       const p = await site();
       await p.getByLabel(campo).first().selectOption({ label: opcao }, { timeout: 5000 });
-      return resumoDaTela(p);
+      return resumoDaTela(await site());
     },
 
     async anotar({ tipo, texto }) {
@@ -239,6 +251,6 @@ async function main(argv = process.argv.slice(2)) {
   console.error('QA Scout MCP pronto.');
 }
 
-module.exports = { criarFerramentas, heuristicas, main, INSTRUCOES };
+module.exports = { criarFerramentas, heuristicas, urlPermitida, main, INSTRUCOES };
 
 if (require.main === module) main().catch(e => { console.error(e); process.exit(1); });
