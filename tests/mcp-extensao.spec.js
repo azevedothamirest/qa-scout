@@ -8,6 +8,7 @@ const path = require('path');
 const { criarFerramentas } = require('../bin/mcp');
 
 const LOJA = 'http://localhost:4173/tests/fixtures/loja.html';
+const ROTULOS = 'http://localhost:4173/tests/fixtures/rotulos.html';
 
 test.describe('MCP · sessão conduzida pelo Claude', () => {
   let perfil, f;
@@ -58,6 +59,14 @@ test.describe('MCP · sessão conduzida pelo Claude', () => {
     const capturas = await f.ver_capturas();
     expect(capturas.split('Abriu a página “Captura · Início”').length - 1).toBe(1);
     expect(capturas.split('Abriu a página “Loja fictícia · Checkout”').length - 1).toBe(2);
+  });
+
+  test('Preencher o campo pelo rótulo exato mesmo com outro rótulo parecido antes na página', async () => {
+    await f.iniciar_sessao({ explorar: 'as notas', descobrir: 'campos trocados', url: ROTULOS });
+    const r = await f.preencher({ campo: 'Nota', valor: 'Pix não responde' });
+    expect(r).toContain('textbox "Nota"');
+    expect(r).toContain('Pix não responde');
+    expect(await f.preencher({ campo: 'Campo que não existe', valor: 'x' })).toContain('Não encontrei o campo');
   });
 
   test('Explicar quando o elemento a clicar não existe na tela', async () => {

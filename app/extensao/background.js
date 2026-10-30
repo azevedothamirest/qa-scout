@@ -203,4 +203,5 @@ async function falhaDeRede(det, status, erro) {
 }
 const FILTRO_REDE = { urls: ['http://*/*', 'https://*/*'] };
 chrome.webRequest.onCompleted.addListener(d => { if (d.statusCode >= 400) falhaDeRede(d, d.statusCode); }, FILTRO_REDE);
-chrome.webRequest.onErrorOccurred.addListener(d => { if (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(d.error)) falhaDeRede(d, 0, d.error); }, FILTRO_REDE);
+// ERR_CACHE_MISS vem de preload/cache (ex.: fontes) e o recurso carrega depois: não é falha para quem usa.
+chrome.webRequest.onErrorOccurred.addListener(d => { if (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT|ERR_CACHE_MISS/.test(d.error)) falhaDeRede(d, 0, d.error); }, FILTRO_REDE);

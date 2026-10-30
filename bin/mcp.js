@@ -74,6 +74,16 @@ function criarFerramentas({ perfil, headless = false, locale } = {}) {
     if (nome) return pagina.getByLabel(nome).or(pagina.getByRole('button', { name: nome })).or(pagina.getByRole('link', { name: nome })).first();
     return pagina.getByText(texto, { exact: false }).first();
   }
+  // Campo pelo rótulo ou placeholder. O nome exato vem antes do parcial e só valem elementos editáveis:
+  // "Nota" não pode cair no grupo "Tipo da nota", que aparece antes do campo na página.
+  async function campoEditavel(pagina, campo) {
+    for (const exact of [true, false]) {
+      const candidatos = pagina.getByLabel(campo, { exact }).or(pagina.getByPlaceholder(campo, { exact }))
+        .locator('xpath=self::input[not(@type="hidden")] | self::textarea | self::select | self::*[@contenteditable="true" or @contenteditable=""]');
+      if (await candidatos.count()) return candidatos.first();
+    }
+    return null;
+  }
   async function resumoDaTela(pagina) {
     const arvore = await pagina.locator('body').ariaSnapshot().catch(e => `(não foi possível ler a tela: ${e.message})`);
     const corte = arvore.length > MAX_PAGINA ? arvore.slice(0, MAX_PAGINA) + '\n… (tela cortada; role a página ou navegue para ver o resto)' : arvore;
@@ -120,7 +130,10 @@ function criarFerramentas({ perfil, headless = false, locale } = {}) {
 
     async preencher({ campo, valor, enviar = false }) {
       const p = await site();
-      const el = p.getByLabel(campo).or(p.getByPlaceholder(campo)).or(p.getByRole('textbox', { name: campo })).first();
+      const el = await campoEditavel(p, campo);
+      if (!el) return `Não encontrei o campo ${JSON.stringify(campo)} nesta tela. Confira o rótulo ou o placeholder no resumo abaixo.
+
+${await resumoDaTela(p)}`;
       await el.fill(valor, { timeout: 5000 });
       if (enviar) await el.press('Enter'); else await el.blur();
       await p.waitForTimeout(300);
