@@ -1,5 +1,18 @@
 # Notas de atualização
 
+## 0.9.1 · Pronto para o compliance
+
+**Segurança**
+- Fontes dentro do próprio pacote: o painel não busca mais nada no Google Fonts e não faz nenhuma requisição de rede.
+- Política de segurança de conteúdo (CSP) na extensão e no site, com `connect-src 'none'`: o app não consegue falar com nenhum servidor.
+- Teste automatizado que falha se o app fizer requisição para fora do site.
+
+**Documentos**
+- Termos de uso nos quatro idiomas, com link no rodapé do app.
+- [Segurança e compliance](docs/seguranca.md): material para o time de segurança avaliar, com fluxo de dados, permissões, CSP e como liberar a extensão pela política do Chrome.
+- `SECURITY.md` com o canal para reportar vulnerabilidades.
+- `npm run pacote` mostra o SHA-256 do zip, para conferir a versão publicada.
+
 ## 0.9.0 · Quatro idiomas
 
 **Novidades**

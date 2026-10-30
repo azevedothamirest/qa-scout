@@ -1047,6 +1047,7 @@ function aplicaTextosFixos(){
   document.querySelectorAll('[data-i18n-title]').forEach(el=>{ el.title=t(el.dataset.i18nTitle); });
   document.querySelectorAll('[data-i18n-aria]').forEach(el=>{ el.setAttribute('aria-label',t(el.dataset.i18nAria)); });
   const pv=$('#link-privacidade'); if(pv) pv.href='https://azevedothamirest.github.io/qa-scout/'+PRIVACIDADE[I18N.atual];
+  const tm=$('#link-termos'); if(tm) tm.href='https://azevedothamirest.github.io/qa-scout/'+PRIVACIDADE[I18N.atual].replace('privacidade','termos');
   const atual=I18N.IDIOMAS.find(i=>i.id===I18N.atual);
   const b=$('#idioma'); if(b){ $('#idioma-cod').textContent=atual.curto; b.setAttribute('aria-label',t('Idioma: {nome}. Trocar idioma',{nome:atual.nome})); }
   const menu=$('#idioma-menu');

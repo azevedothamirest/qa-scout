@@ -106,6 +106,12 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] README, política de privacidade e ficha da Chrome Web Store nos quatro idiomas
 - [x] Pastas reorganizadas: a extensão inteira em `app/`, política em `site/`
 
+## Versão 0.9.1 · compliance
+
+- [x] Fontes locais e CSP com `connect-src 'none'`: nenhuma requisição de rede (#43)
+- [x] Termos de uso, `docs/seguranca.md` e `SECURITY.md` para homologação em empresas (#43)
+- [ ] Release no GitHub com o zip e o SHA-256 de cada versão
+
 ## Decisões tomadas
 
 - Web app sem servidor e sem conta no início: custo zero e nenhuma preocupação com LGPD na largada.
