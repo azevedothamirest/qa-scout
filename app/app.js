@@ -1133,13 +1133,108 @@ $('#tema')?.addEventListener('click',()=>{
   try{ localStorage.setItem(TEMA_KEY,novo); }catch(e){}
 });
 
+// Onboarding: na primeira visita, a pessoa explora uma mini-loja e vê o QA Scout anotando (clique,
+// erro, Alt+1, bug pronto). Fica salvo em qascout.onboarding; "Ver apresentação" no rodapé ou
+// #onboarding na URL abrem de novo. Não aparece em navegador automatizado, nem na aba de impressão.
+const ONB_KEY='qascout.onboarding';
+const BUSSOLA=`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#0F2B33"/><circle cx="32" cy="32" r="25" fill="none" stroke="#296F82" stroke-width="4.3"/><circle cx="32" cy="32" r="15" fill="none" stroke="#1B4E5C" stroke-width="2.6"/><g class="agulha"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#06171C" opacity=".75" transform="translate(1.8 2.4) rotate(40 32 32)"/><g transform="rotate(40 32 32)"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#296F82"/><path d="M32 32 L38.5 32 L32 52 Z" fill="#8AE3D7"/></g></g></svg>`;
+function deveMostrarOnboarding(){
+  if(/^#onboarding$/.test(location.hash)) return true;
+  if(navigator.webdriver || /^#imprimir=/.test(location.hash)) return false;
+  try{ return localStorage.getItem(ONB_KEY)!=='visto'; }catch(e){ return false; }
+}
+function onboarding(){
+  if($('#onb')) return;
+  const ov=document.createElement('div');
+  ov.id='onb'; ov.className='onb'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-labelledby','onb-titulo');
+  ov.innerHTML=`<button type="button" class="onb-pular" data-onb="pular">${t('Pular')}</button>
+    <div class="onb-pontos" aria-hidden="true">${[0,1,2,3,4,5].map(i=>`<i data-ponto="${i}"></i>`).join('')}</div>
+    <div class="onb-centro">
+      <div class="onb-logo">${BUSSOLA}</div>
+      <h2 id="onb-titulo" class="onb-titulo" aria-live="polite"></h2>
+      <p class="onb-sub"></p>
+      <div class="onb-palco" hidden>
+        <div class="onb-loja" aria-label="${t('Loja de exemplo')}">
+          <div class="onb-loja-topo"><b>aurora.</b><span>${t('Checkout')}</span></div>
+          <div class="onb-loja-linha"><span>${t('Luminária Sol')}</span><span>R$ 189,90</span></div>
+          <div class="onb-loja-botoes"><button type="button" class="onb-btn-cupom" data-onb="cupom">${t('Aplicar cupom')}</button><button type="button" class="onb-btn-pagar" data-onb="pagar">${t('Pagar')}</button></div>
+          <div class="onb-loja-erro" hidden>${t('Ops, algo deu errado.')}</div>
+        </div>
+        <div class="onb-notas" aria-live="polite"></div>
+      </div>
+      <div class="onb-teclas" hidden><button type="button" class="onb-tecla" data-tecla="Alt">Alt</button><span>+</span><button type="button" class="onb-tecla" data-tecla="1">1</button></div>
+      <div class="onb-ticket" hidden></div>
+      <div class="onb-acoes"></div>
+    </div>`;
+  // O resto da página fica inerte enquanto o onboarding está aberto (foco e leitor de tela só nele).
+  const fundo=[...document.body.children].filter(el=>el!==ov&&el.tagName!=='SCRIPT');
+  document.body.appendChild(ov); document.body.classList.add('com-onb'); fundo.forEach(el=>{ el.inert=true; el.setAttribute('aria-hidden','true'); });
+  const q=s=>ov.querySelector(s);
+  const notas=[];
+  const nota=(tipo,texto)=>{ const n={tipo,texto}; notas.push(n); desenhaNotas(); return n; };
+  const desenhaNotas=()=>{ q('.onb-notas').innerHTML=notas.map(n=>`<div class="onb-nota ${TYPES[n.tipo].cls}"><span class="kind">${rot(n.tipo)}</span><p>${esc(n.texto)}</p><small>${t('auto · a revisar')}</small></div>`).join(''); };
+  const acoes=html=>{ q('.onb-acoes').innerHTML=html; const b=q('.onb-acoes button'); if(b) b.focus(); };
+  const proximo=passo=>`<button type="button" class="btn primary lg" data-onb="ir" data-passo="${passo}">${t('Próximo')} →</button>`;
+  const texto=(titulo,sub)=>{ q('.onb-titulo').textContent=titulo; q('.onb-sub').textContent=sub||''; ov.classList.remove('troca'); void ov.offsetWidth; ov.classList.add('troca'); };
+  let passo=0, alt=false, um=false;
+  function vai(p){
+    passo=p;
+    ov.dataset.passo=p;
+    ov.querySelectorAll('[data-ponto]').forEach(i=>i.classList.toggle('on',+i.dataset.ponto<=p));
+    q('.onb-palco').hidden=!(p>=1&&p<=3); q('.onb-teclas').hidden=p!==3; q('.onb-ticket').hidden=p!==4; q('.onb-logo').hidden=!(p===0||p===5);
+    if(p===0){ texto('QA Scout',t('Explore com missão. Volte com evidência.')); acoes(`<button type="button" class="btn primary lg" data-onb="ir" data-passo="1">${t('Começar')} →</button>`); }
+    if(p===1){ texto(t('Clique em Pagar.'),t('Esta é uma loja de exemplo. Explore como faria no seu sistema.')); acoes(''); q('.onb-btn-pagar').classList.add('pulsa'); }
+    if(p===2){ texto(t('Agora, aplique o cupom.'),''); acoes(''); q('.onb-btn-cupom').classList.add('pulsa'); }
+    if(p===3){ alt=um=false; ov.querySelectorAll('.onb-tecla').forEach(k=>k.classList.remove('on')); texto(t('Aperte Alt + 1.'),t('Ou toque nas teclas.')); acoes(''); }
+    if(p===4){ texto(t('Copie o bug.'),''); q('.onb-ticket').innerHTML=''; acoes(`<button type="button" class="btn primary lg" data-onb="copiar">${t('Copiar bug')}</button>`); }
+    if(p===5){ texto(t('Sua vez.'),t('Escreva a missão, ligue o cronômetro e explore.')); acoes(`<button type="button" class="btn primary lg" data-onb="sessao">${t('Começar minha primeira sessão')}</button><button type="button" class="btn lg" data-onb="fechar">${t('Explorar o app')}</button>`); }
+  }
+  function viraBug(){
+    if(passo!==3) return;
+    notas[0].tipo='bug'; desenhaNotas(); q('.onb-nota').classList.add('virou');
+    texto(t('Virou bug. Sem sair da tela.'),t('Alt+1 a Alt+5 marcam bug, dúvida, ideia, risco ou observação.')); acoes(proximo(4));
+  }
+  function tecla(k){ if(passo!==3) return; if(k==='Alt') alt=true; if(k==='1') um=true;
+    ov.querySelectorAll('.onb-tecla').forEach(b=>b.classList.toggle('on',(b.dataset.tecla==='Alt'&&alt)||(b.dataset.tecla==='1'&&um)));
+    if(alt&&um) setTimeout(viraBug,250); }
+  function fechar(){
+    try{ localStorage.setItem(ONB_KEY,'visto'); }catch(e){}
+    if(location.hash==='#onboarding') history.replaceState(null,'',location.pathname+location.search);
+    removeEventListener('keydown',teclado,true); ov.classList.add('saindo'); document.body.classList.remove('com-onb'); fundo.forEach(el=>{ el.inert=false; el.removeAttribute('aria-hidden'); });
+    setTimeout(()=>ov.remove(), matchMedia('(prefers-reduced-motion: reduce)').matches?0:400);
+  }
+  function teclado(e){
+    if(e.key==='Escape'){ e.preventDefault(); fechar(); return; }
+    if(passo===3){ if(e.key==='Alt'||e.altKey) tecla('Alt'); if(e.code==='Digit1'||e.key==='1') tecla('1'); if(e.altKey||e.key==='Alt') e.preventDefault(); e.stopPropagation(); }
+  }
+  addEventListener('keydown',teclado,true);
+  ov.addEventListener('click',e=>{
+    const b=e.target.closest('[data-onb],[data-tecla]'); if(!b) return;
+    if(b.dataset.tecla){ tecla(b.dataset.tecla); return; }
+    const a=b.dataset.onb;
+    if(a==='pular'||a==='fechar') fechar();
+    if(a==='ir') vai(+b.dataset.passo);
+    if(a==='pagar'&&passo===1&&!notas.length){ b.classList.remove('pulsa'); nota('obs',t('Clicou no botão “{nome}”',{nome:t('Pagar')})); texto(t('Clicou. Anotado.'),t('Cliques, campos e páginas viram notas com print. O que você digita nunca é lido.')); acoes(proximo(2)); }
+    if(a==='cupom'&&passo===2&&notas.length===1){ b.classList.remove('pulsa'); q('.onb-loja').classList.add('treme'); q('.onb-loja-erro').hidden=false; nota('bug',`${t('Erro de JavaScript')}: TypeError: cupom.valor is undefined`); texto(t('Deu erro? Ele viu antes de você.'),t('Erros de console e falhas de rede também viram notas.')); acoes(proximo(3)); }
+    if(a==='copiar'&&passo===4){
+      const linhas=[['tit',`## ${t('Pagar não responde')}`],['sec',t('Passos para reproduzir')],['',`1. ${t('Abriu a página “{nome}”',{nome:'Checkout'})}`],['',`2. ${t('Clicou no botão “{nome}”',{nome:t('Pagar')})}`],['sec',t('Erros no mesmo minuto')],['erro','TypeError: cupom.valor is undefined']];
+      q('.onb-ticket').innerHTML=linhas.map(([c,l],i)=>`<p class="${c}" style="--i:${i}">${esc(l)}</p>`).join('');
+      texto(t('Passos, print e erro. Pronto pro Jira.'),''); acoes(proximo(5));
+    }
+    if(a==='sessao'){ fechar(); go('new'); }
+  });
+  vai(0);
+}
+$('#link-onboarding')?.addEventListener('click',e=>{ e.preventDefault(); onboarding(); });
+addEventListener('hashchange',()=>{ if(location.hash==='#onboarding') onboarding(); });
+
 // Abertura: aparece uma vez por visita (por aba), some sozinha em ~5 s e pode ser pulada.
 // Não aparece em navegador automatizado, para não atrapalhar os testes.
 function abertura(){
   const el=$('#abertura'); if(!el) return;
   const fim=()=>{ el.remove(); document.body.classList.remove('com-abertura'); };
   let vista=false; try{ vista=sessionStorage.getItem('qascout.abertura')==='1'; sessionStorage.setItem('qascout.abertura','1'); }catch(e){}
-  if(vista || navigator.webdriver){ fim(); return; }
+  if(vista || navigator.webdriver || deveMostrarOnboarding()){ fim(); return; }
   const calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let saiu=false;
   const sair=()=>{ if(saiu) return; saiu=true; el.classList.add('saindo'); setTimeout(fim, calmo?300:1300); };
@@ -1191,6 +1286,7 @@ async function init(){
   }
   if(getActive()) view='active';
   render();
+  if(deveMostrarOnboarding()) onboarding();
   if(corrompido) toast(t('Não foi possível ler as sessões salvas. Guardamos uma cópia e começamos do zero; importe um backup se tiver.'));
   if(EXT){ atualizaAbas(); drenar(); }
 }
