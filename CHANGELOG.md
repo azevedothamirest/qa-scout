@@ -4,9 +4,20 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.1.0](#110--onboarding-interativo) | 03/11/2026 | Onboarding interativo |
 | [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
 | [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
+
+---
+
+## 1.1.0 · Onboarding interativo
+_03/11/2026_
+
+**✨ Novidades**
+- **Apresentação na primeira visita:** em vez de ler sobre o QA Scout, você usa. Numa mini-loja de exemplo, o clique vira nota, o erro do cupom é capturado, o `Alt+1` (ou um toque nas teclas) transforma a nota em bug e o "Copiar bug" monta o ticket pronto pro Jira. No fim, um clique começa a primeira sessão.
+- Dá para pular a qualquer momento (botão **Pular** ou `Esc`) e rever pelo link **Ver apresentação** no rodapé.
+- Nos quatro idiomas, no site, na extensão e no navegador de teste, respeitando quem prefere menos animação.
 
 ---
 
