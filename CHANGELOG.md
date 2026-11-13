@@ -4,10 +4,31 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.1.1](#111--correções-do-onboarding-e-da-captura) | 13/11/2026 | Correções do onboarding e da captura |
 | [1.1.0](#110--onboarding-interativo) | 03/11/2026 | Onboarding interativo |
 | [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
 | [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
+
+---
+
+## 1.1.1 · Correções do onboarding e da captura
+_13/11/2026_
+
+Resultado da rodada de QA exploratório de 13/11 ([#76](https://github.com/azevedothamirest/qa-scout/issues/76)).
+
+**🐞 Correções**
+- **Sessão:** abrir a apresentação com uma sessão em andamento e clicar em "Começar minha primeira sessão" criava uma segunda sessão e escondia a primeira, com as notas. Agora o fim da apresentação leva de volta à sessão, e o app nunca deixa duas sessões em andamento. ([#68](https://github.com/azevedothamirest/qa-scout/issues/68))
+- **MCP:** escolher uma opção numa lista e preencher data, hora, número ou deslizante voltam a virar nota nas sessões conduzidas pelo Claude. Desde a 1.0.1 essas ações não eram registradas. ([#69](https://github.com/azevedothamirest/qa-scout/issues/69))
+- **Captura:** digitar uma data não gera mais várias notas iguais ("Preencheu o campo de data"); o mesmo campo repetido em seguida vira uma nota só.
+- **Apresentação:**
+  - o foco volta para onde estava ao fechar, e o Tab fica dentro dela ([#71](https://github.com/azevedothamirest/qa-scout/issues/71));
+  - no teclado, só Alt+1 juntos viram bug, e "Copiar bug" copia o exemplo ([#72](https://github.com/azevedothamirest/qa-scout/issues/72)).
+- **Política de privacidade:** data alinhada nos quatro idiomas. ([#75](https://github.com/azevedothamirest/qa-scout/issues/75))
+
+**✨ Mudanças**
+- **Nota sem tipo escolhido agora é observação**, não bug. `/bug` e `Alt+1` continuam marcando bug. ([#74](https://github.com/azevedothamirest/qa-scout/issues/74))
+- **Navegador de teste:** quem abre pelo comando `qa-scout` vê a apresentação na primeira vez. ([#73](https://github.com/azevedothamirest/qa-scout/issues/73))
 
 ---
 
