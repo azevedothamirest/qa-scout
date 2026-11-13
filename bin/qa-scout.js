@@ -52,7 +52,9 @@ function recuperaSessoesAntigas(perfil) {
   if (antigas.length) fs.cpSync(path.join(base, antigas[0].n), destino, { recursive: true });
 }
 
-async function abrir({ url, perfil = PERFIL_PADRAO, headless = false, locale } = {}) {
+// apresentacao: true quando é uma pessoa abrindo (o comando qa-scout); o painel mostra o onboarding
+// na primeira vez. O MCP e os testes não passam, então o painel abre direto.
+async function abrir({ url, perfil = PERFIL_PADRAO, headless = false, locale, apresentacao = false } = {}) {
   garanteNavegador();
   fs.mkdirSync(perfil, { recursive: true });
   const extensao = prepararExtensao(path.join(perfil, '..', path.basename(perfil) + '-extensao'));
@@ -76,7 +78,7 @@ async function abrir({ url, perfil = PERFIL_PADRAO, headless = false, locale } =
     catch (e) { if (tentativa >= 50) throw e; await new Promise(r => setTimeout(r, 100)); }
   }
   const painelAberto = context.waitForEvent('page', p => p.url().startsWith(`chrome-extension://${id}/`));
-  await sw.evaluate(() => chrome.windows.create({ url: chrome.runtime.getURL('index.html'), type: 'popup', width: 440, height: 900, left: 0, top: 0 }));
+  await sw.evaluate(hash => chrome.windows.create({ url: chrome.runtime.getURL('index.html') + hash, type: 'popup', width: 440, height: 900, left: 0, top: 0 }), apresentacao ? '#apresentacao' : '');
   const painel = await painelAberto;
 
   // Painel à esquerda e o resto da tela para o sistema em teste.
@@ -106,7 +108,7 @@ if (require.main === module && process.argv[2] === 'mcp') {
   const i = args.indexOf('--perfil');
   const perfil = i >= 0 ? path.resolve(args.splice(i, 2)[1]) : undefined;
   const url = args.find(a => !a.startsWith('--'));
-  abrir({ url, perfil })
+  abrir({ url, perfil, apresentacao: true })
     .then(({ context }) => {
       console.log('QA Scout aberto. Comece uma sessão no painel e explore à vontade.');
       console.log('Feche o navegador para encerrar.');

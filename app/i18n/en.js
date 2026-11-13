@@ -518,4 +518,7 @@ window.QAS_I18N.dic["en"] = {
   "Sua vez.": "Your turn.",
   "Ver apresentação": "Watch the intro",
   "Virou bug. Sem sair da tela.": "Now it's a bug. Without leaving the screen.",
+  "Começar uma sessão": "Start a session",
+  "Já existe uma sessão em andamento. Encerre ela antes de começar outra.": "A session is already in progress. End it before starting another one.",
+  "Sua sessão continua de onde parou.": "Your session picks up where you left off.",
 };

@@ -168,4 +168,6 @@ window.QAS_I18N.dic["pt-PT"] = {
   "Pular": "Saltar",
   "Virou bug. Sem sair da tela.": "Passou a bug. Sem sair do ecrã.",
   "Ver apresentação": "Ver apresentação",
+  "Já existe uma sessão em andamento. Encerre ela antes de começar outra.": "Já existe uma sessão em curso. Termine-a antes de começar outra.",
+  "Sua sessão continua de onde parou.": "A sua sessão continua de onde parou.",
 };
