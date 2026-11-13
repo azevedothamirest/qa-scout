@@ -23,7 +23,7 @@ Teste exploratório costuma ser um trabalho invisível: encontra os bugs mais in
 - Relatório em Markdown ou PDF e bug pronto para o Jira ou GitHub.
 - Quatro idiomas: português do Brasil, português de Portugal, inglês e espanhol.
 
-Lista completa em [funcionalidades](docs/funcionalidades.md).
+Lista completa em [funcionalidades](docs/funcionalidades.md). Para apresentar ao time: [PDF de apresentação](docs/apresentacao/) (pt-BR, pt-PT, en, es).
 
 ## Como usar
 

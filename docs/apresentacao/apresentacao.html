@@ -1,0 +1,162 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>QA Scout · Apresentação</title>
+<style>
+@font-face{font-family:PJ;src:url(../../app/fontes/plus-jakarta-sans-latin-wght-normal.woff2) format('woff2');font-weight:200 800}
+@font-face{font-family:PJ;src:url(../../app/fontes/plus-jakarta-sans-latin-ext-wght-normal.woff2) format('woff2');font-weight:200 800}
+@font-face{font-family:JB;src:url(../../app/fontes/jetbrains-mono-latin-wght-normal.woff2) format('woff2');font-weight:100 800}
+@page{size:A4;margin:0}
+*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;font-family:PJ,sans-serif;color:#14131F;font-size:11.5pt;line-height:1.5}
+.pg{width:210mm;height:297mm;padding:20mm 18mm 16mm;position:relative;overflow:hidden;page-break-after:always;background:#F7F6FB}
+.pg:last-child{page-break-after:auto}
+.capa{background:radial-gradient(60% 40% at 95% 0%,rgba(139,92,246,.35),transparent 70%),radial-gradient(60% 40% at 0% 100%,rgba(41,111,130,.45),transparent 70%),#0B0B12;color:#F4F3FF;display:flex;flex-direction:column;justify-content:center}
+.gr{color:#3DF5A7}
+h1{font-size:44pt;line-height:1.02;letter-spacing:-.03em;margin:18px 0 14px}
+h2{font-size:22pt;letter-spacing:-.02em;margin:0 0 6px}
+h3{font-size:13pt;margin:0 0 4px}
+.eb{font-family:JB;font-size:9pt;letter-spacing:.14em;text-transform:uppercase;color:#0E9F6E;font-weight:700}
+.capa .eb{color:#3DF5A7}
+.lead{font-size:13pt;color:#4B4960;max-width:150mm}
+.capa .lead{color:#C9C7DC}
+.grid{display:grid;gap:10px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+.card{background:#fff;border:1px solid #E2DFEE;border-radius:14px;padding:13px 15px}
+.card p,.card li{margin:0;color:#3D3B52;font-size:10.5pt}
+.card ul{margin:6px 0 0;padding-left:17px}
+.tag{display:inline-block;font-family:JB;font-size:8.5pt;font-weight:700;padding:2px 9px;border-radius:99px;margin-bottom:6px}
+.dev{background:#DDF3FF;color:#0E6A9F}.qa{background:#DDF7EC;color:#0E7F57}.po{background:#F2E6FF;color:#6D3BB8}
+.charter{background:#0B0B12;color:#F4F3FF;border-radius:14px;padding:16px 18px;font-size:13pt;margin:12px 0}
+.charter b{color:#3DF5A7}
+code,.mono{font-family:JB;font-size:9.5pt}
+pre{font-family:JB;font-size:9.5pt;background:#14131F;color:#E8E6F5;border-radius:10px;padding:10px 12px;margin:6px 0;white-space:pre-wrap}
+.passos{counter-reset:p;display:grid;gap:8px}
+.passo{display:flex;gap:12px;align-items:flex-start}.passo i{font-style:normal;flex:none;width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#3DF5A7,#3BC9F5);color:#0B0B12;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:11pt}
+.rod{position:absolute;bottom:9mm;left:18mm;right:18mm;display:flex;justify-content:space-between;font-size:8.5pt;color:#8A88A0}
+a{color:#0E7F57;font-weight:700;text-decoration:none}
+.logo{width:72px;height:72px}
+.tbs{display:flex;height:16px;border-radius:99px;overflow:hidden;margin:6px 0}
+.ok li::marker{content:"✓  ";color:#0E9F6E}
+</style></head><body>
+<!-- 1 capa -->
+<section class="pg capa">
+ <svg class="logo" viewBox="0 0 64 64"><circle cx="32" cy="32" r="31" fill="#0F2B33"/><circle cx="32" cy="32" r="25" fill="none" stroke="#296F82" stroke-width="4.3"/><circle cx="32" cy="32" r="15" fill="none" stroke="#1B4E5C" stroke-width="2.6"/><g transform="rotate(40 32 32)"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#296F82"/><path d="M32 32 L38.5 32 L32 52 Z" fill="#8AE3D7"/></g></svg>
+ <div class="eb" style="margin-top:22px">Apresentação do produto · versão 1.1.1</div>
+ <h1>QA Scout<br><span style="color:#3DF5A7">Explore com missão.</span><br><span style="color:#3BC9F5">Volte com evidência.</span></h1>
+ <p class="lead">Extensão do Chrome, gratuita e de código aberto, para teste exploratório baseado em sessões. Registra o que acontece enquanto você explora e entrega o relatório e o bug prontos para o time.</p>
+ <div class="grid g3" style="margin-top:34px;max-width:160mm">
+  <div style="border:1px solid #2A2A38;border-radius:14px;padding:12px 14px"><b style="font-size:20pt" class="gr">0</b><div style="color:#C9C7DC;font-size:10pt">requisições de rede: os dados ficam no seu computador</div></div>
+  <div style="border:1px solid #2A2A38;border-radius:14px;padding:12px 14px"><b style="font-size:20pt" class="gr">4</b><div style="color:#C9C7DC;font-size:10pt">idiomas: pt-BR, pt-PT, inglês e espanhol</div></div>
+  <div style="border:1px solid #2A2A38;border-radius:14px;padding:12px 14px"><b style="font-size:20pt" class="gr">176</b><div style="color:#C9C7DC;font-size:10pt">testes automatizados no próprio projeto</div></div>
+ </div>
+ <p style="position:absolute;bottom:16mm;left:18mm;color:#9C9AB3;font-size:10pt">Thamires Azevedo · QA Sênior · github.com/azevedothamirest/qa-scout</p>
+</section>
+
+<!-- 2 conceito -->
+<section class="pg">
+ <div class="eb">O conceito</div>
+ <h2>O que é teste exploratório?</h2>
+ <p class="lead">É aprender sobre o sistema, desenhar os testes e executá-los <b>ao mesmo tempo</b>. Em vez de seguir um roteiro fechado, quem testa investiga com uma missão, observa o comportamento real e decide o próximo passo pelo que acabou de ver.</p>
+ <div class="grid g2" style="margin-top:14px">
+  <div class="card"><h3>Roteiro (script)</h3><p>Verifica o que já se sabe que deveria acontecer. Bom para regressão e automação.</p></div>
+  <div class="card" style="border-color:#3DF5A7"><h3>Exploratório</h3><p>Descobre o que ninguém pensou em escrever: combinações, bordas, fluxos reais. É onde aparecem os bugs mais caros.</p></div>
+ </div>
+ <h2 style="margin-top:22px;font-size:17pt">Sessões com tempo marcado (SBTM)</h2>
+ <p>O <b>Session-Based Test Management</b>, de Jon e James Bach, dá estrutura sem virar roteiro. Cada sessão tem três partes:</p>
+ <div class="passos" style="margin-top:8px">
+  <div class="passo"><i>1</i><div><b>Charter:</b> a missão, no modelo de Elisabeth Hendrickson.</div></div>
+  <div class="passo"><i>2</i><div><b>Sessão:</b> um bloco de tempo sem interrupção (30 a 90 min), anotando bugs, dúvidas, ideias, riscos e observações.</div></div>
+  <div class="passo"><i>3</i><div><b>Debriefing:</b> revisão das notas, divisão do tempo em Teste, Bug e Setup (TBS) e o que fica para a próxima sessão.</div></div>
+ </div>
+ <div class="charter">Explorar <b>o checkout com Pix</b> com <b>QR expirado, botão voltar e cupom</b> para descobrir <b>pedidos pagos que ficam pendentes</b>.</div>
+ <h3 style="margin-top:6px">Divisão do tempo (TBS)</h3>
+ <div class="tbs"><i style="width:60%;background:#0E9F6E"></i><i style="width:25%;background:#E0354F"></i><i style="width:15%;background:#C98A00"></i></div>
+ <p style="font-size:10pt;color:#4B4960">Teste 60% · Bug 25% · Setup 15%. Muito tempo em setup ou bug indica ambiente instável ou produto frágil: uma métrica que o time inteiro entende.</p>
+ <div class="rod"><span>QA Scout · apresentação</span><span>2</span></div>
+</section>
+
+<!-- 3 problema e solução -->
+<section class="pg">
+ <div class="eb">O problema</div>
+ <h2>Exploratório costuma ser trabalho invisível</h2>
+ <p class="lead">Encontra os melhores bugs, mas deixa pouco rastro: o que foi explorado, por quanto tempo, com qual evidência? E reproduzir o bug depois vira arqueologia.</p>
+ <div class="eb" style="margin-top:20px">A solução</div>
+ <h2>O QA Scout anota enquanto você explora</h2>
+ <div class="grid g2" style="margin-top:10px">
+  <div class="card"><h3>📸 Captura automática</h3><p>Cliques, campos preenchidos e páginas abertas viram notas com print, no painel lateral do Chrome. <b>O valor digitado nunca é lido.</b></p></div>
+  <div class="card"><h3>🧯 Erros de console e rede</h3><p>Erro de JavaScript, <code>console.error</code>, respostas 4xx/5xx e falhas de conexão viram notas sugeridas como bug ou risco.</p></div>
+  <div class="card"><h3>🪜 Passos para reproduzir</h3><p>Um clique monta a lista com as ações que vieram antes do bug.</p></div>
+  <div class="card"><h3>🐞 Bug pronto pro Jira</h3><p>"Copiar bug" gera título, ambiente, navegador, página, passos, obtido x esperado e os erros do mesmo minuto.</p></div>
+  <div class="card"><h3>🃏 Baralho de heurísticas</h3><p>18 cartas (tours de Whittaker, dados, interação, contexto) para quando a criatividade travar.</p></div>
+  <div class="card"><h3>📄 Relatório da sessão</h3><p>Debriefing com TBS e relatório em Markdown ou PDF para colar no Jira, Notion ou Slack.</p></div>
+ </div>
+ <div class="card" style="margin-top:12px;background:#0B0B12;border:none"><p style="color:#C9C7DC"><b style="color:#3DF5A7">Você revisa tudo.</b> As notas automáticas chegam "a revisar": confirme, edite ou exclua. Só as revisadas entram no relatório.</p></div>
+ <div class="rod"><span>QA Scout · apresentação</span><span>3</span></div>
+</section>
+
+<!-- 4 por área -->
+<section class="pg">
+ <div class="eb">Para o time inteiro</div>
+ <h2>Como cada área aplica</h2>
+ <p class="lead">Exploratório não é exclusividade de QA. Com uma missão curta e 20 minutos, qualquer pessoa do time encontra o que o teste roteirizado não pega.</p>
+ <div class="grid" style="margin-top:12px;gap:12px">
+  <div class="card"><span class="tag qa">QA</span><h3>Sessões com missão e evidência</h3><ul>
+   <li>Planeje a sprint em charters por risco: o que mais pode custar caro?</li>
+   <li>Use o TBS no debriefing para mostrar onde o tempo foi parar.</li>
+   <li>Abra bugs com passos e erros de console já anexados, sem "não consigo reproduzir".</li>
+   <li>Transforme o que a sessão descobriu em casos de regressão automatizada.</li></ul></div>
+  <div class="card"><span class="tag dev">Dev</span><h3>Explorar antes de abrir o PR</h3><ul>
+   <li>Uma sessão de 15 min na própria feature: "explorar o formulário novo com dados inválidos para descobrir validações faltando".</li>
+   <li>Bugs chegam com passos, ambiente, URL e o erro de JavaScript do mesmo minuto: menos ida e volta.</li>
+   <li>Na revisão de PR, explore a branch em homologação e cole o relatório no PR.</li></ul></div>
+  <div class="card"><span class="tag po">Produto</span><h3>Validar a experiência real</h3><ul>
+   <li>Explore a jornada como cliente antes da release: "explorar o onboarding com um usuário novo para descobrir onde a pessoa trava".</li>
+   <li>Notas de <b>dúvida</b> e <b>ideia</b> viram perguntas de refinamento e backlog.</li>
+   <li>O relatório mostra cobertura e riscos em linguagem de negócio, ótimo para decidir o go/no-go.</li></ul></div>
+ </div>
+ <div class="card" style="margin-top:12px;border-color:#8B5CF6"><h3>💡 Ritual sugerido: bug bash de 30 minutos</h3><p>Cada pessoa (QA, dev, produto, design) pega um charter diferente, todos exploram ao mesmo tempo e o time junta os relatórios no fim. Rápido, barato e revela muito antes da release.</p></div>
+ <div class="rod"><span>QA Scout · apresentação</span><span>4</span></div>
+</section>
+
+<!-- 5 instalação + claude -->
+<section class="pg">
+ <div class="eb">Começar</div>
+ <h2>Instalação em 1 minuto</h2>
+ <div class="grid g2" style="margin-top:8px">
+  <div class="card"><h3>🧩 Extensão do Chrome (recomendado)</h3><p>Instale pela Chrome Web Store, abra o painel lateral pelo ícone da bússola e comece uma sessão. O Chrome pede acesso aos sites no primeiro uso.</p></div>
+  <div class="card"><h3>🖥️ Navegador de teste (sem mexer no seu Chrome)</h3><p>Com Node.js 18+:</p><pre>npx github:azevedothamirest/qa-scout https://seu-sistema</pre></div>
+ </div>
+ <p style="margin-top:8px">Passo a passo completo, código-fonte e tutorial: <a href="https://github.com/azevedothamirest/qa-scout">github.com/azevedothamirest/qa-scout</a> (veja <span class="mono">docs/tutorial.md</span>).</p>
+
+ <div class="eb" style="margin-top:18px">Com IA</div>
+ <h2>O Claude explora com você (MCP)</h2>
+ <p>O QA Scout tem um servidor <b>MCP</b> que deixa o Claude conduzir a sessão no navegador de teste: ele lê a tela, clica, preenche, consulta os erros capturados, anota o que encontra e devolve o relatório. A sessão fica no histórico para você revisar.</p>
+ <pre>claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp</pre>
+ <div class="charter" style="font-size:11.5pt">"Use o QA Scout para uma sessão de 20 minutos em https://homolog.minhaloja.com: explorar o checkout, com cupons e Pix, para descobrir cobranças erradas. Me mostre o relatório."</div>
+ <div class="grid g3">
+  <div class="card"><h3>1. Lê</h3><p>Entende a tela pela árvore de acessibilidade.</p></div>
+  <div class="card"><h3>2. Explora</h3><p>Clica e preenche como uma pessoa; a captura grava tudo.</p></div>
+  <div class="card"><h3>3. Anota</h3><p>Registra bugs, riscos e dúvidas e encerra com o relatório.</p></div>
+ </div>
+ <p style="font-size:9.5pt;color:#66637C;margin-top:8px">Roda no terminal (Claude Code ou Claude Desktop). O texto das páginas visitadas vai para o Claude: use só ambientes e dados de teste.</p>
+ <div class="rod"><span>QA Scout · apresentação</span><span>5</span></div>
+</section>
+
+<!-- 6 segurança -->
+<section class="pg">
+ <div class="eb">Pode usar no trabalho?</div>
+ <h2>Privacidade e segurança</h2>
+ <ul class="ok card" style="padding-left:30px;margin-top:10px">
+  <li>Sem servidor, sem conta, sem telemetria: <b>nenhuma requisição de rede</b> (bloqueada por CSP <span class="mono">connect-src 'none'</span>).</li>
+  <li>Dados só no armazenamento local do navegador; saem apenas quando você copia ou baixa algo.</li>
+  <li>Valores digitados nunca são lidos; tokens e senhas nas URLs são mascarados.</li>
+  <li>Código aberto (licença MIT): dá para auditar tudo o que ele faz.</li>
+  <li>Material para o time de segurança: <span class="mono">docs/seguranca.md</span>, termos de uso e <span class="mono">SECURITY.md</span>.</li>
+ </ul>
+ <h2 style="margin-top:22px">Resumo</h2>
+ <div class="grid g3" style="margin-top:8px">
+  <div class="card"><span class="tag qa">QA</span><p>Evidência e rastreabilidade do exploratório.</p></div>
+  <div class="card"><span class="tag dev">Dev</span><p>Bugs reproduzíveis, com contexto técnico.</p></div>
+  <div class="card"><span class="tag po">Produto</span><p>Visão real da experiência e dos riscos.</p></div>
+ </div>
+ <div class="charter" style="margin-top:22px;text-align:center"><span class="gr" style="font-weight:800;font-size:17pt">Explore com missão. Volte com evidência.</span><br><span style="font-size:10.5pt;color:#C9C7DC">github.com/azevedothamirest/qa-scout · Thamires Azevedo · @qa.thami</span></div>
+ <div class="rod"><span>QA Scout · apresentação</span><span>6</span></div>
+</section>
+</body></html>

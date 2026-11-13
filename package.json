@@ -40,7 +40,8 @@
     "test:regressao": "playwright test --grep @regressao",
     "test:report": "playwright show-report",
     "pacote": "node scripts/empacotar.js",
-    "mcp": "node bin/qa-scout.js mcp"
+    "mcp": "node bin/qa-scout.js mcp",
+    "apresentacao": "node scripts/apresentacao.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",
