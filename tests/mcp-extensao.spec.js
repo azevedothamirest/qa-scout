@@ -22,6 +22,16 @@ test.describe('MCP · sessão conduzida pelo Claude', () => {
     fs.rmSync(perfil + '-extensao', { recursive: true, force: true });
   });
 
+  // #69: desde a 1.0.1 a captura só aceita eventos de interação real; o MCP escolhe e preenche como uma pessoa.
+  test('Registrar a opção escolhida e o campo de data preenchidos pelo MCP', async () => {
+    await f.iniciar_sessao({ explorar: 'o formulário', descobrir: 'campos sem registro', minutos: 10, url: 'http://localhost:4173/tests/fixtures/captura.html', area: 'Campos via MCP' });
+    await f.escolher_opcao({ campo: 'Estado', opcao: 'RJ' });
+    await f.preencher({ campo: 'Data da entrega', valor: '2026-11-20' });
+    await expect.poll(() => f.ver_capturas()).toContain('Escolheu “RJ” em “Estado”');
+    const capturas = await f.ver_capturas();
+    expect(capturas.split('Preencheu o campo de data “Data da entrega”').length - 1).toBe(1);
+  });
+
   test('Conduzir sessão completa pelas ferramentas e devolver o relatório', { tag: '@regressao' }, async () => {
     const inicio = await f.iniciar_sessao({ explorar: 'o checkout', com: 'cupons e Pix', descobrir: 'cobranças erradas', minutos: 15, url: LOJA, area: 'Checkout via MCP' });
     expect(inicio).toContain('Sessão iniciada');

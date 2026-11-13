@@ -447,13 +447,31 @@ test.describe('Cobertura da captura', () => {
   test('Descrever upload, campos sem rótulo, opção do select e botões de ícone ou texto longo', async ({ context, painel }) => {
     await iniciarSessao(painel);
     const pagina = await acompanharCaptura(context, painel);
-    await pagina.getByLabel('Comprovante').setInputFiles({ name: 'segredo-do-cliente.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
-    await pagina.getByLabel('Data da entrega').fill('2026-11-02');
-    await pagina.locator('.volume').fill('7');
+    // Interações de verdade: desde a 1.0.1 a captura ignora eventos criados por script (isTrusted),
+    // então nada de setInputFiles direto, fill em data/deslizante ou selectOption (#70).
+    // O setInputFiles do Playwright gera change por script; o DOM.setFileInputFiles do protocolo do
+    // Chrome gera o mesmo evento que o seletor de arquivos quando a pessoa escolhe um.
+    const pdf = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-anexo-')), 'segredo-do-cliente.pdf');
+    fs.writeFileSync(pdf, 'x');
+    const cdp = await context.newCDPSession(pagina);
+    const { root } = await cdp.send('DOM.getDocument');
+    const { nodeId } = await cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector: '#doc' });
+    await cdp.send('DOM.setFileInputFiles', { nodeId, files: [pdf] });
+    const data = pagina.getByLabel('Data da entrega');
+    await data.fill('2026-11-02');
+    await data.focus(); await data.press('ArrowUp'); await data.press('ArrowDown');
+    const volume = pagina.locator('.volume'), caixa = await volume.boundingBox();
+    await pagina.mouse.click(caixa.x + caixa.width * 0.7, caixa.y + caixa.height / 2);
     await pagina.locator('.semrotulo').fill('qualquer coisa');
     await pagina.locator('.semrotulo').blur();
-    await pagina.getByLabel('Estado').selectOption('RJ');
-    await pagina.getByLabel('Validade do cartão').selectOption('12');
+    const escolhe = async (rotulo, posicao) => {
+      await pagina.getByLabel(rotulo).click();
+      await pagina.keyboard.press('Home');
+      for (let i = 0; i < posicao; i++) await pagina.keyboard.press('ArrowDown');
+      await pagina.keyboard.press('Enter');
+    };
+    await escolhe('Estado', 2);
+    await escolhe('Validade do cartão', 2);
     await pagina.locator('#lixeira').click();
     await pagina.locator('#longo').click();
 
