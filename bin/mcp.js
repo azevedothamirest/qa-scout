@@ -159,13 +159,18 @@ ${await resumoDaTela(p)}`;
       const lista = p.getByLabel(campo).first();
       const alvo = await lista.evaluate((s, o) => [...(s.options || [])].findIndex(x => x.label === o || x.text.trim() === o), opcao).catch(() => -1);
       const multipla = await lista.evaluate(s => s.multiple || s.size > 1).catch(() => true);
-      if (alvo >= 0 && !multipla) {
+      const escolhida = () => lista.evaluate((s, o) => s.selectedOptions[0]?.label === o, opcao);
+      // A lista leva um instante para abrir; sem esperar, as teclas iam para o select fechado e a
+      // escolha se perdia. Tenta duas vezes antes de cair no selectOption.
+      for (let tentativa = 0; alvo >= 0 && !multipla && tentativa < 2 && !(await escolhida()); tentativa++) {
         await lista.click({ timeout: 5000 });
+        await p.waitForTimeout(200);
         await p.keyboard.press('Home');
         for (let i = 0; i < alvo; i++) await p.keyboard.press('ArrowDown');
         await p.keyboard.press('Enter');
+        await p.waitForTimeout(100);
       }
-      if (alvo < 0 || multipla || await lista.evaluate((s, o) => s.selectedOptions[0]?.label !== o, opcao)) {
+      if (!(await escolhida())) {
         await lista.selectOption({ label: opcao }, { timeout: 5000 });
       }
       return resumoDaTela(await site());
