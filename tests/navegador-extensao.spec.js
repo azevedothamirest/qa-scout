@@ -67,6 +67,26 @@ test.describe('Navegador de teste (comando qa-scout)', () => {
   });
 });
 
+// #73: o comando qa-scout (uma pessoa) mostra a apresentação na primeira vez; o MCP e os testes abrem direto.
+test.describe('Navegador de teste · apresentação', () => {
+  test('Mostrar a apresentação quando uma pessoa abre o navegador de teste pela primeira vez', async () => {
+    const perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-'));
+    const aberto = await abrir({ url: LOJA, perfil, headless: true, locale: 'pt-BR', apresentacao: true });
+    try {
+      await expect(aberto.painel.getByRole('dialog')).toBeVisible();
+      await aberto.painel.getByRole('button', { name: 'Pular' }).click();
+      await expect(aberto.painel.getByRole('button', { name: 'Começar nova sessão' })).toBeVisible();
+      await aberto.painel.reload();
+      await expect(aberto.painel.getByRole('button', { name: 'Começar nova sessão' })).toBeVisible();
+      await expect(aberto.painel.getByRole('dialog')).toHaveCount(0);
+    } finally {
+      await aberto.context.close();
+      fs.rmSync(perfil, { recursive: true, force: true });
+      fs.rmSync(perfil + '-extensao', { recursive: true, force: true });
+    }
+  });
+});
+
 test.describe('Navegador de teste · atualização', () => {
   test('Recuperar as sessões guardadas sob o id antigo da extensão', async () => {
     const perfil = fs.mkdtempSync(path.join(os.tmpdir(), 'qa-scout-'));

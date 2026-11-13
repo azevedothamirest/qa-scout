@@ -193,6 +193,16 @@ test.describe('Sessão em campo', () => {
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
   });
 
+  // #74
+  test('Registrar como observação a nota sem tipo escolhido', async ({ page }) => {
+    await page.locator('#note-in').fill('/bug pagamento recusado');
+    await page.locator('#note-in').press('Control+Enter');
+    await page.locator('#note-in').fill('tela demora a carregar');
+    await page.locator('#note-in').press('Control+Enter');
+    await expect(page.locator('.note', { hasText: 'pagamento recusado' }).locator('.kind')).toHaveText('Bug');
+    await expect(page.locator('.note', { hasText: 'tela demora a carregar' }).locator('.kind')).toHaveText('Observação');
+  });
+
   test('Registrar nota com Ctrl+Enter usando o tipo selecionado', async ({ page }) => {
     await page.locator('[data-type="ris"]').click();
     await page.locator('#note-in').fill('Webhook chega antes do pedido');
@@ -250,7 +260,7 @@ test.describe('Sessão em campo', () => {
   });
 
   test('Encerrar e gerar relatório em Markdown', async ({ page }) => {
-    await page.locator('#note-in').fill('Desconto aplicado duas vezes');
+    await page.locator('#note-in').fill('/bug Desconto aplicado duas vezes');
     await page.locator('#note-in').press('Control+Enter');
     await page.getByRole('button', { name: 'Encerrar' }).click();
     await page.getByRole('button', { name: 'Sim, encerrar' }).click();

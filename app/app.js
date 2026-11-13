@@ -312,7 +312,7 @@ function viewNew(){
 }
 
 /* ---------- tela: sessão em campo ---------- */
-let noteType = 'bug', filter = 'all', pendingImgs = [], heurIdx = Math.floor(Math.random()*HEUR.length), confirmDel = null;
+let noteType = 'obs', filter = 'all', pendingImgs = [], heurIdx = Math.floor(Math.random()*HEUR.length), confirmDel = null;
 function viewSession(s){
   return `<section class="session">
     <aside class="side">
@@ -1005,11 +1005,13 @@ document.addEventListener('submit',e=>{
   if(e.target.id!=='charter-form') return;
   e.preventDefault();
   if(!validaCharter({focar:true})) return;
+  // Só uma sessão em andamento por vez: um caminho que abra o charter com sessão ativa não cria outra.
+  if(getActive()){ go('active'); toast(t('Já existe uma sessão em andamento. Encerre ela antes de começar outra.')); return; }
   const d=readDraft();
   // Na extensão, a captura começa junto com a sessão: o pedido de acesso precisa sair deste clique.
   const pedidoAcesso = EXT && !modoNavegador ? chrome.permissions.request({origins:['<all_urls>']}).catch(()=>false) : null;
   const s={id:uid(),area:d.area||d.explorar,charter:{explorar:d.explorar,com:d.com||t('o que estiver à mão'),descobrir:d.descobrir},ambiente:d.ambiente,testadora:d.testadora,plannedMin:d.plannedMin,navegador:navegadorAtual(),status:'running',startedAt:Date.now(),runStartedAt:Date.now(),elapsedMs:0,notes:[]};
-  state.sessions.push(s); state.activeId=s.id; state.draft=null; noteType='bug'; filter='all';
+  state.sessions.push(s); state.activeId=s.id; state.draft=null; noteType='obs'; filter='all';
   save(); go('active'); setTimeout(()=>$('#note-in')?.focus(),50);
   if(pedidoAcesso) pedidoAcesso.then(ok=>ok ? acompanharAbaAtual({auto:true}) : toast(t('Sem acesso aos sites, a captura automática fica desligada. Dá para ligar em “Acompanhar a aba atual”.')));
 });
@@ -1140,11 +1142,14 @@ const ONB_KEY='qascout.onboarding';
 const BUSSOLA=`<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#0F2B33"/><circle cx="32" cy="32" r="25" fill="none" stroke="#296F82" stroke-width="4.3"/><circle cx="32" cy="32" r="15" fill="none" stroke="#1B4E5C" stroke-width="2.6"/><g class="agulha"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#06171C" opacity=".75" transform="translate(1.8 2.4) rotate(40 32 32)"/><g transform="rotate(40 32 32)"><path d="M32 12 L38.5 32 L32 52 L25.5 32 Z" fill="#296F82"/><path d="M32 32 L38.5 32 L32 52 Z" fill="#8AE3D7"/></g></g></svg>`;
 function deveMostrarOnboarding(){
   if(/^#onboarding$/.test(location.hash)) return true;
-  if(navigator.webdriver || /^#imprimir=/.test(location.hash)) return false;
+  // #apresentacao: o comando qa-scout abriu o painel para uma pessoa (o MCP não usa), então vale
+  // mesmo com navigator.webdriver, que o Chromium do Playwright sempre liga.
+  if(location.hash!=='#apresentacao' && (navigator.webdriver || /^#imprimir=/.test(location.hash))) return false;
   try{ return localStorage.getItem(ONB_KEY)!=='visto'; }catch(e){ return false; }
 }
 function onboarding(){
   if($('#onb')) return;
+  const quemAbriu=document.activeElement;
   const ov=document.createElement('div');
   ov.id='onb'; ov.className='onb'; ov.setAttribute('role','dialog'); ov.setAttribute('aria-modal','true'); ov.setAttribute('aria-labelledby','onb-titulo');
   ov.innerHTML=`<button type="button" class="onb-pular" data-onb="pular">${t('Pular')}</button>
@@ -1187,7 +1192,12 @@ function onboarding(){
     if(p===2){ texto(t('Agora, aplique o cupom.'),''); acoes(''); q('.onb-btn-cupom').classList.add('pulsa'); }
     if(p===3){ alt=um=false; ov.querySelectorAll('.onb-tecla').forEach(k=>k.classList.remove('on')); texto(t('Aperte Alt + 1.'),t('Ou toque nas teclas.')); acoes(''); }
     if(p===4){ texto(t('Copie o bug.'),''); q('.onb-ticket').innerHTML=''; acoes(`<button type="button" class="btn primary lg" data-onb="copiar">${t('Copiar bug')}</button>`); }
-    if(p===5){ texto(t('Sua vez.'),t('Escreva a missão, ligue o cronômetro e explore.')); acoes(`<button type="button" class="btn primary lg" data-onb="sessao">${t('Começar minha primeira sessão')}</button><button type="button" class="btn lg" data-onb="fechar">${t('Explorar o app')}</button>`); }
+    if(p===5){
+      // Com sessão em andamento, o caminho é voltar para ela (nunca abrir um charter novo por cima).
+      const ativa=getActive();
+      texto(t('Sua vez.'),ativa?t('Sua sessão continua de onde parou.'):t('Escreva a missão, ligue o cronômetro e explore.'));
+      acoes(`<button type="button" class="btn primary lg" data-onb="sessao">${ativa?t('Voltar para a sessão'):(state.sessions.some(x=>!x.example)?t('Começar uma sessão'):t('Começar minha primeira sessão'))}</button><button type="button" class="btn lg" data-onb="fechar">${t('Explorar o app')}</button>`);
+    }
   }
   function viraBug(){
     if(passo!==3) return;
@@ -1199,15 +1209,32 @@ function onboarding(){
     if(alt&&um) setTimeout(viraBug,250); }
   function fechar(){
     try{ localStorage.setItem(ONB_KEY,'visto'); }catch(e){}
-    if(location.hash==='#onboarding') history.replaceState(null,'',location.pathname+location.search);
-    removeEventListener('keydown',teclado,true); ov.classList.add('saindo'); document.body.classList.remove('com-onb'); fundo.forEach(el=>{ el.inert=false; el.removeAttribute('aria-hidden'); });
+    if(/^#(onboarding|apresentacao)$/.test(location.hash)) history.replaceState(null,'',location.pathname+location.search);
+    removeEventListener('keydown',teclado,true); removeEventListener('keyup',soltou,true); ov.classList.add('saindo'); document.body.classList.remove('com-onb'); fundo.forEach(el=>{ el.inert=false; el.removeAttribute('aria-hidden'); });
+    if(quemAbriu && quemAbriu!==document.body && document.contains(quemAbriu)) quemAbriu.focus(); else $('#app')?.focus?.();
     setTimeout(()=>ov.remove(), matchMedia('(prefers-reduced-motion: reduce)').matches?0:400);
   }
   function teclado(e){
     if(e.key==='Escape'){ e.preventDefault(); fechar(); return; }
-    if(passo===3){ if(e.key==='Alt'||e.altKey) tecla('Alt'); if(e.code==='Digit1'||e.key==='1') tecla('1'); if(e.altKey||e.key==='Alt') e.preventDefault(); e.stopPropagation(); }
+    if(e.key==='Tab'){ // o foco circula só dentro do diálogo
+      const f=[...ov.querySelectorAll('button:not([disabled])')].filter(b=>b.offsetParent!==null);
+      const i=f.indexOf(document.activeElement);
+      if(e.shiftKey && i<=0){ e.preventDefault(); f[f.length-1]?.focus(); }
+      else if(!e.shiftKey && (i===-1 || i===f.length-1)){ e.preventDefault(); f[0]?.focus(); }
+      return;
+    }
+    if(passo===3){
+      // No teclado só vale a combinação de verdade: 1 com o Alt segurado, como no sistema em teste.
+      if(e.key==='Alt'){ acende('Alt',true); }
+      else if(e.code==='Digit1' && e.altKey){ alt=um=true; acende('1',true); setTimeout(viraBug,250); }
+      if(e.altKey||e.key==='Alt') e.preventDefault();
+      e.stopPropagation();
+    }
   }
+  function soltou(e){ if(passo===3 && e.key==='Alt' && !um) acende('Alt',false); }
+  function acende(k,on){ ov.querySelector(`.onb-tecla[data-tecla="${k}"]`)?.classList.toggle('on',on); }
   addEventListener('keydown',teclado,true);
+  addEventListener('keyup',soltou,true);
   ov.addEventListener('click',e=>{
     const b=e.target.closest('[data-onb],[data-tecla]'); if(!b) return;
     if(b.dataset.tecla){ tecla(b.dataset.tecla); return; }
@@ -1219,9 +1246,10 @@ function onboarding(){
     if(a==='copiar'&&passo===4){
       const linhas=[['tit',`## ${t('Pagar não responde')}`],['sec',t('Passos para reproduzir')],['',`1. ${t('Abriu a página “{nome}”',{nome:'Checkout'})}`],['',`2. ${t('Clicou no botão “{nome}”',{nome:t('Pagar')})}`],['sec',t('Erros no mesmo minuto')],['erro','TypeError: cupom.valor is undefined']];
       q('.onb-ticket').innerHTML=linhas.map(([c,l],i)=>`<p class="${c}" style="--i:${i}">${esc(l)}</p>`).join('');
+      copy(linhas.map(([,l])=>l).join('\n'),t('Bug copiado. É só colar no Jira ou no GitHub.'));
       texto(t('Passos, print e erro. Pronto pro Jira.'),''); acoes(proximo(5));
     }
-    if(a==='sessao'){ fechar(); go('new'); }
+    if(a==='sessao'){ fechar(); go(getActive()?'active':'new'); }
   });
   vai(0);
 }

@@ -518,4 +518,7 @@ window.QAS_I18N.dic["es"] = {
   "Sua vez.": "Tu turno.",
   "Ver apresentação": "Ver presentación",
   "Virou bug. Sem sair da tela.": "Ahora es un bug. Sin salir de la pantalla.",
+  "Começar uma sessão": "Empezar una sesión",
+  "Já existe uma sessão em andamento. Encerre ela antes de começar outra.": "Ya hay una sesión en curso. Termínala antes de empezar otra.",
+  "Sua sessão continua de onde parou.": "Tu sesión sigue donde la dejaste.",
 };
