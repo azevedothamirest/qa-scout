@@ -15,7 +15,11 @@ Tudo o que o painel de desenvolvedor da Chrome Web Store pede, pronto para copia
 4. Preencha as abas com os textos abaixo e envie as imagens de `docs/loja/`.
 5. Envie para revisão. Desde a 0.6 o acesso aos sites é opcional (pedido no primeiro uso), o que reduz o aviso de "Permissões amplas do host"; mesmo assim a revisão pode levar alguns dias.
 
-Para cada nova versão: suba o `version` no `app/manifest.json` e no `package.json`, registre a versão no `CHANGELOG.md`, rode `npm run pacote` e envie o novo `.zip` em **Pacote → Enviar novo pacote**.
+Para cada nova versão:
+1. Suba o `version` no `app/manifest.json` e no `package.json` e registre a versão no `CHANGELOG.md`.
+2. Rode a **Suíte completa** (Actions → "Suíte completa" → Run workflow, ou `npm test` local) e só siga com ela verde. A CI do PR roda só a regressão, e mudanças de segurança já quebraram testes de fora dela (#70).
+3. Se mudou o que a extensão registra ou envia, atualize a política (`site/privacidade*.html`) nos 4 idiomas, **com a data do topo** (#75).
+4. Rode `npm run pacote`, guarde o SHA-256 que ele mostra e envie o novo `.zip` em **Pacote → Enviar novo pacote**.
 
 ## Ficha da loja
 
