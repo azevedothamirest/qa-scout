@@ -504,8 +504,11 @@ async function drenar(){
         // Erro ou falha de rede repetida: soma na nota que já existe em vez de criar outra.
         const igual = ev.chave && s.notes.find(n=>n.chave===ev.chave);
         if(igual){ contaRepeticao(igual, ev.vezes||1); continue; }
-        const img = ev.img ? await anotaPrint(ev) : null;
         const t=Math.max(0, elapsed(s)-(Date.now()-ev.ts));
+        // O mesmo campo de novo em seguida (data digitada dígito a dígito, ajustes do MCP): uma nota só.
+        const ultima=s.notes[s.notes.length-1];
+        if(ev.tipo==='campo' && ultima && ultima.origem==='campo' && ultima.pending && ultima.passo===ev.desc && t-ultima.t<10000) continue;
+        const img = ev.img ? await anotaPrint(ev) : null;
         const lugar = ev.tipo==='pagina' ? '' : (ev.titulo ? ` · ${ev.titulo.slice(0,60)}` : '');
         const nota={id:uid(),type:ev.nota||'obs',t,text:ev.desc+lugar,passo:ev.desc,origem:ev.tipo,url:ev.url||'',imgs:img?[img]:[],auto:true,pending:true};
         if(ev.chave){ nota.chave=ev.chave; nota.vezes=1; if((ev.vezes||1)>1) contaRepeticao(nota, ev.vezes-1); }

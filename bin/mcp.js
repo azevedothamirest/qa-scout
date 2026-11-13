@@ -135,6 +135,18 @@ function criarFerramentas({ perfil, headless = false, locale } = {}) {
 
 ${await resumoDaTela(p)}`;
       await el.fill(valor, { timeout: 5000 });
+      // A captura só aceita eventos de interação real (isTrusted). O fill digita nos campos de texto,
+      // mas em data, hora, número e deslizante só troca o valor por script: aí um ajuste com as setas,
+      // ida e volta, gera o change de verdade e o valor final fica o pedido.
+      const tipo = await el.evaluate(e => e.type || '');
+      if (/^(date|time|datetime-local|month|week|number|range)$/.test(tipo)) {
+        await el.focus();
+        for (const [a, b] of [['ArrowUp', 'ArrowDown'], ['ArrowDown', 'ArrowUp']]) {
+          await el.press(a); await el.press(b);
+          if (await el.inputValue() === valor) break;
+        }
+        if (await el.inputValue() !== valor) await el.fill(valor);
+      }
       if (enviar) await el.press('Enter'); else await el.blur();
       await p.waitForTimeout(300);
       return resumoDaTela(await site());
@@ -142,7 +154,20 @@ ${await resumoDaTela(p)}`;
 
     async escolher_opcao({ campo, opcao }) {
       const p = await site();
-      await p.getByLabel(campo).first().selectOption({ label: opcao }, { timeout: 5000 });
+      // Como uma pessoa: abre a lista e escolhe com o teclado, para o change ser de verdade (isTrusted)
+      // e a captura registrar. Se a lista não abrir (select múltiplo, por exemplo), cai no selectOption.
+      const lista = p.getByLabel(campo).first();
+      const alvo = await lista.evaluate((s, o) => [...(s.options || [])].findIndex(x => x.label === o || x.text.trim() === o), opcao).catch(() => -1);
+      const multipla = await lista.evaluate(s => s.multiple || s.size > 1).catch(() => true);
+      if (alvo >= 0 && !multipla) {
+        await lista.click({ timeout: 5000 });
+        await p.keyboard.press('Home');
+        for (let i = 0; i < alvo; i++) await p.keyboard.press('ArrowDown');
+        await p.keyboard.press('Enter');
+      }
+      if (alvo < 0 || multipla || await lista.evaluate((s, o) => s.selectedOptions[0]?.label !== o, opcao)) {
+        await lista.selectOption({ label: opcao }, { timeout: 5000 });
+      }
       return resumoDaTela(await site());
     },
 
