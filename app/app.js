@@ -1110,7 +1110,7 @@ $('#idioma-menu')?.addEventListener('click',e=>{
   menuIdioma(false);
   if(b.dataset.idioma===I18N.atual){ $('#idioma').focus(); return; }
   I18N.definir(b.dataset.idioma);
-  try{ sessionStorage.removeItem('qascout.abertura'); }catch(e){}
+  try{ (EXT?localStorage:sessionStorage).removeItem('qascout.abertura'); }catch(e){}
   location.reload();
 });
 $('#idioma-menu')?.addEventListener('keydown',e=>{
@@ -1267,7 +1267,9 @@ addEventListener('hashchange',()=>{ if(location.hash==='#onboarding') onboarding
 function abertura(){
   const el=$('#abertura'); if(!el) return;
   const fim=()=>{ el.remove(); document.body.classList.remove('com-abertura'); };
-  let vista=false; try{ vista=sessionStorage.getItem('qascout.abertura')==='1'; sessionStorage.setItem('qascout.abertura','1'); }catch(e){}
+  // Na extensão o painel recomeça a cada vez que abre: a abertura aparece só na primeira vez
+  // (e depois de trocar o idioma). No site, uma vez por aba.
+  let vista=false; try{ const m=EXT?localStorage:sessionStorage; vista=m.getItem('qascout.abertura')==='1'; m.setItem('qascout.abertura','1'); }catch(e){}
   if(vista || navigator.webdriver || deveMostrarOnboarding()){ fim(); return; }
   const calmo = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let saiu=false;

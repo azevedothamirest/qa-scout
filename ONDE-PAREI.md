@@ -13,7 +13,7 @@ Branch `fix/layout-captura` (commit WIP, ainda não enviado ao GitHub).
 ## Falta
 1. Rodar `npm test` completo (os navegadores do Playwright precisaram de links em /opt/pw-browsers após o reset).
 2. Conferir o aviso no navegador de teste (modo popup) e em celular/tema claro.
-3. Ver se a tela de abertura (splash) deve pular ao reabrir o painel (4º print).
+3. ~~Abertura~~: feito, na extensão só aparece na primeira vez (e após trocar idioma).
 4. Abas cortadas no painel bem estreito (3º print).
 5. Subir a versão para 1.2.0 (a 1.1.1 já está publicada na loja), abrir as issues e o PR e gerar o pacote.
 6. Apagar este arquivo antes do PR.
