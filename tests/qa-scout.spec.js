@@ -491,3 +491,11 @@ test.describe('Página MCP', () => {
     await expect(page.getByRole('link', { name: 'veja o guia de instalação' })).toHaveAttribute('href', /docs\/mcp\.md#instalar$/);
   });
 });
+
+test.describe('Histórico · resumo', () => {
+  test('Deixar as sessões de exemplo fora dos números da home', async ({ page }) => {
+    const resumo = page.getByLabel('Resumo das sessões');
+    await expect(resumo).toContainText('0sessões concluídas');
+    await expect(resumo).toContainText('0bugs encontrados');
+  });
+});

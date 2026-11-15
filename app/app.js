@@ -216,9 +216,11 @@ let query = '';
 function viewHome(){
   const done = state.sessions.filter(s=>s.status==='done').sort((a,b)=>b.startedAt-a.startedAt);
   const active = getActive();
-  const totMin = Math.round(done.reduce((a,s)=>a+s.elapsedMs,0)/MIN);
-  const bugs = done.reduce((a,s)=>a+counts(s).bug,0);
-  const duv = done.reduce((a,s)=>a+counts(s).duv,0);
+  // Os números da home contam só as sessões da pessoa, nunca as de exemplo (#61).
+  const reais = done.filter(s=>!s.example);
+  const totMin = Math.round(reais.reduce((a,s)=>a+s.elapsedMs,0)/MIN);
+  const bugs = reais.reduce((a,s)=>a+counts(s).bug,0);
+  const duv = reais.reduce((a,s)=>a+counts(s).duv,0);
   const hasEx = state.sessions.some(s=>s.example);
   const q = query.trim().toLowerCase();
   const list = done.filter(s=>!q || [s.area,charterText(s.charter),s.ambiente,...s.notes.map(n=>n.text)].join(' ').toLowerCase().includes(q));
@@ -235,7 +237,7 @@ function viewHome(){
         </div>
       </div>
       <div class="stats" aria-label="${t('Resumo das sessões')}">
-        <div class="stat"><b>${done.length}</b><span>${t('sessões concluídas')}</span></div>
+        <div class="stat"><b>${reais.length}</b><span>${t('sessões concluídas')}</span></div>
         <div class="stat"><b>${totMin}<small style="font-size:15px"> min</small></b><span>${t('explorando')}</span></div>
         <div class="stat"><b style="color:var(--t-bug)">${bugs}</b><span>${t('bugs encontrados')}</span></div>
         <div class="stat"><b style="color:var(--t-duv)">${duv}</b><span>${t('dúvidas levantadas')}</span></div>
