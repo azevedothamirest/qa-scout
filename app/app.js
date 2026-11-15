@@ -165,6 +165,9 @@ function charterHtml(c){ return t('Explorar {explorar} com {com} para descobrir 
 function charterText(c){ return t('Explorar {explorar} com {com} para descobrir {descobrir}', c); }
 function getActive(){ return state.sessions.find(s=>s.id===state.activeId && s.status!=='done') || null; }
 let toastT;
+let anuncioT;
+// "Pular para o conteúdo": leva o foco ao <main> sem mexer na URL.
+document.getElementById('pular')?.addEventListener('click',e=>{ e.preventDefault(); $('#app').focus(); });
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(limpaToast,2600); }
 // Ao sumir, o aviso sai também da região de status: ela não fica mostrando o recado de outra tela (#55).
 function limpaToast(){ clearTimeout(toastT); const el=$('#toast'); el.classList.remove('show'); el.textContent=''; }
@@ -596,7 +599,7 @@ function viewReport(s){
           <p class="hint" style="margin:0">${t('Teste, investigação de bug e preparo (TBS).')} <button class="ajuda" data-go="metodo" data-arg="debriefing">${t('Como fazer um bom debriefing?')}</button></p>
           <div class="tbs" id="tbs-bar">${tbsBar(db)}</div>
           <div class="tbs-legend">
-            ${[['test','Teste','var(--accent)'],['bug','Bug','var(--t-bug)'],['setup','Setup','var(--marker)']].map(([k,l,col])=>`<div class="slider"><label for="tbs-${k}"><span class="sw" style="background:${col}"></span>${t(l)}</label><input type="range" id="tbs-${k}" min="0" max="100" step="5" value="${db[k]}" data-tbs="${k}"><span class="mono" id="tbs-${k}-v">${db[k]}%</span></div>`).join('')}
+            ${[['test','Teste','var(--accent)'],['bug','Bug','var(--t-bug)'],['setup','Setup','var(--marker)']].map(([k,l,col])=>`<div class="slider"><label for="tbs-${k}"><span class="sw" style="background:${col}"></span>${t(l)}</label><input type="range" id="tbs-${k}" min="0" max="100" step="5" value="${db[k]}" aria-valuetext="${db[k]}%" data-tbs="${k}"><span class="mono" id="tbs-${k}-v">${db[k]}%</span></div>`).join('')}
           </div>
           <div class="field" style="margin:16px 0 10px"><label for="db-cov">${t('Áreas cobertas')}</label><textarea id="db-cov" data-db="coverage" placeholder="${t('O que de fato foi explorado')}">${esc(db.coverage)}</textarea></div>
           <div class="field" style="margin:0"><label for="db-next">${t('Fora do escopo e próximas sessões')}</label><textarea id="db-next" data-db="next" placeholder="${t('O que ficou para depois')}">${esc(db.next)}</textarea></div>
@@ -1060,7 +1063,9 @@ document.addEventListener('input',e=>{
       s.debrief[k]=v;
       if(sumO===0){ s.debrief[others[0]]=rest; s.debrief[others[1]]=0; }
       else { const a=Math.round(rest*s.debrief[others[0]]/sumO/5)*5; s.debrief[others[0]]=a; s.debrief[others[1]]=rest-a; }
-      ['test','bug','setup'].forEach(x=>{ $('#tbs-'+x).value=s.debrief[x]; $('#tbs-'+x+'-v').textContent=s.debrief[x]+'%'; });
+      ['test','bug','setup'].forEach(x=>{ $('#tbs-'+x).value=s.debrief[x]; $('#tbs-'+x).setAttribute('aria-valuetext',s.debrief[x]+'%'); $('#tbs-'+x+'-v').textContent=s.debrief[x]+'%'; });
+      // Os outros dois se reajustam para somar 100%: o leitor de tela ouve a nova divisão (#60).
+      clearTimeout(anuncioT); anuncioT=setTimeout(()=>{ const a=$('#anuncio'); if(a) a.textContent=t('Teste {t}%, Bug {b}%, Setup {s}%',{t:s.debrief.test,b:s.debrief.bug,s:s.debrief.setup}); },400);
       $('#tbs-bar').innerHTML=tbsBar(s.debrief);
     } else s.debrief[bt.dataset.db]=bt.value;
     $('#md-out').value=toMarkdown(s); save();

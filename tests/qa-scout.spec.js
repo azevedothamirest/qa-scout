@@ -460,3 +460,27 @@ test.describe('Acessibilidade · títulos', () => {
     confere(await niveis(page));
   });
 });
+
+test.describe('Acessibilidade · navegação e debriefing', () => {
+  test('Levar o foco ao conteúdo pelo link "Pular para o conteúdo" no primeiro Tab', async ({ page }) => {
+    await page.keyboard.press('Tab');
+    const pular = page.getByRole('link', { name: 'Pular para o conteúdo' });
+    await expect(pular).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('#app')).toBeFocused();
+  });
+
+  test('Anunciar a porcentagem dos sliders e a nova divisão do tempo', async ({ page }) => {
+    await page.locator('[data-open="ex-pix"]').click();
+    const teste = page.getByRole('slider', { name: 'Teste' });
+    await expect(teste).toHaveAttribute('aria-valuetext', '55%');
+    await teste.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(teste).toHaveAttribute('aria-valuetext', '60%');
+    await expect(page.locator('#anuncio')).toHaveText(/^Teste 60%, Bug \d+%, Setup \d+%$/);
+  });
+
+  test('Dar pelo menos 24 px de altura aos links do rodapé', async ({ page }) => {
+    for (const a of await page.locator('.rodape a').all()) expect((await a.boundingBox()).height).toBeGreaterThanOrEqual(24);
+  });
+});

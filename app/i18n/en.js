@@ -120,6 +120,8 @@ window.QAS_I18N.dic["en"] = {
   "Contexto": "Context",
   "Abrir sessão {area}": "Open session {area}",
   "Como começar": "How to start",
+  "Pular para o conteúdo": "Skip to content",
+  "Teste {t}%, Bug {b}%, Setup {s}%": "Test {t}%, Bug {b}%, Setup {s}%",
   "Voltar à sessão": "Back to session",
   "Continuar sessão": "Continue session",
   "Copiado": "Copied",

@@ -20,6 +20,8 @@
   <div class="abertura-pular" data-i18n="clique ou Esc para pular">clique ou Esc para pular</div>
 </div>
 
+<a class="pular" href="#app" id="pular" data-i18n="Pular para o conteúdo">Pular para o conteúdo</a>
+
 <header class="top">
   <div class="top-in">
     <div class="brand">
@@ -41,7 +43,7 @@
   </div>
 </header>
 
-<main id="app"></main>
+<main id="app" tabindex="-1"></main>
 <footer class="rodape no-print">
   <span data-i18n="QA Scout está em beta aberto.">QA Scout está em beta aberto.</span>
   <a href="https://github.com/azevedothamirest/qa-scout/blob/main/docs/tutorial.md" target="_blank" rel="noopener" data-i18n="Como usar ↗">Como usar ↗</a>
@@ -51,6 +53,7 @@
   <a id="link-onboarding" href="#onboarding" data-i18n="Ver apresentação">Ver apresentação</a>
 </footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="sr-only" id="anuncio" aria-live="polite"></div>
 
 <script src="i18n.js"></script>
 <script src="i18n/pt-PT.js"></script>
