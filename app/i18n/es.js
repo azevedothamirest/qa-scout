@@ -88,7 +88,6 @@ window.QAS_I18N.dic["es"] = {
   "Checkout · pagamento com Pix": "Checkout · pago instantáneo",
   "Cinco perguntas para fechar": "Cinco preguntas para cerrar",
   "Claro": "Claro",
-  "Claude Desktop: veja o guia": "Claude Desktop: consulta la guía",
   "Clique duas vezes em salvar, pagar ou enviar. Envie o formulário antes da tela terminar de carregar.": "Haz doble clic en guardar, pagar o enviar. Envía el formulario antes de que la pantalla termine de cargar.",
   "Clique duplo e pressa": "Doble clic y prisa",
   "Clique numa carta ou aperte Enter para virar. Quer praticar?": "Haz clic en una carta o pulsa Enter para darle la vuelta. ¿Quieres practicar?",
@@ -305,7 +304,6 @@ window.QAS_I18N.dic["es"] = {
   "Peça a sessão": "Pide la sesión",
   "Por que charter?": "¿Por qué un charter?",
   "Prefere um navegador separado?": "¿Prefieres un navegador aparte?",
-  "Primeira vez: o Chromium é baixado": "La primera vez se descarga Chromium",
   "Print anexado {n}": "Captura adjunta {n}",
   "Print anexado à nota": "Captura adjuntada a la nota",
   "Print da nota": "Captura de la nota",
@@ -525,4 +523,7 @@ window.QAS_I18N.dic["es"] = {
   "Começar uma sessão": "Empezar una sesión",
   "Já existe uma sessão em andamento. Encerre ela antes de começar outra.": "Ya hay una sesión en curso. Termínala antes de empezar otra.",
   "Sua sessão continua de onde parou.": "Tu sesión sigue donde la dejaste.",
+  "Claude Desktop:": "Claude Desktop:",
+  "veja o guia de instalação": "consulta la guía de instalación",
+  "Na primeira sessão, o Chromium de teste é baixado sozinho (um ou dois minutos).": "En la primera sesión, el Chromium de prueba se descarga solo (uno o dos minutos).",
 };

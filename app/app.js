@@ -812,8 +812,8 @@ function viewMcp(){
     <div class="mcp-aviso" role="note"><b>${t('Roda no terminal do seu computador.')}</b> ${t('O MCP funciona no Claude Code ou no Claude Desktop, com o Node.js 18 ou mais recente instalado.')} ${EXT?t('Esta extensão só explica como usar: quem abre o navegador e conduz a sessão é o comando <code>qa-scout mcp</code>.'):t('Este site só explica como usar: quem abre o navegador e conduz a sessão é o comando <code>qa-scout mcp</code>.')}</div>
     <h2 class="sr-only">${t('Como começar')}</h2>
     <div class="passos mcp-passos">
-      <div class="passo"><h3>${t('Instale no Claude Code')}</h3><p>${t('No terminal, uma vez só:')}</p>${cmd(MCP_INSTALAR,'o comando de instalação')}<small>${t('Claude Desktop: veja o guia')}</small></div>
-      <div class="passo"><h3>${t('Confira a conexão')}</h3><p>${t('O <code>qa-scout</code> deve aparecer como conectado.')}</p>${cmd('claude mcp list','o comando de conferência')}<small>${t('Primeira vez: o Chromium é baixado')}</small></div>
+      <div class="passo"><h3>${t('Instale no Claude Code')}</h3><p>${t('No terminal, uma vez só:')}</p>${cmd(MCP_INSTALAR,'o comando de instalação')}<small>${t('Claude Desktop:')} <a href="https://github.com/azevedothamirest/qa-scout/blob/main/docs/mcp.md#instalar" target="_blank" rel="noopener">${t('veja o guia de instalação')}</a></small></div>
+      <div class="passo"><h3>${t('Confira a conexão')}</h3><p>${t('O <code>qa-scout</code> deve aparecer como conectado.')}</p>${cmd('claude mcp list','o comando de conferência')}<small>${t('Na primeira sessão, o Chromium de teste é baixado sozinho (um ou dois minutos).')}</small></div>
       <div class="passo"><h3>${t('Peça a sessão')}</h3><p>${t('Abra o Claude Code e diga o que explorar, com o quê, para descobrir o quê e por quanto tempo.')}</p><small>${t('O charter, como você já faz')}</small></div>
     </div>
     <div class="section-head" style="margin:26px 0 12px"><div><div class="eyebrow">${t('Como pedir')}</div><h2>${t('Exemplos de pedido')}</h2></div></div>

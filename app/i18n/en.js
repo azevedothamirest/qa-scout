@@ -88,7 +88,6 @@ window.QAS_I18N.dic["en"] = {
   "Checkout · pagamento com Pix": "Checkout · instant payment",
   "Cinco perguntas para fechar": "Five questions to wrap up",
   "Claro": "Light",
-  "Claude Desktop: veja o guia": "Claude Desktop: see the guide",
   "Clique duas vezes em salvar, pagar ou enviar. Envie o formulário antes da tela terminar de carregar.": "Double-click save, pay or submit. Submit the form before the screen finishes loading.",
   "Clique duplo e pressa": "Double click and haste",
   "Clique numa carta ou aperte Enter para virar. Quer praticar?": "Click a card or press Enter to flip it. Want to practice?",
@@ -305,7 +304,6 @@ window.QAS_I18N.dic["en"] = {
   "Peça a sessão": "Ask for the session",
   "Por que charter?": "Why a charter?",
   "Prefere um navegador separado?": "Prefer a separate browser?",
-  "Primeira vez: o Chromium é baixado": "First time: Chromium gets downloaded",
   "Print anexado {n}": "Attached screenshot {n}",
   "Print anexado à nota": "Screenshot attached to the note",
   "Print da nota": "Note screenshot",
@@ -525,4 +523,7 @@ window.QAS_I18N.dic["en"] = {
   "Começar uma sessão": "Start a session",
   "Já existe uma sessão em andamento. Encerre ela antes de começar outra.": "A session is already in progress. End it before starting another one.",
   "Sua sessão continua de onde parou.": "Your session picks up where you left off.",
+  "Claude Desktop:": "Claude Desktop:",
+  "veja o guia de instalação": "see the install guide",
+  "Na primeira sessão, o Chromium de teste é baixado sozinho (um ou dois minutos).": "On the first session, the test Chromium downloads by itself (a minute or two).",
 };

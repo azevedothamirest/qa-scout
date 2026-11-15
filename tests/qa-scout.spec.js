@@ -484,3 +484,10 @@ test.describe('Acessibilidade · navegação e debriefing', () => {
     for (const a of await page.locator('.rodape a').all()) expect((await a.boundingBox()).height).toBeGreaterThanOrEqual(24);
   });
 });
+
+test.describe('Página MCP', () => {
+  test('Levar "veja o guia de instalação" ao guia do Claude Desktop', async ({ page }) => {
+    await page.locator('#tab-mcp').click();
+    await expect(page.getByRole('link', { name: 'veja o guia de instalação' })).toHaveAttribute('href', /docs\/mcp\.md#instalar$/);
+  });
+});
