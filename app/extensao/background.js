@@ -118,7 +118,8 @@ async function abrePainel(tab) {
   if (modoAtual !== 'navegador') { await chrome.sidePanel.open({ windowId: tab.windowId }).catch(() => {}); return; }
   // No navegador de teste o painel é uma janela popup: traz de volta ou abre outra.
   const url = chrome.runtime.getURL('index.html');
-  const [aba] = await chrome.tabs.query({ url: url + '*' });
+  // Padrão de URL do tabs.query não aceita chrome-extension://: filtra à mão.
+  const aba = (await chrome.tabs.query({})).find(t => (t.url || '').startsWith(url));
   if (aba) { await chrome.windows.update(aba.windowId, { focused: true }).catch(() => {}); return; }
   await chrome.windows.create({ url, type: 'popup', width: 440, height: 900, left: 0, top: 0 }).catch(() => {});
 }
