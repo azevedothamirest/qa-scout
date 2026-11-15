@@ -121,6 +121,8 @@ window.QAS_I18N.dic["en"] = {
   "Como começar": "How to start",
   "Pular para o conteúdo": "Skip to content",
   "Teste {t}%, Bug {b}%, Setup {s}%": "Test {t}%, Bug {b}%, Setup {s}%",
+  "Tempo planejado esgotado: sessão pausada.": "Planned time is up: session paused.",
+  "Tempo esgotado. Retome para prorrogar ou encerre.": "Time is up. Resume to extend or end the session.",
   "Voltar à sessão": "Back to session",
   "Continuar sessão": "Continue session",
   "Copiado": "Copied",

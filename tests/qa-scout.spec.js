@@ -538,3 +538,49 @@ test.describe('Navegação', () => {
     await expect(page.locator('#c-exp')).toHaveValue('o carrinho');
   });
 });
+
+test.describe('Sessão esquecida', () => {
+  test('Pausar a sessão sozinha quando acaba o tempo planejado', async ({ page }) => {
+    await page.clock.install();
+    await page.reload();
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.locator('#c-exp').fill('o checkout');
+    await page.locator('#c-des').fill('falhas');
+    await page.getByLabel('Duração planejada').fill('1');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await page.clock.runFor(61_000);
+    await expect(page.getByRole('button', { name: 'Retomar' })).toBeVisible();
+    await expect(page.locator('#clock')).toHaveText('01:00');
+    await expect(page.locator('#clock-sub')).toHaveText('Tempo esgotado. Retome para prorrogar ou encerre.');
+  });
+
+  test('Prorrogar sem pausar de novo depois de retomar a sessão esgotada', async ({ page }) => {
+    await page.clock.install();
+    await page.reload();
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.locator('#c-exp').fill('o checkout');
+    await page.locator('#c-des').fill('falhas');
+    await page.getByLabel('Duração planejada').fill('1');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await page.clock.runFor(61_000);
+    await page.getByRole('button', { name: 'Retomar' }).click();
+    await page.clock.runFor(30_000);
+    await expect(page.getByRole('button', { name: 'Pausar' })).toBeVisible();
+    await expect(page.locator('#clock-sub')).toContainText('além do planejado');
+  });
+
+  test('Encontrar pausada a sessão esquecida aberta depois de recarregar', async ({ page }) => {
+    await page.clock.install();
+    await page.reload();
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.locator('#c-exp').fill('o checkout');
+    await page.locator('#c-des').fill('falhas');
+    await page.getByLabel('Duração planejada').fill('1');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    // Simula a aba fechada: o relógio anda sem o app rodando.
+    await page.evaluate(() => { const st = JSON.parse(localStorage.getItem('qascout.v1')); const s = st.sessions.find(x => x.id === st.activeId); s.runStartedAt -= 3 * 3600_000; localStorage.setItem('qascout.v1', JSON.stringify(st)); });
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Retomar' })).toBeVisible();
+    await expect(page.locator('#clock')).toHaveText('01:00');
+  });
+});

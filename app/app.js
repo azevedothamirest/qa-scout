@@ -481,8 +481,23 @@ if(EXT && !/^#imprimir=/.test(location.hash)){ try{ chrome.runtime.connect({name
 function syncCaptura(){
   if(!EXT) return;
   const s=getActive();
-  chrome.runtime.sendMessage({cmd:'capturando', valor: !!(s && s.status==='running')}).catch(()=>{});
+  const rodando = !!(s && s.status==='running');
+  // Hora em que o tempo planejado acaba: o background para de capturar sozinho, mesmo com o painel fechado.
+  const ate = rodando && !s.prorrogada ? s.runStartedAt + Math.max(0, s.plannedMin*MIN - s.elapsedMs) : null;
+  chrome.runtime.sendMessage({cmd:'capturando', valor: rodando, ate}).catch(()=>{});
 }
+// Sessão esquecida aberta: ao acabar o tempo planejado, ela é pausada (a captura para junto) e
+// fica esperando "Retomar" (que vale como prorrogação) ou "Encerrar".
+function fechaNoTempo(){
+  const s=getActive();
+  if(!s || s.status!=='running' || s.prorrogada) return false;
+  const plan=s.plannedMin*MIN;
+  if(elapsed(s) < plan) return false;
+  s.elapsedMs=plan; s.runStartedAt=null; s.status='paused'; s.esgotou=true;
+  save();
+  return true;
+}
+setInterval(()=>{ if(fechaNoTempo()){ render(); toast(t('Tempo planejado esgotado: sessão pausada.')); } },1000);
 async function acompanharAbaAtual({auto=false}={}){
   if(!auto){
     // O pedido precisa sair direto do clique, antes de qualquer outra espera.
@@ -898,7 +913,8 @@ function tick(){
   const clock=$('#clock'), sub=$('#clock-sub'), bar=$('#bar'); if(!clock) return;
   clock.textContent=fmtClock(e);
   const over=e>plan;
-  sub.textContent = over ? t('+{t} além do planejado',{t:fmtClock(e-plan)}) : t('{t} restantes de {plan} min',{t:fmtClock(plan-e),plan:s.plannedMin});
+  sub.textContent = s.esgotou && s.status==='paused' ? t('Tempo esgotado. Retome para prorrogar ou encerre.')
+    : over ? t('+{t} além do planejado',{t:fmtClock(e-plan)}) : t('{t} restantes de {plan} min',{t:fmtClock(plan-e),plan:s.plannedMin});
   sub.classList.toggle('over',over); bar.classList.toggle('over',over);
   bar.firstElementChild.style.width = Math.min(100,e/plan*100)+'%';
 }
@@ -1021,7 +1037,7 @@ document.addEventListener('click',e=>{
   if(act==='heur'){ heurIdx=(heurIdx+1+Math.floor(Math.random()*(HEUR.length-1)))%HEUR.length; $('#heur').innerHTML=heurHtml(); }
   if(act==='toggle' && s){
     if(s.status==='running'){ s.elapsedMs+=Date.now()-s.runStartedAt; s.runStartedAt=null; s.status='paused'; }
-    else { s.runStartedAt=Date.now(); s.status='running'; }
+    else { s.runStartedAt=Date.now(); s.status='running'; if(s.esgotou) s.prorrogada=true; }
     save(); render();
   }
   if(act==='end'){ $('#end-confirm').hidden=false; }
@@ -1356,12 +1372,14 @@ async function init(){
     setTimeout(()=>window.print(),600);
     return;
   }
+  const esgotou=fechaNoTempo();
   const rota=lerRota();
   if(rota){ view=rota.view; viewArg=rota.arg; }
   else if(getActive()) view='active';
   render();
   if(!/^#(onboarding|apresentacao)$/.test(location.hash)) marcaRota(true);
   if(deveMostrarOnboarding()) onboarding();
+  if(esgotou) toast(t('Tempo planejado esgotado: sessão pausada.'));
   if(corrompido) toast(t('Não foi possível ler as sessões salvas. Guardamos uma cópia e começamos do zero; importe um backup se tiver.'));
   if(EXT){ atualizaAbas(); drenar(); }
 }

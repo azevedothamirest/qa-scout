@@ -165,6 +165,7 @@ window.QAS_I18N.dic["pt-PT"] = {
   "Passos, print e erro. Pronto pro Jira.": "Passos, captura e erro. Pronto para o Jira.",
   "Próximo": "Seguinte",
   "Pular": "Saltar",
+  "Tempo esgotado. Retome para prorrogar ou encerre.": "Tempo esgotado. Retome para prolongar ou termine.",
   "Pular para o conteúdo": "Saltar para o conteúdo",
   "Virou bug. Sem sair da tela.": "Passou a bug. Sem sair do ecrã.",
   "Ver apresentação": "Ver apresentação",

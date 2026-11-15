@@ -23,6 +23,8 @@ Fecha o que ficou aberto da rodada de QA de UX/UI de 30/10 ([#63](https://github
 - **Cada tela tem endereço próprio** (`#/heuristicas`, `#/relatorio/<id>`...). O Voltar do navegador volta para a tela anterior, dá para abrir uma seção direto ou numa aba nova, e o menu virou links. ([#48](https://github.com/azevedothamirest/qa-scout/issues/48))
 - **Trocar o idioma mantém a tela atual**, sem repetir a abertura e sem perder o charter que estava sendo digitado. ([#59](https://github.com/azevedothamirest/qa-scout/issues/59))
 
+- **Sessão esquecida aberta para sozinha:** quando o tempo planejado acaba, a sessão é pausada e a captura para, mesmo com o painel fechado ou o app fechado. "Retomar" vale como prorrogação; "Encerrar" leva ao relatório.
+
 **♿ Acessibilidade**
 - **Notas:** "Editar", "Excluir", "Confirmar" e "Copiar bug" dizem a qual nota pertencem, e "Continuar" na confirmação de encerrar virou "Voltar à sessão". ([#54](https://github.com/azevedothamirest/qa-scout/issues/54))
 - **Nomes:**

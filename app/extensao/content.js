@@ -251,10 +251,13 @@
     raiz.querySelector('.x').addEventListener('click', e => { if (e.isTrusted) { host.remove(); ind = null; fechadoAte = (indEstado && indEstado.desde) || 1; } });
     return { host, raiz };
   }
-  let fechadoAte = 0;
+  let fechadoAte = 0, indFim = null;
   function mostraIndicador(st) {
     indEstado = st;
-    const visivel = st && st.ativo && st.desde !== fechadoAte && !document.hidden;
+    // Com hora para acabar (tempo planejado da sessão), o aviso some sozinho nessa hora.
+    clearTimeout(indFim);
+    if (st && st.ate && st.ativo) { const falta = st.ate - Date.now(); if (falta > 0) indFim = setTimeout(() => mostraIndicador(indEstado), falta + 50); }
+    const visivel = st && st.ativo && !(st.ate && Date.now() >= st.ate) && st.desde !== fechadoAte && !document.hidden;
     if (!visivel) { if (ind) { ind.host.remove(); ind = null; } return; }
     if (!ind) ind = montaIndicador();
     if (!ind.host.isConnected) document.documentElement.appendChild(ind.host);
