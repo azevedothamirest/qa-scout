@@ -118,6 +118,7 @@ window.QAS_I18N.dic["es"] = {
   "Confirmar selecionadas ({n})": "Confirmar seleccionadas ({n})",
   "Confirmar todas ({n})": "Confirmar todas ({n})",
   "Contexto": "Contexto",
+  "Abrir sessão {area}": "Abrir sesión {area}",
   "Voltar à sessão": "Volver a la sesión",
   "Continuar sessão": "Continuar la sesión",
   "Copiado": "Copiado",

@@ -14,7 +14,7 @@ test.describe('Histórico de sessões', () => {
   test('Exibir sessões de exemplo no primeiro acesso', async ({ page }) => {
     await expect(page.locator('.row')).toHaveCount(2);
     await expect(page.getByText('Checkout · pagamento com Pix')).toBeVisible();
-    await expect(page.locator('.tag-ex').first()).toHaveText('exemplo');
+    await expect(page.locator('.tag-ex').first()).toHaveText(/exemplo$/);
   });
 
   test('Filtrar sessões pelo texto de uma nota', async ({ page }) => {
@@ -417,5 +417,17 @@ test.describe('Acessibilidade', () => {
     await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
     await page.getByRole('button', { name: 'Voltar à sessão' }).click();
     await expect(page.locator('#note-in')).toBeVisible();
+  });
+});
+
+test.describe('Acessibilidade · nomes', () => {
+  test('Dar nome curto ao card de sessão de exemplo e separar o selo do título', async ({ page }) => {
+    await expect(page.getByRole('button', { name: 'Abrir sessão Checkout · pagamento com Pix, exemplo' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Checkout · pagamento com Pix · exemplo' })).toBeVisible();
+  });
+
+  test('Tirar o atalho do nome do botão de puxar carta', async ({ page }) => {
+    await page.locator('#tab-deck').click();
+    await expect(page.getByRole('button', { name: 'Puxar outra carta', exact: true })).toHaveAttribute('aria-keyshortcuts', 'Space');
   });
 });

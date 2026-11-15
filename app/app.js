@@ -253,7 +253,7 @@ function viewHome(){
     </div>` : ''}
     <div class="section-head">
       <div><div class="eyebrow">${t('Histórico')}</div><h2>${t('Sessões anteriores')}</h2></div>
-      <div class="backup"><button class="btn ghost" data-act="backup">${t('Baixar backup')}</button><label class="btn ghost file-lbl">${t('Importar backup')}<input type="file" id="backup-in" accept="application/json,.json"></label></div>
+      <div class="backup"><button class="btn ghost" data-act="backup">${t('Baixar backup')}</button><label class="btn ghost file-lbl"><span aria-hidden="true">${t('Importar backup')}</span><input type="file" id="backup-in" accept="application/json,.json" aria-label="${t('Importar backup')}"></label></div>
       <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="${t('Buscar por área, charter ou nota')}" value="${esc(query)}" aria-label="${t('Buscar sessões')}"></label>
     </div>
     <div class="list" id="list">
@@ -264,9 +264,11 @@ function viewHome(){
 }
 function rowHtml(s){
   const d=new Date(s.startedAt), c=counts(s);
-  return `<button class="row" data-open="${s.id}">
+  // Nome curto para leitor de tela: o card inteiro (data, charter, contagens) virava um nome enorme (#49).
+  const nome = t('Abrir sessão {area}',{area:s.area}) + (s.example?`, ${t('exemplo')}`:'');
+  return `<button class="row" data-open="${s.id}" aria-label="${esc(nome)}">
     <div class="date"><b>${pad(d.getDate())}</b>${mesCurto(d)}</div>
-    <div style="min-width:0"><h3>${esc(s.area)}${s.example?`<span class="tag-ex">${t('exemplo')}</span>`:''}</h3><p>${esc(charterText(s.charter))}</p></div>
+    <div style="min-width:0"><h3>${esc(s.area)}${s.example?`<span class="tag-ex"><span class="sr-only"> · </span>${t('exemplo')}</span>`:''}</h3><p>${esc(charterText(s.charter))}</p></div>
     <div class="chips">
       <span class="chip">${minReais(s)}/${s.plannedMin} min</span>
       ${['bug','duv','ris'].filter(k=>c[k]).map(k=>`<span class="chip ${TYPES[k].cls}" style="color:var(--c)"><i></i><span style="color:var(--ink)">${c[k]} ${c[k]>1?plural(k).toLowerCase():rot(k).toLowerCase()}</span></span>`).join('')}
@@ -733,7 +735,7 @@ function viewDeck(){
         <div class="monte" aria-hidden="true"><i></i><i></i></div>
         <div id="carta">${cartaHtml()}</div>
         <div class="mesa-acoes">
-          <button class="btn primary lg" data-act="puxar">${t('Puxar outra carta')} <kbd>${t('Espaço')}</kbd></button>
+          <button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>
           <button class="btn lg" data-act="usar-carta">${active?t('Anotar como ideia na sessão'):t('Começar sessão com esta carta')}</button>
         </div>
       </div>
