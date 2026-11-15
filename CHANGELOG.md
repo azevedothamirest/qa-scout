@@ -4,7 +4,7 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
-| [1.3.0](#130--acessibilidade-e-navegação) | 15/11/2026 | Acessibilidade e navegação |
+| [1.2.1](#121--acessibilidade-e-navegação) | 15/11/2026 | Acessibilidade e navegação |
 | [1.2.0](#120--captura-com-o-painel-fechado) | 15/11/2026 | Captura com o painel fechado |
 | [1.1.1](#111--correções-do-onboarding-e-da-captura) | 13/11/2026 | Correções do onboarding e da captura |
 | [1.1.0](#110--onboarding-interativo) | 03/11/2026 | Onboarding interativo |
@@ -14,7 +14,7 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 ---
 
-## 1.3.0 · Acessibilidade e navegação
+## 1.2.1 · Acessibilidade e navegação
 _15/11/2026_
 
 Fecha o que ficou aberto da rodada de QA de UX/UI de 30/10 ([#63](https://github.com/azevedothamirest/qa-scout/issues/63)).
