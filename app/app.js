@@ -446,6 +446,9 @@ async function atualizaAbas(){
   abasInfo = (await Promise.all(abas.map(id=>chrome.tabs.get(id).catch(()=>null)))).filter(Boolean);
   const c=$('#captura'), s=getActive(); if(c&&s) c.innerHTML=capturaHtml(s);
 }
+// Porta aberta enquanto este painel existe: o background sabe que ele fechou (onDisconnect) e
+// passa a mostrar o aviso flutuante nas abas acompanhadas. A aba de impressão não conta.
+if(EXT && !/^#imprimir=/.test(location.hash)){ try{ chrome.runtime.connect({name:'painel'}); }catch(e){} }
 function syncCaptura(){
   if(!EXT) return;
   const s=getActive();

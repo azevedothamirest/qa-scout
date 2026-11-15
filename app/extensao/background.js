@@ -71,6 +71,65 @@ async function guardaEvento(ev) {
   if (ev.url) ev.url = mascaraUrl(ev.url);
   const chave = `qascout.ev.${ev.ts}.${Math.random().toString(36).slice(2, 7)}`;
   await chrome.storage.local.set({ [chave]: ev });
+  await contaNoIndicador(ev);
+}
+
+// Com o painel fechado a captura continua: os eventos esperam no storage até o painel abrir.
+// O painel mantém uma porta aberta ("painel"); sem nenhuma, as abas acompanhadas mostram o aviso
+// flutuante (content.js) com quantos registros já esperam e o último. painéis fica no storage.session
+// para sobreviver ao service worker dormir.
+const IND = 'qascout.indicador';
+let fila = Promise.resolve();
+const emFila = f => (fila = fila.then(f, f));
+async function painelAberto() { return ((await chrome.storage.session.get('paineis')).paineis || 0) > 0; }
+function atualizaIndicador() {
+  return emFila(async () => {
+    const { capturando } = await estado();
+    const aberto = await painelAberto();
+    const { [IND]: atual = {} } = await chrome.storage.local.get(IND);
+    const ativo = capturando && !aberto;
+    if (!ativo) { if (atual.ativo || atual.n) await chrome.storage.local.set({ [IND]: { ativo: false } }); return; }
+    if (!atual.ativo) await chrome.storage.local.set({ [IND]: { ativo: true, desde: Date.now(), n: 0, ultimo: '' } });
+  });
+}
+function contaNoIndicador(ev) {
+  return emFila(async () => {
+    const { [IND]: atual } = await chrome.storage.local.get(IND);
+    if (!atual || !atual.ativo) return;
+    await chrome.storage.local.set({ [IND]: { ...atual, n: (atual.n || 0) + 1, ultimo: String(ev.desc || '').slice(0, 90) } });
+  });
+}
+chrome.runtime.onConnect.addListener(porta => {
+  if (porta.name !== 'painel') return;
+  emFila(async () => chrome.storage.session.set({ paineis: ((await chrome.storage.session.get('paineis')).paineis || 0) + 1 })).then(atualizaIndicador);
+  porta.onDisconnect.addListener(() => {
+    emFila(async () => chrome.storage.session.set({ paineis: Math.max(0, ((await chrome.storage.session.get('paineis')).paineis || 0) - 1) })).then(atualizaIndicador);
+  });
+});
+chrome.storage.onChanged.addListener((m, area) => { if (area === 'session' && m.capturando) atualizaIndicador(); });
+// Navegador reaberto: nenhum painel aberto ainda e nenhuma captura em andamento.
+chrome.runtime.onStartup.addListener(() => chrome.storage.local.set({ [IND]: { ativo: false } }));
+
+// sidePanel.open só vale no gesto do clique: nada de await antes dele. O modo fica guardado em memória.
+let modoAtual = null;
+chrome.storage.local.get('qascout.modo').then(r => { modoAtual = r['qascout.modo'] || ''; });
+chrome.storage.onChanged.addListener((m, area) => { if (area === 'local' && m['qascout.modo']) modoAtual = m['qascout.modo'].newValue || ''; });
+async function abrePainel(tab) {
+  if (modoAtual !== 'navegador') { await chrome.sidePanel.open({ windowId: tab.windowId }).catch(() => {}); return; }
+  // No navegador de teste o painel é uma janela popup: traz de volta ou abre outra.
+  const url = chrome.runtime.getURL('index.html');
+  const [aba] = await chrome.tabs.query({ url: url + '*' });
+  if (aba) { await chrome.windows.update(aba.windowId, { focused: true }).catch(() => {}); return; }
+  await chrome.windows.create({ url, type: 'popup', width: 440, height: 900, left: 0, top: 0 }).catch(() => {});
+}
+
+// Tira o aviso flutuante da frente antes do print, para ele não aparecer na evidência.
+async function printSemIndicador(tab) {
+  const { [IND]: st } = await chrome.storage.local.get(IND);
+  const oculta = valor => chrome.tabs.sendMessage(tab.id, { cmd: 'ocultarIndicador', valor }, { frameId: 0 }).catch(() => {});
+  if (st && st.ativo) await oculta(true);
+  try { return await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 70 }); }
+  finally { if (st && st.ativo) oculta(false); }
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, responder) => {
@@ -93,6 +152,7 @@ chrome.runtime.onMessage.addListener((msg, sender, responder) => {
     estado().then(({ abas }) => chrome.storage.session.set({ abas: abas.filter(id => id !== msg.tabId) })).then(() => responder({ ok: true }));
     return true;
   }
+  if (msg && msg.cmd === 'abrirPainel' && sender.tab) { abrePainel(sender.tab); return; }
   if (msg && msg.cmd === 'capturando') {
     chrome.storage.session.set({ capturando: !!msg.valor }).then(() => responder({ ok: true }));
     return true;
@@ -121,7 +181,7 @@ async function registra(msg, tab) {
   if (tab.active && (marca || (msg.tipo === 'clique' && Date.now() - ultimoPrint >= INTERVALO_PRINT))) {
     if (!marca) ultimoPrint = Date.now();
     try {
-      ev.img = await chrome.tabs.captureVisibleTab(tab.windowId, { format: 'jpeg', quality: 70 });
+      ev.img = await printSemIndicador(tab);
       if (!marca) Object.assign(ev, { x: msg.x, y: msg.y, vw: msg.vw, vh: msg.vh });
     } catch (e) {}
   }
