@@ -392,3 +392,30 @@ test.describe('Servidor local', () => {
     expect((await request.get('/tests/fixtures/loja.html')).status()).toBe(200);
   });
 });
+
+test.describe('Acessibilidade', () => {
+  test('Ligar Editar e Excluir ao texto da própria nota', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.locator('#c-exp').fill('o checkout');
+    await page.locator('#c-des').fill('falhas');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await page.locator('#note-in').fill('Primeira nota');
+    await page.getByRole('button', { name: 'Registrar nota' }).click();
+    await page.locator('#note-in').fill('Segunda nota');
+    await page.getByRole('button', { name: 'Registrar nota' }).click();
+    // Cada botão aponta (aria-describedby) para o texto da nota em que está.
+    const descricao = b => b.evaluate(el => document.getElementById(el.getAttribute('aria-describedby')).textContent);
+    expect(await descricao(page.locator('.note', { hasText: 'Primeira nota' }).getByRole('button', { name: 'Excluir' }))).toBe('Primeira nota');
+    expect(await descricao(page.locator('.note', { hasText: 'Segunda nota' }).getByRole('button', { name: 'Editar' }))).toBe('Segunda nota');
+  });
+
+  test('Chamar de "Voltar à sessão" a saída da confirmação de encerrar', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.locator('#c-exp').fill('o checkout');
+    await page.locator('#c-des').fill('falhas');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
+    await page.getByRole('button', { name: 'Voltar à sessão' }).click();
+    await expect(page.locator('#note-in')).toBeVisible();
+  });
+});

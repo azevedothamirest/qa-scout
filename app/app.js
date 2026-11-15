@@ -327,7 +327,7 @@ function viewSession(s){
         </div>
         <div id="end-confirm" hidden style="margin-top:12px;font-size:14px">
           ${t('Encerrar e ir para o relatório?')}
-          <div class="timer-actions" style="margin-top:8px"><button class="btn" data-act="end-no">${t('Continuar')}</button><button class="btn end" data-act="end-yes">${t('Sim, encerrar')}</button></div>
+          <div class="timer-actions" style="margin-top:8px"><button class="btn" data-act="end-no">${t('Voltar à sessão')}</button><button class="btn end" data-act="end-yes">${t('Sim, encerrar')}</button></div>
         </div>
       </div>
       <div class="card charter-card">
@@ -420,10 +420,10 @@ function noteHtml(n){
         <textarea id="edit-in">${esc(n.text)}</textarea>
         <div class="edit-foot">${temPassos(n.text)?'':`<button class="btn ghost" data-passos="${n.id}">${t('Incluir passos para reproduzir')}</button>`}<button class="btn ghost" data-cancel-edit>${t('Cancelar')}</button><button class="btn primary" data-saveedit="${n.id}">${n.pending?t('Salvar e confirmar'):t('Salvar')}</button></div>
       </div>`
-    : `<p class="txt">${esc(n.text)}</p>${n.url?`<p class="url">${esc(n.url)}</p>`:''}
+    : `<p class="txt" id="nt-${esc(n.id)}">${esc(n.text)}</p>${n.url?`<p class="url">${esc(n.url)}</p>`:''}
       ${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}
       <div class="note-actions">${confirmDel===n.id?`<button class="confirm" data-delnote="${n.id}" data-sure="1">${t('Confirmar exclusão')}</button><button data-cancel-del>${t('Cancelar')}</button>`
-        :`${n.pending?`<button class="ok" data-oknote="${n.id}">${t('Confirmar')}</button>`:''}${n.type==='bug'&&!n.pending?`<button data-copybug="${n.id}">${t('Copiar bug')}</button>`:''}<button data-editnote="${n.id}">${t('Editar')}</button><button data-delnote="${n.id}">${t('Excluir')}</button>`}</div>`;
+        :`${n.pending?`<button class="ok" data-oknote="${n.id}" aria-describedby="nt-${esc(n.id)}">${t('Confirmar')}</button>`:''}${n.type==='bug'&&!n.pending?`<button data-copybug="${n.id}" aria-describedby="nt-${esc(n.id)}">${t('Copiar bug')}</button>`:''}<button data-editnote="${n.id}" aria-describedby="nt-${esc(n.id)}">${t('Editar')}</button><button data-delnote="${n.id}" aria-describedby="nt-${esc(n.id)}">${t('Excluir')}</button>`}</div>`;
   return `<article class="note ${TYPES[n.type].cls}${n.pending?' pendente':''}" data-note="${n.id}">
     <div class="t">${n.pending?`<input type="checkbox" class="sel" data-sel="${n.id}" aria-label="${t('Selecionar nota')}" ${selecionadas.has(n.id)?'checked':''}> `:''}${fmtT(n.t)}</div>
     <div style="min-width:0"><div class="kind"><i></i>${rot(n.type)} ${tag}</div>${corpo}</div></article>`;
@@ -583,7 +583,7 @@ function viewReport(s){
           <p class="hint" style="margin:0 0 6px">${t('Elas só entram no relatório e no Markdown depois de confirmadas. Edite o texto ou o tipo se não for observação.')}</p>
           ${(vis=>loteHtml(s,vis)+`<div class="rev-lista">${vis.map(noteHtml).join('')}</div>`)(paginaDe('rev',pendentes(s)))}${pagerHtml('rev',pendentes(s).length)}</div>`:''}
         ${TYPE_ORDER.filter(k=>c[k]).map(k=>`<div class="group ${TYPES[k].cls}"><h3><i></i>${plural(k)}</h3>
-          ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}">${t('Copiar bug')}</button></div>`:''}</div></div>`).join('')}
+          ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0" id="rt-${esc(n.id)}">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}" aria-describedby="rt-${esc(n.id)}">${t('Copiar bug')}</button></div>`:''}</div></div>`).join('')}
         </div>`).join('') || `<p class="hint">${t('Nenhuma nota registrada nessa sessão.')}</p>`}
       </div>
       <aside style="display:grid;gap:16px;min-width:0">
