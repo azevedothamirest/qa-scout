@@ -281,7 +281,7 @@ function viewNew(){
   const d = state.draft || {explorar:'',com:'',descobrir:'',area:'',ambiente:'',testadora:'',plannedMin:60};
   return `<section class="view">
     <div class="section-head">
-      <div><div class="eyebrow">${t('Nova sessão')}</div><h2 style="font-size:28px;margin-top:6px">${t('Escreva o charter da sessão')}</h2></div>
+      <div><div class="eyebrow">${t('Nova sessão')}</div><h1 style="font-size:28px;margin-top:6px">${t('Escreva o charter da sessão')}</h1></div>
       <div style="display:flex;gap:14px;align-items:center"><button class="ajuda" type="button" data-go="metodo" data-arg="charter">${t('Por que charter?')}</button><button class="btn" type="button" data-act="exemplo-charter">${t('Usar um exemplo')}</button></div>
     </div>
     <form class="panel form-grid" id="charter-form" novalidate>
@@ -317,6 +317,7 @@ function viewNew(){
 let noteType = 'obs', filter = 'all', pendingImgs = [], heurIdx = Math.floor(Math.random()*HEUR.length), confirmDel = null;
 function viewSession(s){
   return `<section class="session">
+    <h1 class="sr-only">${t('Sessão ativa')}: ${esc(s.area)}</h1>
     <aside class="side">
       <div class="card timer">
         <div class="eyebrow">${t('Tempo de sessão')} ${s.status==='paused'?`<span class="paused-tag">${t('pausada')}</span>`:''}</div>
@@ -370,7 +371,7 @@ function viewSession(s){
 function heurHtml(){
   const h=HEUR[heurIdx];
   return `<div class="heur-head"><span class="eyebrow">${t('Travou? Tente isto')}</span><button class="link-btn" data-act="heur">${t('Outra ideia ↻')}</button></div>
-    <div class="cat">${esc(t(h.cat))}</div><h3>${esc(t(h.t))}</h3><p>${esc(t(h.p))}</p>`;
+    <div class="cat">${esc(t(h.cat))}</div><h2>${esc(t(h.t))}</h2><p>${esc(t(h.p))}</p>`;
 }
 function thumbsHtml(){ return pendingImgs.map((src,i)=>`<div class="thumb"><img src="${esc(src)}" alt="${t('Print anexado {n}',{n:i+1})}"><button data-rmimg="${i}" aria-label="${t('Remover print')}">×</button></div>`).join(''); }
 function logHtml(s){
@@ -581,17 +582,17 @@ function viewReport(s){
         </div>
         <p class="charter-line">${charterHtml(s.charter)}.</p>
         <div class="kpis">${TYPE_ORDER.map(k=>`<div class="kpi ${TYPES[k].cls}"><b>${c[k]}</b><span>${c[k]===1?rot(k):plural(k)}</span></div>`).join('')}</div>
-        ${pendentes(s).length?`<div class="revisar no-print" id="revisar"><h3>${pendentes(s).length} ${pendentes(s).length===1?t('nota automática para revisar'):t('notas automáticas para revisar')}</h3>
+        ${pendentes(s).length?`<div class="revisar no-print" id="revisar"><h2>${pendentes(s).length} ${pendentes(s).length===1?t('nota automática para revisar'):t('notas automáticas para revisar')}</h2>
           <p class="hint" style="margin:0 0 6px">${t('Elas só entram no relatório e no Markdown depois de confirmadas. Edite o texto ou o tipo se não for observação.')}</p>
           ${(vis=>loteHtml(s,vis)+`<div class="rev-lista">${vis.map(noteHtml).join('')}</div>`)(paginaDe('rev',pendentes(s)))}${pagerHtml('rev',pendentes(s).length)}</div>`:''}
-        ${TYPE_ORDER.filter(k=>c[k]).map(k=>`<div class="group ${TYPES[k].cls}"><h3><i></i>${plural(k)}</h3>
+        ${TYPE_ORDER.filter(k=>c[k]).map(k=>`<div class="group ${TYPES[k].cls}"><h2><i></i>${plural(k)}</h2>
           ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0" id="rt-${esc(n.id)}">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}" aria-describedby="rt-${esc(n.id)}">${t('Copiar bug')}</button></div>`:''}</div></div>`).join('')}
         </div>`).join('') || `<p class="hint">${t('Nenhuma nota registrada nessa sessão.')}</p>`}
       </div>
       <aside style="display:grid;gap:16px;min-width:0">
         <div class="card debrief">
           <div class="eyebrow">Debriefing</div>
-          <h3 style="font-size:17px;margin:4px 0 2px">${t('Como o tempo foi dividido?')}</h3>
+          <h2 style="font-size:17px;margin:4px 0 2px">${t('Como o tempo foi dividido?')}</h2>
           <p class="hint" style="margin:0">${t('Teste, investigação de bug e preparo (TBS).')} <button class="ajuda" data-go="metodo" data-arg="debriefing">${t('Como fazer um bom debriefing?')}</button></p>
           <div class="tbs" id="tbs-bar">${tbsBar(db)}</div>
           <div class="tbs-legend">
@@ -602,7 +603,7 @@ function viewReport(s){
         </div>
         <div class="card">
           <div class="eyebrow">${t('Compartilhar')}</div>
-          <h3 style="font-size:17px;margin:4px 0 10px">${t('Relatório em Markdown')}</h3>
+          <h2 style="font-size:17px;margin:4px 0 10px">${t('Relatório em Markdown')}</h2>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
             <button class="btn primary" data-act="copy-md">${t('Copiar Markdown')}</button>
             <button class="btn" data-act="copy-bugs">${t('Copiar só os bugs')}</button>
@@ -714,7 +715,7 @@ function cartaHtml(){
   const h=HEUR[deckIdx];
   return `<article class="carta ${CAT_CLS[h.cat]}" data-giro="${deckGiro%2}" aria-live="polite">
     <div class="carta-topo"><span class="cat">${esc(t(h.cat))}</span><span class="carta-n">${deckIdx+1}/${HEUR.length}</span></div>
-    <h3>${esc(t(h.t))}</h3>
+    <h2>${esc(t(h.t))}</h2>
     <p>${esc(t(h.p))}</p>
     <div class="desafio"><span>${t('Faz isso agora')}</span>${esc(t(DESAFIO[h.t]||''))}</div>
   </article>`;
@@ -727,7 +728,7 @@ function viewDeck(){
     <div class="sorteio">
       <div class="sorteio-txt">
         <div class="eyebrow">${t('Baralho de ideias · {n} cartas',{n:HEUR.length})}</div>
-        <h2>${t('Travou?')} <em>${t('Puxa uma carta.')}</em></h2>
+        <h1>${t('Travou?')} <em>${t('Puxa uma carta.')}</em></h1>
         <p class="hint">${t('Cada carta traz uma heurística e um desafio para fazer agora. Tours inspirados em James Whittaker, mais dados e contextos do dia a dia brasileiro.')}</p>
         <div class="deck-filters" role="group" aria-label="${t('Categoria')}">${cats.map(c=>`<button data-cat="${c}" aria-pressed="${deckCat===c}">${t(c)}</button>`).join('')}</div>
       </div>
@@ -806,6 +807,7 @@ function viewMcp(){
       <p>${t('Você passa a missão e o Claude conduz a sessão no navegador de teste: lê a tela, clica, preenche, anota o que encontra e devolve o relatório. A captura do QA Scout grava tudo como faria com você, e a sessão fica no seu histórico para revisar.')}</p>
     </div>
     <div class="mcp-aviso" role="note"><b>${t('Roda no terminal do seu computador.')}</b> ${t('O MCP funciona no Claude Code ou no Claude Desktop, com o Node.js 18 ou mais recente instalado.')} ${EXT?t('Esta extensão só explica como usar: quem abre o navegador e conduz a sessão é o comando <code>qa-scout mcp</code>.'):t('Este site só explica como usar: quem abre o navegador e conduz a sessão é o comando <code>qa-scout mcp</code>.')}</div>
+    <h2 class="sr-only">${t('Como começar')}</h2>
     <div class="passos mcp-passos">
       <div class="passo"><h3>${t('Instale no Claude Code')}</h3><p>${t('No terminal, uma vez só:')}</p>${cmd(MCP_INSTALAR,'o comando de instalação')}<small>${t('Claude Desktop: veja o guia')}</small></div>
       <div class="passo"><h3>${t('Confira a conexão')}</h3><p>${t('O <code>qa-scout</code> deve aparecer como conectado.')}</p>${cmd('claude mcp list','o comando de conferência')}<small>${t('Primeira vez: o Chromium é baixado')}</small></div>

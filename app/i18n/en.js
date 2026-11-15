@@ -119,6 +119,7 @@ window.QAS_I18N.dic["en"] = {
   "Confirmar todas ({n})": "Confirm all ({n})",
   "Contexto": "Context",
   "Abrir sessão {area}": "Open session {area}",
+  "Como começar": "How to start",
   "Voltar à sessão": "Back to session",
   "Continuar sessão": "Continue session",
   "Copiado": "Copied",

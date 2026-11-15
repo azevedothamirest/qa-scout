@@ -286,9 +286,9 @@ test.describe('Baralho de heurísticas', () => {
   });
 
   test('Puxar outra carta diferente da atual', async ({ page }) => {
-    const antes = await page.locator('.carta h3').textContent();
+    const antes = await page.locator('.carta h2').textContent();
     await page.getByRole('button', { name: /Puxar outra carta/ }).click();
-    await expect(page.locator('.carta h3')).not.toHaveText(antes || '');
+    await expect(page.locator('.carta h2')).not.toHaveText(antes || '');
     await expect(page.locator('.desafio')).toContainText('Faz isso agora');
   });
 
@@ -301,7 +301,7 @@ test.describe('Baralho de heurísticas', () => {
   });
 
   test('Começar sessão com a carta sugerida no campo "com"', async ({ page }) => {
-    const titulo = await page.locator('.carta h3').textContent();
+    const titulo = await page.locator('.carta h2').textContent();
     await page.getByRole('button', { name: 'Começar sessão com esta carta' }).click();
     await expect(page.getByLabel('com', { exact: true })).toHaveValue(new RegExp(`heurística “${titulo}”`));
   });
@@ -312,7 +312,7 @@ test.describe('Baralho de heurísticas', () => {
     await page.getByLabel('para descobrir').fill('falhas de sessão');
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
     await page.getByRole('button', { name: 'Heurísticas', exact: true }).click();
-    const titulo = await page.locator('.carta h3').textContent();
+    const titulo = await page.locator('.carta h2').textContent();
     await page.getByRole('button', { name: 'Anotar como ideia na sessão' }).click();
     await page.getByRole('button', { name: 'Sessão ativa' }).click();
     await expect(page.locator('.note.t-ide')).toContainText(`Heurística “${titulo}”`);
@@ -321,7 +321,7 @@ test.describe('Baralho de heurísticas', () => {
   test('Abrir uma carta pela lista completa', async ({ page }) => {
     await page.getByRole('button', { name: 'Ver todas' }).click();
     await page.locator('.hcard', { hasText: 'Permissões' }).click();
-    await expect(page.locator('.carta h3')).toHaveText('Permissões');
+    await expect(page.locator('.carta h2')).toHaveText('Permissões');
   });
 });
 
@@ -429,5 +429,34 @@ test.describe('Acessibilidade · nomes', () => {
   test('Tirar o atalho do nome do botão de puxar carta', async ({ page }) => {
     await page.locator('#tab-deck').click();
     await expect(page.getByRole('button', { name: 'Puxar outra carta', exact: true })).toHaveAttribute('aria-keyshortcuts', 'Space');
+  });
+});
+
+test.describe('Acessibilidade · títulos', () => {
+  // Uma tela tem um h1 e nenhum título pula nível (h1 → h3) (#53).
+  async function niveis(page) {
+    return page.evaluate(() => [...document.querySelectorAll('main h1, main h2, main h3, main h4')]
+      .filter(e => e.offsetParent || e.classList.contains('sr-only')).map(e => +e.tagName[1]));
+  }
+  function confere(n) {
+    expect(n.filter(x => x === 1)).toHaveLength(1);
+    n.forEach((x, i) => { if (i) expect(x - n[i - 1]).toBeLessThanOrEqual(1); });
+  }
+  test('Começar cada tela por um h1 sem pular níveis de título', async ({ page }) => {
+    confere(await niveis(page));
+    for (const tela of ['deck', 'metodo', 'mcp']) {
+      await page.locator(`#tab-${tela}, [data-go="${tela}"]`).first().click();
+      confere(await niveis(page));
+    }
+    await page.locator('[data-go="home"]').first().click();
+    await page.locator('[data-open="ex-pix"]').click();
+    confere(await niveis(page));
+    await page.locator('[data-go="home"]').first().click();
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    confere(await niveis(page));
+    await page.locator('#c-exp').fill('o checkout');
+    await page.locator('#c-des').fill('falhas');
+    await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+    confere(await niveis(page));
   });
 });
