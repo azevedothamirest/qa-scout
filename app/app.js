@@ -627,7 +627,8 @@ function viewReport(s){
 function tbsBar(db){ const tot=(db.test+db.bug+db.setup)||1; return `<i style="width:${db.test/tot*100}%;background:var(--accent)"></i><i style="width:${db.bug/tot*100}%;background:var(--t-bug)"></i><i style="width:${db.setup/tot*100}%;background:var(--marker)"></i>`; }
 // Texto digitado vai para o Markdown como texto: HTML, links e marcadores de bloco no início da linha
 // são escapados, para o relatório não mudar de forma no GitHub ou no Jira.
-const mdEsc = l => l.replace(/[\\`[\]|]/g,'\\$&').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// Ênfase (* _ ~) também escapa: o que se vê na nota é o que sai no Markdown (#56).
+const mdEsc = l => l.replace(/[\\`[\]|*_~]/g,'\\$&').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const mdInline = t => mdEsc(String(t??'').replace(/\s*\n\s*/g,' '));
 const mdBloco = (t, recuo='') => String(t??'').split(/\n+/).map(l=>mdEsc(l).replace(/^(\s*)(\d+)([.)])(?=\s|$)/,'$1$2\\$3').replace(/^(\s*)([#+*-])(?=\s|$)/,'$1\\$2')).join('  \n'+recuo);
 function toMarkdown(s, onlyBugs=false){

@@ -251,3 +251,16 @@ test.describe('Regressão · correções da 0.6.3', () => {
     expect(md).not.toMatch(/<img|<b>/);
   });
 });
+
+test.describe('Markdown do relatório · ênfase', () => {
+  test('Escapar asteriscos e sublinhados digitados na nota', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await iniciarSessao(page);
+    await registrar(page, 'Nota com **negrito** e _itálico_ e ~~risco~~');
+    await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
+    await page.getByRole('button', { name: 'Sim, encerrar' }).click();
+    await page.getByRole('button', { name: 'Copiar Markdown' }).click();
+    const md = await page.evaluate(() => navigator.clipboard.readText());
+    expect(md).toContain('Nota com \\*\\*negrito\\*\\* e \\_itálico\\_ e \\~\\~risco\\~\\~');
+  });
+});
