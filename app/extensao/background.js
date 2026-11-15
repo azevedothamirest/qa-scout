@@ -7,7 +7,9 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => 
 
 // No modo "navegador de teste" (aberto pelo comando qa-scout), toda aba de site é acompanhada.
 async function estado() {
-  const { abas = [], capturando = false } = await chrome.storage.session.get(['abas', 'capturando']);
+  const { abas = [], capturando: ligado = false, capturarAte = null } = await chrome.storage.session.get(['abas', 'capturando', 'capturarAte']);
+  // Acabou o tempo planejado da sessão: para de capturar mesmo com o painel fechado.
+  const capturando = ligado && !(capturarAte && Date.now() >= capturarAte);
   const { 'qascout.modo': modo } = await chrome.storage.local.get('qascout.modo');
   const todas = modo === 'navegador';
   const acompanha = tab => todas ? /^(https?|file):/.test(tab.url || '') : abas.includes(tab.id);
@@ -89,7 +91,8 @@ function atualizaIndicador() {
     const { [IND]: atual = {} } = await chrome.storage.local.get(IND);
     const ativo = capturando && !aberto;
     if (!ativo) { if (atual.ativo || atual.n) await chrome.storage.local.set({ [IND]: { ativo: false } }); return; }
-    if (!atual.ativo) await chrome.storage.local.set({ [IND]: { ativo: true, desde: Date.now(), n: 0, ultimo: '' } });
+    const { capturarAte = null } = await chrome.storage.session.get('capturarAte');
+    if (!atual.ativo || atual.ate !== capturarAte) await chrome.storage.local.set({ [IND]: { ...(atual.ativo ? atual : { n: 0, ultimo: '' }), ativo: true, desde: atual.ativo ? atual.desde : Date.now(), ate: capturarAte } });
   });
 }
 function contaNoIndicador(ev) {
@@ -106,7 +109,7 @@ chrome.runtime.onConnect.addListener(porta => {
     emFila(async () => chrome.storage.session.set({ paineis: Math.max(0, ((await chrome.storage.session.get('paineis')).paineis || 0) - 1) })).then(atualizaIndicador);
   });
 });
-chrome.storage.onChanged.addListener((m, area) => { if (area === 'session' && m.capturando) atualizaIndicador(); });
+chrome.storage.onChanged.addListener((m, area) => { if (area === 'session' && (m.capturando || m.capturarAte)) atualizaIndicador(); });
 // Navegador reaberto: nenhum painel aberto ainda e nenhuma captura em andamento.
 chrome.runtime.onStartup.addListener(() => chrome.storage.local.set({ [IND]: { ativo: false } }));
 
@@ -155,7 +158,7 @@ chrome.runtime.onMessage.addListener((msg, sender, responder) => {
   }
   if (msg && msg.cmd === 'abrirPainel' && sender.tab) { abrePainel(sender.tab); return; }
   if (msg && msg.cmd === 'capturando') {
-    chrome.storage.session.set({ capturando: !!msg.valor }).then(() => responder({ ok: true }));
+    chrome.storage.session.set({ capturando: !!msg.valor, capturarAte: msg.ate || null }).then(() => responder({ ok: true }));
     return true;
   }
 });

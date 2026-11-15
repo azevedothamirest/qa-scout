@@ -569,6 +569,25 @@ test.describe('Painel fechado · navegador de teste', () => {
   });
 });
 
+test.describe('Tempo planejado', () => {
+  test('Parar a captura com o painel fechado quando acaba o tempo da sessão', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    const url = painel.url();
+    const [sw] = context.serviceWorkers();
+    await painel.close();
+    await expect(loja.locator('qa-scout-indicador')).toHaveCount(1);
+    // O tempo planejado acabou agora: a captura para e o aviso some.
+    await sw.evaluate(() => chrome.storage.session.set({ capturarAte: Date.now() }));
+    await expect(loja.locator('qa-scout-indicador')).toHaveCount(0);
+    await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
+    const novo = await context.newPage();
+    await novo.goto(url);
+    await expect(novo.locator('#note-in')).toBeVisible();
+    await expect(novo.locator('.note', { hasText: 'Pagar com Pix' })).toHaveCount(0);
+  });
+});
+
 test.describe('Painel estreito', () => {
   test('Manter o painel sem rolagem lateral com título de aba longo', async ({ context, painel }) => {
     await painel.setViewportSize({ width: 360, height: 800 });

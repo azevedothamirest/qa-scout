@@ -4,12 +4,44 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.2.1](#121--acessibilidade-e-navegação) | 15/11/2026 | Acessibilidade e navegação |
 | [1.2.0](#120--captura-com-o-painel-fechado) | 15/11/2026 | Captura com o painel fechado |
 | [1.1.1](#111--correções-do-onboarding-e-da-captura) | 13/11/2026 | Correções do onboarding e da captura |
 | [1.1.0](#110--onboarding-interativo) | 03/11/2026 | Onboarding interativo |
 | [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
 | [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
+
+---
+
+## 1.2.1 · Acessibilidade e navegação
+_15/11/2026_
+
+Fecha o que ficou aberto da rodada de QA de UX/UI de 30/10 ([#63](https://github.com/azevedothamirest/qa-scout/issues/63)).
+
+**✨ Novidades**
+- **Cada tela tem endereço próprio** (`#/heuristicas`, `#/relatorio/<id>`...). O Voltar do navegador volta para a tela anterior, dá para abrir uma seção direto ou numa aba nova, e o menu virou links. ([#48](https://github.com/azevedothamirest/qa-scout/issues/48))
+- **Trocar o idioma mantém a tela atual**, sem repetir a abertura e sem perder o charter que estava sendo digitado. ([#59](https://github.com/azevedothamirest/qa-scout/issues/59))
+
+- **Sessão esquecida aberta para sozinha:** quando o tempo planejado acaba, a sessão é pausada e a captura para, mesmo com o painel fechado ou o app fechado. "Retomar" vale como prorrogação; "Encerrar" leva ao relatório.
+
+**♿ Acessibilidade**
+- **Notas:** "Editar", "Excluir", "Confirmar" e "Copiar bug" dizem a qual nota pertencem, e "Continuar" na confirmação de encerrar virou "Voltar à sessão". ([#54](https://github.com/azevedothamirest/qa-scout/issues/54))
+- **Nomes:**
+  - o card de sessão tem nome curto ("Abrir sessão …, exemplo");
+  - o selo "exemplo" ficou separado do título;
+  - o atalho "Espaço" saiu do nome do botão de puxar carta;
+  - "Importar backup" não se repete mais. ([#49](https://github.com/azevedothamirest/qa-scout/issues/49))
+- **Títulos:** um h1 por tela e nenhum salto de nível. ([#53](https://github.com/azevedothamirest/qa-scout/issues/53))
+- **Navegação e debriefing:**
+  - entrou o link "Pular para o conteúdo";
+  - os sliders de Teste, Bug e Setup anunciam a % e a nova divisão;
+  - os links do rodapé têm pelo menos 24 px. ([#60](https://github.com/azevedothamirest/qa-scout/issues/60))
+
+**✨ Mudanças**
+- **MCP:** "veja o guia de instalação" agora leva ao guia do Claude Desktop, e a dica do Chromium diz quanto tempo leva. ([#58](https://github.com/azevedothamirest/qa-scout/issues/58))
+- **Markdown:** `*`, `_` e `~` digitados na nota são escapados, então o relatório mostra o que está na nota. ([#56](https://github.com/azevedothamirest/qa-scout/issues/56))
+- **Home:** os números contam só as suas sessões, sem as de exemplo. ([#61](https://github.com/azevedothamirest/qa-scout/issues/61))
 
 ---
 

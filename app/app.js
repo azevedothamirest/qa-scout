@@ -165,6 +165,9 @@ function charterHtml(c){ return t('Explorar {explorar} com {com} para descobrir 
 function charterText(c){ return t('Explorar {explorar} com {com} para descobrir {descobrir}', c); }
 function getActive(){ return state.sessions.find(s=>s.id===state.activeId && s.status!=='done') || null; }
 let toastT;
+let anuncioT;
+// "Pular para o conteúdo": leva o foco ao <main> sem mexer na URL.
+document.getElementById('pular')?.addEventListener('click',e=>{ e.preventDefault(); $('#app').focus(); });
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(limpaToast,2600); }
 // Ao sumir, o aviso sai também da região de status: ela não fica mostrando o recado de outra tela (#55).
 function limpaToast(){ clearTimeout(toastT); const el=$('#toast'); el.classList.remove('show'); el.textContent=''; }
@@ -175,8 +178,29 @@ async function copy(text, okMsg, fallbackEl){
 
 /* ---------- roteamento ---------- */
 let view = 'home', viewArg = null;
+// Cada tela tem endereço próprio (#/heuristicas, #/relatorio/<id>...): Voltar do navegador, link
+// direto e troca de idioma voltam para a mesma tela (#48, #59).
+const ROTAS = {home:'sessoes',new:'nova',active:'sessao',deck:'heuristicas',metodo:'metodo',mcp:'mcp',report:'relatorio'};
+const rotaDe = (v,arg) => '#/'+ROTAS[v]+(arg?'/'+encodeURIComponent(arg):'');
+function lerRota(){
+  const m=location.hash.match(/^#\/([a-z]+)(?:\/(.+))?$/); if(!m) return null;
+  const v=Object.keys(ROTAS).find(k=>ROTAS[k]===m[1]); if(!v) return null;
+  let arg=null; try{ arg=m[2]?decodeURIComponent(m[2]):null; }catch(e){}
+  if(v==='report' && !state.sessions.some(s=>s.id===arg)) return {view:'home',arg:null};
+  return {view:v,arg};
+}
+function marcaRota(substituir){
+  const h=rotaDe(view,viewArg); if(location.hash===h) return;
+  try{ history[substituir?'replaceState':'pushState'](null,'',location.pathname+location.search+h); }catch(e){}
+}
+addEventListener('popstate',()=>{
+  if(/^#imprimir=/.test(location.hash)) return;
+  const r=lerRota()||{view:'home',arg:null};
+  if(view==='new'){ state.draft=readDraft(); save(); }
+  view=r.view; viewArg=r.arg; render(); window.scrollTo({top:0});
+});
 function go(v,arg=null){
-  view=v; viewArg=arg; render();
+  view=v; viewArg=arg; render(); marcaRota(false);
   const alvo = v==='metodo' && arg ? document.getElementById('m-'+arg) : null;
   if(alvo){ virarCarta(alvo,true); alvo.scrollIntoView({block:'center'}); alvo.focus({preventScroll:true}); } else window.scrollTo({top:0});
 }
@@ -213,9 +237,11 @@ let query = '';
 function viewHome(){
   const done = state.sessions.filter(s=>s.status==='done').sort((a,b)=>b.startedAt-a.startedAt);
   const active = getActive();
-  const totMin = Math.round(done.reduce((a,s)=>a+s.elapsedMs,0)/MIN);
-  const bugs = done.reduce((a,s)=>a+counts(s).bug,0);
-  const duv = done.reduce((a,s)=>a+counts(s).duv,0);
+  // Os números da home contam só as sessões da pessoa, nunca as de exemplo (#61).
+  const reais = done.filter(s=>!s.example);
+  const totMin = Math.round(reais.reduce((a,s)=>a+s.elapsedMs,0)/MIN);
+  const bugs = reais.reduce((a,s)=>a+counts(s).bug,0);
+  const duv = reais.reduce((a,s)=>a+counts(s).duv,0);
   const hasEx = state.sessions.some(s=>s.example);
   const q = query.trim().toLowerCase();
   const list = done.filter(s=>!q || [s.area,charterText(s.charter),s.ambiente,...s.notes.map(n=>n.text)].join(' ').toLowerCase().includes(q));
@@ -232,7 +258,7 @@ function viewHome(){
         </div>
       </div>
       <div class="stats" aria-label="${t('Resumo das sessões')}">
-        <div class="stat"><b>${done.length}</b><span>${t('sessões concluídas')}</span></div>
+        <div class="stat"><b>${reais.length}</b><span>${t('sessões concluídas')}</span></div>
         <div class="stat"><b>${totMin}<small style="font-size:15px"> min</small></b><span>${t('explorando')}</span></div>
         <div class="stat"><b style="color:var(--t-bug)">${bugs}</b><span>${t('bugs encontrados')}</span></div>
         <div class="stat"><b style="color:var(--t-duv)">${duv}</b><span>${t('dúvidas levantadas')}</span></div>
@@ -253,7 +279,7 @@ function viewHome(){
     </div>` : ''}
     <div class="section-head">
       <div><div class="eyebrow">${t('Histórico')}</div><h2>${t('Sessões anteriores')}</h2></div>
-      <div class="backup"><button class="btn ghost" data-act="backup">${t('Baixar backup')}</button><label class="btn ghost file-lbl">${t('Importar backup')}<input type="file" id="backup-in" accept="application/json,.json"></label></div>
+      <div class="backup"><button class="btn ghost" data-act="backup">${t('Baixar backup')}</button><label class="btn ghost file-lbl"><span aria-hidden="true">${t('Importar backup')}</span><input type="file" id="backup-in" accept="application/json,.json" aria-label="${t('Importar backup')}"></label></div>
       <label class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="${t('Buscar por área, charter ou nota')}" value="${esc(query)}" aria-label="${t('Buscar sessões')}"></label>
     </div>
     <div class="list" id="list">
@@ -264,9 +290,11 @@ function viewHome(){
 }
 function rowHtml(s){
   const d=new Date(s.startedAt), c=counts(s);
-  return `<button class="row" data-open="${s.id}">
+  // Nome curto para leitor de tela: o card inteiro (data, charter, contagens) virava um nome enorme (#49).
+  const nome = t('Abrir sessão {area}',{area:s.area}) + (s.example?`, ${t('exemplo')}`:'');
+  return `<button class="row" data-open="${s.id}" aria-label="${esc(nome)}">
     <div class="date"><b>${pad(d.getDate())}</b>${mesCurto(d)}</div>
-    <div style="min-width:0"><h3>${esc(s.area)}${s.example?`<span class="tag-ex">${t('exemplo')}</span>`:''}</h3><p>${esc(charterText(s.charter))}</p></div>
+    <div style="min-width:0"><h3>${esc(s.area)}${s.example?`<span class="tag-ex"><span class="sr-only"> · </span>${t('exemplo')}</span>`:''}</h3><p>${esc(charterText(s.charter))}</p></div>
     <div class="chips">
       <span class="chip">${minReais(s)}/${s.plannedMin} min</span>
       ${['bug','duv','ris'].filter(k=>c[k]).map(k=>`<span class="chip ${TYPES[k].cls}" style="color:var(--c)"><i></i><span style="color:var(--ink)">${c[k]} ${c[k]>1?plural(k).toLowerCase():rot(k).toLowerCase()}</span></span>`).join('')}
@@ -279,7 +307,7 @@ function viewNew(){
   const d = state.draft || {explorar:'',com:'',descobrir:'',area:'',ambiente:'',testadora:'',plannedMin:60};
   return `<section class="view">
     <div class="section-head">
-      <div><div class="eyebrow">${t('Nova sessão')}</div><h2 style="font-size:28px;margin-top:6px">${t('Escreva o charter da sessão')}</h2></div>
+      <div><div class="eyebrow">${t('Nova sessão')}</div><h1 style="font-size:28px;margin-top:6px">${t('Escreva o charter da sessão')}</h1></div>
       <div style="display:flex;gap:14px;align-items:center"><button class="ajuda" type="button" data-go="metodo" data-arg="charter">${t('Por que charter?')}</button><button class="btn" type="button" data-act="exemplo-charter">${t('Usar um exemplo')}</button></div>
     </div>
     <form class="panel form-grid" id="charter-form" novalidate>
@@ -315,6 +343,7 @@ function viewNew(){
 let noteType = 'obs', filter = 'all', pendingImgs = [], heurIdx = Math.floor(Math.random()*HEUR.length), confirmDel = null;
 function viewSession(s){
   return `<section class="session">
+    <h1 class="sr-only">${t('Sessão ativa')}: ${esc(s.area)}</h1>
     <aside class="side">
       <div class="card timer">
         <div class="eyebrow">${t('Tempo de sessão')} ${s.status==='paused'?`<span class="paused-tag">${t('pausada')}</span>`:''}</div>
@@ -327,7 +356,7 @@ function viewSession(s){
         </div>
         <div id="end-confirm" hidden style="margin-top:12px;font-size:14px">
           ${t('Encerrar e ir para o relatório?')}
-          <div class="timer-actions" style="margin-top:8px"><button class="btn" data-act="end-no">${t('Continuar')}</button><button class="btn end" data-act="end-yes">${t('Sim, encerrar')}</button></div>
+          <div class="timer-actions" style="margin-top:8px"><button class="btn" data-act="end-no">${t('Voltar à sessão')}</button><button class="btn end" data-act="end-yes">${t('Sim, encerrar')}</button></div>
         </div>
       </div>
       <div class="card charter-card">
@@ -368,7 +397,7 @@ function viewSession(s){
 function heurHtml(){
   const h=HEUR[heurIdx];
   return `<div class="heur-head"><span class="eyebrow">${t('Travou? Tente isto')}</span><button class="link-btn" data-act="heur">${t('Outra ideia ↻')}</button></div>
-    <div class="cat">${esc(t(h.cat))}</div><h3>${esc(t(h.t))}</h3><p>${esc(t(h.p))}</p>`;
+    <div class="cat">${esc(t(h.cat))}</div><h2>${esc(t(h.t))}</h2><p>${esc(t(h.p))}</p>`;
 }
 function thumbsHtml(){ return pendingImgs.map((src,i)=>`<div class="thumb"><img src="${esc(src)}" alt="${t('Print anexado {n}',{n:i+1})}"><button data-rmimg="${i}" aria-label="${t('Remover print')}">×</button></div>`).join(''); }
 function logHtml(s){
@@ -420,10 +449,10 @@ function noteHtml(n){
         <textarea id="edit-in">${esc(n.text)}</textarea>
         <div class="edit-foot">${temPassos(n.text)?'':`<button class="btn ghost" data-passos="${n.id}">${t('Incluir passos para reproduzir')}</button>`}<button class="btn ghost" data-cancel-edit>${t('Cancelar')}</button><button class="btn primary" data-saveedit="${n.id}">${n.pending?t('Salvar e confirmar'):t('Salvar')}</button></div>
       </div>`
-    : `<p class="txt">${esc(n.text)}</p>${n.url?`<p class="url">${esc(n.url)}</p>`:''}
+    : `<p class="txt" id="nt-${esc(n.id)}">${esc(n.text)}</p>${n.url?`<p class="url">${esc(n.url)}</p>`:''}
       ${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}
       <div class="note-actions">${confirmDel===n.id?`<button class="confirm" data-delnote="${n.id}" data-sure="1">${t('Confirmar exclusão')}</button><button data-cancel-del>${t('Cancelar')}</button>`
-        :`${n.pending?`<button class="ok" data-oknote="${n.id}">${t('Confirmar')}</button>`:''}${n.type==='bug'&&!n.pending?`<button data-copybug="${n.id}">${t('Copiar bug')}</button>`:''}<button data-editnote="${n.id}">${t('Editar')}</button><button data-delnote="${n.id}">${t('Excluir')}</button>`}</div>`;
+        :`${n.pending?`<button class="ok" data-oknote="${n.id}" aria-describedby="nt-${esc(n.id)}">${t('Confirmar')}</button>`:''}${n.type==='bug'&&!n.pending?`<button data-copybug="${n.id}" aria-describedby="nt-${esc(n.id)}">${t('Copiar bug')}</button>`:''}<button data-editnote="${n.id}" aria-describedby="nt-${esc(n.id)}">${t('Editar')}</button><button data-delnote="${n.id}" aria-describedby="nt-${esc(n.id)}">${t('Excluir')}</button>`}</div>`;
   return `<article class="note ${TYPES[n.type].cls}${n.pending?' pendente':''}" data-note="${n.id}">
     <div class="t">${n.pending?`<input type="checkbox" class="sel" data-sel="${n.id}" aria-label="${t('Selecionar nota')}" ${selecionadas.has(n.id)?'checked':''}> `:''}${fmtT(n.t)}</div>
     <div style="min-width:0"><div class="kind"><i></i>${rot(n.type)} ${tag}</div>${corpo}</div></article>`;
@@ -452,8 +481,23 @@ if(EXT && !/^#imprimir=/.test(location.hash)){ try{ chrome.runtime.connect({name
 function syncCaptura(){
   if(!EXT) return;
   const s=getActive();
-  chrome.runtime.sendMessage({cmd:'capturando', valor: !!(s && s.status==='running')}).catch(()=>{});
+  const rodando = !!(s && s.status==='running');
+  // Hora em que o tempo planejado acaba: o background para de capturar sozinho, mesmo com o painel fechado.
+  const ate = rodando && !s.prorrogada ? s.runStartedAt + Math.max(0, s.plannedMin*MIN - s.elapsedMs) : null;
+  chrome.runtime.sendMessage({cmd:'capturando', valor: rodando, ate}).catch(()=>{});
 }
+// Sessão esquecida aberta: ao acabar o tempo planejado, ela é pausada (a captura para junto) e
+// fica esperando "Retomar" (que vale como prorrogação) ou "Encerrar".
+function fechaNoTempo(){
+  const s=getActive();
+  if(!s || s.status!=='running' || s.prorrogada) return false;
+  const plan=s.plannedMin*MIN;
+  if(elapsed(s) < plan) return false;
+  s.elapsedMs=plan; s.runStartedAt=null; s.status='paused'; s.esgotou=true;
+  save();
+  return true;
+}
+setInterval(()=>{ if(fechaNoTempo()){ render(); toast(t('Tempo planejado esgotado: sessão pausada.')); } },1000);
 async function acompanharAbaAtual({auto=false}={}){
   if(!auto){
     // O pedido precisa sair direto do clique, antes de qualquer outra espera.
@@ -579,28 +623,28 @@ function viewReport(s){
         </div>
         <p class="charter-line">${charterHtml(s.charter)}.</p>
         <div class="kpis">${TYPE_ORDER.map(k=>`<div class="kpi ${TYPES[k].cls}"><b>${c[k]}</b><span>${c[k]===1?rot(k):plural(k)}</span></div>`).join('')}</div>
-        ${pendentes(s).length?`<div class="revisar no-print" id="revisar"><h3>${pendentes(s).length} ${pendentes(s).length===1?t('nota automática para revisar'):t('notas automáticas para revisar')}</h3>
+        ${pendentes(s).length?`<div class="revisar no-print" id="revisar"><h2>${pendentes(s).length} ${pendentes(s).length===1?t('nota automática para revisar'):t('notas automáticas para revisar')}</h2>
           <p class="hint" style="margin:0 0 6px">${t('Elas só entram no relatório e no Markdown depois de confirmadas. Edite o texto ou o tipo se não for observação.')}</p>
           ${(vis=>loteHtml(s,vis)+`<div class="rev-lista">${vis.map(noteHtml).join('')}</div>`)(paginaDe('rev',pendentes(s)))}${pagerHtml('rev',pendentes(s).length)}</div>`:''}
-        ${TYPE_ORDER.filter(k=>c[k]).map(k=>`<div class="group ${TYPES[k].cls}"><h3><i></i>${plural(k)}</h3>
-          ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}">${t('Copiar bug')}</button></div>`:''}</div></div>`).join('')}
+        ${TYPE_ORDER.filter(k=>c[k]).map(k=>`<div class="group ${TYPES[k].cls}"><h2><i></i>${plural(k)}</h2>
+          ${s.notes.filter(n=>n.type===k&&!n.pending).map(n=>`<div class="note ${TYPES[k].cls}" style="padding:10px 0"><div class="t">${fmtT(n.t)}</div><div style="min-width:0"><p class="txt" style="margin:0" id="rt-${esc(n.id)}">${esc(n.text)}</p>${n.imgs&&n.imgs.length?`<div class="imgs">${n.imgs.filter(imgOk).map(src=>`<img src="${esc(src)}" alt="${t('Print da nota')}">`).join('')}</div>`:''}${k==='bug'?`<div class="note-actions no-print"><button data-copybug="${n.id}" aria-describedby="rt-${esc(n.id)}">${t('Copiar bug')}</button></div>`:''}</div></div>`).join('')}
         </div>`).join('') || `<p class="hint">${t('Nenhuma nota registrada nessa sessão.')}</p>`}
       </div>
       <aside style="display:grid;gap:16px;min-width:0">
         <div class="card debrief">
           <div class="eyebrow">Debriefing</div>
-          <h3 style="font-size:17px;margin:4px 0 2px">${t('Como o tempo foi dividido?')}</h3>
+          <h2 style="font-size:17px;margin:4px 0 2px">${t('Como o tempo foi dividido?')}</h2>
           <p class="hint" style="margin:0">${t('Teste, investigação de bug e preparo (TBS).')} <button class="ajuda" data-go="metodo" data-arg="debriefing">${t('Como fazer um bom debriefing?')}</button></p>
           <div class="tbs" id="tbs-bar">${tbsBar(db)}</div>
           <div class="tbs-legend">
-            ${[['test','Teste','var(--accent)'],['bug','Bug','var(--t-bug)'],['setup','Setup','var(--marker)']].map(([k,l,col])=>`<div class="slider"><label for="tbs-${k}"><span class="sw" style="background:${col}"></span>${t(l)}</label><input type="range" id="tbs-${k}" min="0" max="100" step="5" value="${db[k]}" data-tbs="${k}"><span class="mono" id="tbs-${k}-v">${db[k]}%</span></div>`).join('')}
+            ${[['test','Teste','var(--accent)'],['bug','Bug','var(--t-bug)'],['setup','Setup','var(--marker)']].map(([k,l,col])=>`<div class="slider"><label for="tbs-${k}"><span class="sw" style="background:${col}"></span>${t(l)}</label><input type="range" id="tbs-${k}" min="0" max="100" step="5" value="${db[k]}" aria-valuetext="${db[k]}%" data-tbs="${k}"><span class="mono" id="tbs-${k}-v">${db[k]}%</span></div>`).join('')}
           </div>
           <div class="field" style="margin:16px 0 10px"><label for="db-cov">${t('Áreas cobertas')}</label><textarea id="db-cov" data-db="coverage" placeholder="${t('O que de fato foi explorado')}">${esc(db.coverage)}</textarea></div>
           <div class="field" style="margin:0"><label for="db-next">${t('Fora do escopo e próximas sessões')}</label><textarea id="db-next" data-db="next" placeholder="${t('O que ficou para depois')}">${esc(db.next)}</textarea></div>
         </div>
         <div class="card">
           <div class="eyebrow">${t('Compartilhar')}</div>
-          <h3 style="font-size:17px;margin:4px 0 10px">${t('Relatório em Markdown')}</h3>
+          <h2 style="font-size:17px;margin:4px 0 10px">${t('Relatório em Markdown')}</h2>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
             <button class="btn primary" data-act="copy-md">${t('Copiar Markdown')}</button>
             <button class="btn" data-act="copy-bugs">${t('Copiar só os bugs')}</button>
@@ -621,7 +665,8 @@ function viewReport(s){
 function tbsBar(db){ const tot=(db.test+db.bug+db.setup)||1; return `<i style="width:${db.test/tot*100}%;background:var(--accent)"></i><i style="width:${db.bug/tot*100}%;background:var(--t-bug)"></i><i style="width:${db.setup/tot*100}%;background:var(--marker)"></i>`; }
 // Texto digitado vai para o Markdown como texto: HTML, links e marcadores de bloco no início da linha
 // são escapados, para o relatório não mudar de forma no GitHub ou no Jira.
-const mdEsc = l => l.replace(/[\\`[\]|]/g,'\\$&').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// Ênfase (* _ ~) também escapa: o que se vê na nota é o que sai no Markdown (#56).
+const mdEsc = l => l.replace(/[\\`[\]|*_~]/g,'\\$&').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const mdInline = t => mdEsc(String(t??'').replace(/\s*\n\s*/g,' '));
 const mdBloco = (t, recuo='') => String(t??'').split(/\n+/).map(l=>mdEsc(l).replace(/^(\s*)(\d+)([.)])(?=\s|$)/,'$1$2\\$3').replace(/^(\s*)([#+*-])(?=\s|$)/,'$1\\$2')).join('  \n'+recuo);
 function toMarkdown(s, onlyBugs=false){
@@ -712,7 +757,7 @@ function cartaHtml(){
   const h=HEUR[deckIdx];
   return `<article class="carta ${CAT_CLS[h.cat]}" data-giro="${deckGiro%2}" aria-live="polite">
     <div class="carta-topo"><span class="cat">${esc(t(h.cat))}</span><span class="carta-n">${deckIdx+1}/${HEUR.length}</span></div>
-    <h3>${esc(t(h.t))}</h3>
+    <h2>${esc(t(h.t))}</h2>
     <p>${esc(t(h.p))}</p>
     <div class="desafio"><span>${t('Faz isso agora')}</span>${esc(t(DESAFIO[h.t]||''))}</div>
   </article>`;
@@ -725,7 +770,7 @@ function viewDeck(){
     <div class="sorteio">
       <div class="sorteio-txt">
         <div class="eyebrow">${t('Baralho de ideias · {n} cartas',{n:HEUR.length})}</div>
-        <h2>${t('Travou?')} <em>${t('Puxa uma carta.')}</em></h2>
+        <h1>${t('Travou?')} <em>${t('Puxa uma carta.')}</em></h1>
         <p class="hint">${t('Cada carta traz uma heurística e um desafio para fazer agora. Tours inspirados em James Whittaker, mais dados e contextos do dia a dia brasileiro.')}</p>
         <div class="deck-filters" role="group" aria-label="${t('Categoria')}">${cats.map(c=>`<button data-cat="${c}" aria-pressed="${deckCat===c}">${t(c)}</button>`).join('')}</div>
       </div>
@@ -733,7 +778,7 @@ function viewDeck(){
         <div class="monte" aria-hidden="true"><i></i><i></i></div>
         <div id="carta">${cartaHtml()}</div>
         <div class="mesa-acoes">
-          <button class="btn primary lg" data-act="puxar">${t('Puxar outra carta')} <kbd>${t('Espaço')}</kbd></button>
+          <button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>
           <button class="btn lg" data-act="usar-carta">${active?t('Anotar como ideia na sessão'):t('Começar sessão com esta carta')}</button>
         </div>
       </div>
@@ -804,9 +849,10 @@ function viewMcp(){
       <p>${t('Você passa a missão e o Claude conduz a sessão no navegador de teste: lê a tela, clica, preenche, anota o que encontra e devolve o relatório. A captura do QA Scout grava tudo como faria com você, e a sessão fica no seu histórico para revisar.')}</p>
     </div>
     <div class="mcp-aviso" role="note"><b>${t('Roda no terminal do seu computador.')}</b> ${t('O MCP funciona no Claude Code ou no Claude Desktop, com o Node.js 18 ou mais recente instalado.')} ${EXT?t('Esta extensão só explica como usar: quem abre o navegador e conduz a sessão é o comando <code>qa-scout mcp</code>.'):t('Este site só explica como usar: quem abre o navegador e conduz a sessão é o comando <code>qa-scout mcp</code>.')}</div>
+    <h2 class="sr-only">${t('Como começar')}</h2>
     <div class="passos mcp-passos">
-      <div class="passo"><h3>${t('Instale no Claude Code')}</h3><p>${t('No terminal, uma vez só:')}</p>${cmd(MCP_INSTALAR,'o comando de instalação')}<small>${t('Claude Desktop: veja o guia')}</small></div>
-      <div class="passo"><h3>${t('Confira a conexão')}</h3><p>${t('O <code>qa-scout</code> deve aparecer como conectado.')}</p>${cmd('claude mcp list','o comando de conferência')}<small>${t('Primeira vez: o Chromium é baixado')}</small></div>
+      <div class="passo"><h3>${t('Instale no Claude Code')}</h3><p>${t('No terminal, uma vez só:')}</p>${cmd(MCP_INSTALAR,'o comando de instalação')}<small>${t('Claude Desktop:')} <a href="https://github.com/azevedothamirest/qa-scout/blob/main/docs/mcp.md#instalar" target="_blank" rel="noopener">${t('veja o guia de instalação')}</a></small></div>
+      <div class="passo"><h3>${t('Confira a conexão')}</h3><p>${t('O <code>qa-scout</code> deve aparecer como conectado.')}</p>${cmd('claude mcp list','o comando de conferência')}<small>${t('Na primeira sessão, o Chromium de teste é baixado sozinho (um ou dois minutos).')}</small></div>
       <div class="passo"><h3>${t('Peça a sessão')}</h3><p>${t('Abra o Claude Code e diga o que explorar, com o quê, para descobrir o quê e por quanto tempo.')}</p><small>${t('O charter, como você já faz')}</small></div>
     </div>
     <div class="section-head" style="margin:26px 0 12px"><div><div class="eyebrow">${t('Como pedir')}</div><h2>${t('Exemplos de pedido')}</h2></div></div>
@@ -867,7 +913,8 @@ function tick(){
   const clock=$('#clock'), sub=$('#clock-sub'), bar=$('#bar'); if(!clock) return;
   clock.textContent=fmtClock(e);
   const over=e>plan;
-  sub.textContent = over ? t('+{t} além do planejado',{t:fmtClock(e-plan)}) : t('{t} restantes de {plan} min',{t:fmtClock(plan-e),plan:s.plannedMin});
+  sub.textContent = s.esgotou && s.status==='paused' ? t('Tempo esgotado. Retome para prorrogar ou encerre.')
+    : over ? t('+{t} além do planejado',{t:fmtClock(e-plan)}) : t('{t} restantes de {plan} min',{t:fmtClock(plan-e),plan:s.plannedMin});
   sub.classList.toggle('over',over); bar.classList.toggle('over',over);
   bar.firstElementChild.style.width = Math.min(100,e/plan*100)+'%';
 }
@@ -919,7 +966,9 @@ function readDraft(){
 
 document.addEventListener('click',e=>{
   const fc=e.target.closest('.fc'); if(fc && !e.target.closest('button,a')){ virarCarta(fc); return; }
-  const bt=e.target.closest('button,[data-open]'); if(!bt) return;
+  const bt=e.target.closest('button,[data-open],a[data-go]'); if(!bt) return;
+  // Ctrl/Cmd/Shift + clique num link de seção: deixa o navegador abrir em outra aba.
+  if(bt.tagName==='A'){ if(e.ctrlKey||e.metaKey||e.shiftKey||e.button!==0) return; e.preventDefault(); }
   if(bt.dataset.go){ if(view==='new') { state.draft=readDraft(); save(); } go(bt.dataset.go==='active' && !getActive() ? 'new' : bt.dataset.go, bt.dataset.arg||null); return; }
   if(bt.dataset.open){ go('report',bt.dataset.open); return; }
   if(bt.dataset.copiar){ copy(bt.dataset.copiar,t('Copiado')); return; }
@@ -988,7 +1037,7 @@ document.addEventListener('click',e=>{
   if(act==='heur'){ heurIdx=(heurIdx+1+Math.floor(Math.random()*(HEUR.length-1)))%HEUR.length; $('#heur').innerHTML=heurHtml(); }
   if(act==='toggle' && s){
     if(s.status==='running'){ s.elapsedMs+=Date.now()-s.runStartedAt; s.runStartedAt=null; s.status='paused'; }
-    else { s.runStartedAt=Date.now(); s.status='running'; }
+    else { s.runStartedAt=Date.now(); s.status='running'; if(s.esgotou) s.prorrogada=true; }
     save(); render();
   }
   if(act==='end'){ $('#end-confirm').hidden=false; }
@@ -1056,7 +1105,9 @@ document.addEventListener('input',e=>{
       s.debrief[k]=v;
       if(sumO===0){ s.debrief[others[0]]=rest; s.debrief[others[1]]=0; }
       else { const a=Math.round(rest*s.debrief[others[0]]/sumO/5)*5; s.debrief[others[0]]=a; s.debrief[others[1]]=rest-a; }
-      ['test','bug','setup'].forEach(x=>{ $('#tbs-'+x).value=s.debrief[x]; $('#tbs-'+x+'-v').textContent=s.debrief[x]+'%'; });
+      ['test','bug','setup'].forEach(x=>{ $('#tbs-'+x).value=s.debrief[x]; $('#tbs-'+x).setAttribute('aria-valuetext',s.debrief[x]+'%'); $('#tbs-'+x+'-v').textContent=s.debrief[x]+'%'; });
+      // Os outros dois se reajustam para somar 100%: o leitor de tela ouve a nova divisão (#60).
+      clearTimeout(anuncioT); anuncioT=setTimeout(()=>{ const a=$('#anuncio'); if(a) a.textContent=t('Teste {t}%, Bug {b}%, Setup {s}%',{t:s.debrief.test,b:s.debrief.bug,s:s.debrief.setup}); },400);
       $('#tbs-bar').innerHTML=tbsBar(s.debrief);
     } else s.debrief[bt.dataset.db]=bt.value;
     $('#md-out').value=toMarkdown(s); save();
@@ -1110,7 +1161,8 @@ $('#idioma-menu')?.addEventListener('click',e=>{
   menuIdioma(false);
   if(b.dataset.idioma===I18N.atual){ $('#idioma').focus(); return; }
   I18N.definir(b.dataset.idioma);
-  try{ (EXT?localStorage:sessionStorage).removeItem('qascout.abertura'); }catch(e){}
+  // Recarrega na mesma tela (a URL guarda a rota), sem repetir a abertura e sem perder o rascunho (#59).
+  if(view==='new'){ state.draft=readDraft(); save(); }
   location.reload();
 });
 $('#idioma-menu')?.addEventListener('keydown',e=>{
@@ -1320,9 +1372,14 @@ async function init(){
     setTimeout(()=>window.print(),600);
     return;
   }
-  if(getActive()) view='active';
+  const esgotou=fechaNoTempo();
+  const rota=lerRota();
+  if(rota){ view=rota.view; viewArg=rota.arg; }
+  else if(getActive()) view='active';
   render();
+  if(!/^#(onboarding|apresentacao)$/.test(location.hash)) marcaRota(true);
   if(deveMostrarOnboarding()) onboarding();
+  if(esgotou) toast(t('Tempo planejado esgotado: sessão pausada.'));
   if(corrompido) toast(t('Não foi possível ler as sessões salvas. Guardamos uma cópia e começamos do zero; importe um backup se tiver.'));
   if(EXT){ atualizaAbas(); drenar(); }
 }
