@@ -178,8 +178,29 @@ async function copy(text, okMsg, fallbackEl){
 
 /* ---------- roteamento ---------- */
 let view = 'home', viewArg = null;
+// Cada tela tem endereço próprio (#/heuristicas, #/relatorio/<id>...): Voltar do navegador, link
+// direto e troca de idioma voltam para a mesma tela (#48, #59).
+const ROTAS = {home:'sessoes',new:'nova',active:'sessao',deck:'heuristicas',metodo:'metodo',mcp:'mcp',report:'relatorio'};
+const rotaDe = (v,arg) => '#/'+ROTAS[v]+(arg?'/'+encodeURIComponent(arg):'');
+function lerRota(){
+  const m=location.hash.match(/^#\/([a-z]+)(?:\/(.+))?$/); if(!m) return null;
+  const v=Object.keys(ROTAS).find(k=>ROTAS[k]===m[1]); if(!v) return null;
+  let arg=null; try{ arg=m[2]?decodeURIComponent(m[2]):null; }catch(e){}
+  if(v==='report' && !state.sessions.some(s=>s.id===arg)) return {view:'home',arg:null};
+  return {view:v,arg};
+}
+function marcaRota(substituir){
+  const h=rotaDe(view,viewArg); if(location.hash===h) return;
+  try{ history[substituir?'replaceState':'pushState'](null,'',location.pathname+location.search+h); }catch(e){}
+}
+addEventListener('popstate',()=>{
+  if(/^#imprimir=/.test(location.hash)) return;
+  const r=lerRota()||{view:'home',arg:null};
+  if(view==='new'){ state.draft=readDraft(); save(); }
+  view=r.view; viewArg=r.arg; render(); window.scrollTo({top:0});
+});
 function go(v,arg=null){
-  view=v; viewArg=arg; render();
+  view=v; viewArg=arg; render(); marcaRota(false);
   const alvo = v==='metodo' && arg ? document.getElementById('m-'+arg) : null;
   if(alvo){ virarCarta(alvo,true); alvo.scrollIntoView({block:'center'}); alvo.focus({preventScroll:true}); } else window.scrollTo({top:0});
 }
@@ -929,7 +950,9 @@ function readDraft(){
 
 document.addEventListener('click',e=>{
   const fc=e.target.closest('.fc'); if(fc && !e.target.closest('button,a')){ virarCarta(fc); return; }
-  const bt=e.target.closest('button,[data-open]'); if(!bt) return;
+  const bt=e.target.closest('button,[data-open],a[data-go]'); if(!bt) return;
+  // Ctrl/Cmd/Shift + clique num link de seção: deixa o navegador abrir em outra aba.
+  if(bt.tagName==='A'){ if(e.ctrlKey||e.metaKey||e.shiftKey||e.button!==0) return; e.preventDefault(); }
   if(bt.dataset.go){ if(view==='new') { state.draft=readDraft(); save(); } go(bt.dataset.go==='active' && !getActive() ? 'new' : bt.dataset.go, bt.dataset.arg||null); return; }
   if(bt.dataset.open){ go('report',bt.dataset.open); return; }
   if(bt.dataset.copiar){ copy(bt.dataset.copiar,t('Copiado')); return; }
@@ -1122,7 +1145,8 @@ $('#idioma-menu')?.addEventListener('click',e=>{
   menuIdioma(false);
   if(b.dataset.idioma===I18N.atual){ $('#idioma').focus(); return; }
   I18N.definir(b.dataset.idioma);
-  try{ (EXT?localStorage:sessionStorage).removeItem('qascout.abertura'); }catch(e){}
+  // Recarrega na mesma tela (a URL guarda a rota), sem repetir a abertura e sem perder o rascunho (#59).
+  if(view==='new'){ state.draft=readDraft(); save(); }
   location.reload();
 });
 $('#idioma-menu')?.addEventListener('keydown',e=>{
@@ -1332,8 +1356,11 @@ async function init(){
     setTimeout(()=>window.print(),600);
     return;
   }
-  if(getActive()) view='active';
+  const rota=lerRota();
+  if(rota){ view=rota.view; viewArg=rota.arg; }
+  else if(getActive()) view='active';
   render();
+  if(!/^#(onboarding|apresentacao)$/.test(location.hash)) marcaRota(true);
   if(deveMostrarOnboarding()) onboarding();
   if(corrompido) toast(t('Não foi possível ler as sessões salvas. Guardamos uma cópia e começamos do zero; importe um backup se tiver.'));
   if(EXT){ atualizaAbas(); drenar(); }

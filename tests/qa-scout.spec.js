@@ -176,8 +176,8 @@ test.describe('Charter', () => {
     await page.getByRole('button', { name: 'Começar nova sessão' }).click();
     await page.getByLabel('Duração planejada').fill('-5');
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
-    await page.getByRole('button', { name: 'Heurísticas' }).click();
-    await page.getByRole('navigation').getByRole('button', { name: 'Nova sessão' }).click();
+    await page.getByRole('link', { name: 'Heurísticas', exact: true }).click();
+    await page.getByRole('navigation').getByRole('link', { name: 'Nova sessão' }).click();
     await expect(page.getByLabel('Duração planejada')).toHaveValue('-5');
     await expect(page.getByLabel('Duração planejada')).toHaveAttribute('aria-invalid', 'true');
     await expect(page.getByText('Use um tempo entre 1 e 480 minutos.')).toBeVisible();
@@ -226,13 +226,13 @@ test.describe('Sessão em campo', () => {
   });
 
   test('Chamar a aba da sessão de "Sessão ativa" enquanto ela roda', async ({ page }) => {
-    await expect(page.getByRole('navigation').getByRole('button', { name: 'Sessão ativa' })).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('navigation').getByRole('link', { name: 'Sessão ativa' })).toHaveAttribute('aria-current', 'page');
   });
 
   test('Esvaziar a região de status quando o aviso some, mesmo depois de trocar de tela', async ({ page }) => {
     await page.getByRole('button', { name: 'Registrar nota' }).click();
     await expect(page.locator('#toast')).toContainText('Escreva algo');
-    await page.getByRole('button', { name: 'Heurísticas' }).click();
+    await page.getByRole('link', { name: 'Heurísticas', exact: true }).click();
     await expect(page.locator('#toast')).toHaveText('');
   });
 
@@ -282,7 +282,7 @@ test.describe('Debriefing', () => {
 
 test.describe('Baralho de heurísticas', () => {
   test.beforeEach(async ({ page }) => {
-    await page.getByRole('button', { name: 'Heurísticas', exact: true }).click();
+    await page.getByRole('link', { name: 'Heurísticas', exact: true }).click();
   });
 
   test('Puxar outra carta diferente da atual', async ({ page }) => {
@@ -307,14 +307,14 @@ test.describe('Baralho de heurísticas', () => {
   });
 
   test('Anotar a carta como ideia durante a sessão', async ({ page }) => {
-    await page.getByRole('button', { name: 'Nova sessão' }).click();
+    await page.getByRole('navigation').getByRole('link', { name: 'Nova sessão' }).click();
     await page.getByLabel('Explorar').fill('o login');
     await page.getByLabel('para descobrir').fill('falhas de sessão');
     await page.getByRole('button', { name: 'Iniciar sessão' }).click();
-    await page.getByRole('button', { name: 'Heurísticas', exact: true }).click();
+    await page.getByRole('link', { name: 'Heurísticas', exact: true }).click();
     const titulo = await page.locator('.carta h2').textContent();
     await page.getByRole('button', { name: 'Anotar como ideia na sessão' }).click();
-    await page.getByRole('button', { name: 'Sessão ativa' }).click();
+    await page.getByRole('navigation').getByRole('link', { name: 'Sessão ativa' }).click();
     await expect(page.locator('.note.t-ide')).toContainText(`Heurística “${titulo}”`);
   });
 
@@ -374,7 +374,7 @@ test.describe('Tema', () => {
 test.describe('MCP', () => {
   test('Mostrar como instalar o MCP no terminal e copiar um pedido de exemplo', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']).catch(() => {});
-    await page.getByRole('button', { name: 'MCP', exact: true }).click();
+    await page.getByRole('link', { name: 'MCP', exact: true }).click();
     await expect(page.getByRole('heading', { name: /Explore em dupla com o Claude/ })).toBeVisible();
     await expect(page.getByText('Roda no terminal do seu computador.')).toBeVisible();
     await expect(page.getByText('claude mcp add qa-scout -- npx -y github:azevedothamirest/qa-scout mcp')).toBeVisible();
@@ -497,5 +497,44 @@ test.describe('Histórico · resumo', () => {
     const resumo = page.getByLabel('Resumo das sessões');
     await expect(resumo).toContainText('0sessões concluídas');
     await expect(resumo).toContainText('0bugs encontrados');
+  });
+});
+
+test.describe('Navegação', () => {
+  test('Voltar à tela anterior pelo botão Voltar do navegador', async ({ page }) => {
+    await page.getByRole('link', { name: 'Heurísticas', exact: true }).click();
+    await expect(page).toHaveURL(/#\/heuristicas$/);
+    await page.getByRole('link', { name: 'MCP', exact: true }).click();
+    await expect(page).toHaveURL(/#\/mcp$/);
+    await page.goBack();
+    await expect(page.locator('#tab-deck')).toHaveAttribute('aria-current', 'page');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Travou?');
+  });
+
+  test('Abrir direto o relatório pelo endereço da tela', async ({ page }) => {
+    await page.goto('/#/relatorio/ex-pix');
+    await expect(page.getByRole('heading', { level: 1, name: 'Checkout · pagamento com Pix' })).toBeVisible();
+  });
+
+  test('Cair nas sessões quando o relatório do endereço não existe', async ({ page }) => {
+    await page.goto('/#/relatorio/nao-existe');
+    await expect(page.locator('#tab-home')).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('Trocar o idioma sem sair da tela atual', async ({ page }) => {
+    await page.locator('[data-open="ex-pix"]').click();
+    await page.locator('#idioma').click();
+    await page.locator('[data-idioma="en"]').click();
+    await expect(page).toHaveURL(/#\/relatorio\/ex-pix$/);
+    await expect(page.getByText('Session report', { exact: false }).first()).toBeVisible();
+    await expect(page.locator('.abertura')).toHaveCount(0);
+  });
+
+  test('Guardar o charter digitado ao trocar o idioma', async ({ page }) => {
+    await page.getByRole('button', { name: 'Começar nova sessão' }).click();
+    await page.locator('#c-exp').fill('o carrinho');
+    await page.locator('#idioma').click();
+    await page.locator('[data-idioma="es"]').click();
+    await expect(page.locator('#c-exp')).toHaveValue('o carrinho');
   });
 });

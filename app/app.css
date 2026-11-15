@@ -45,7 +45,7 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:
 [data-escuro] .tema .lua{display:block}
 @media (max-width:480px){.tema span{display:none}.tema{padding:0 11px}}
 .tabs{display:flex;gap:4px;background:var(--surface-2);padding:4px;border-radius:99px;border:1px solid var(--line)}
-.tab{border:0;background:transparent;padding:7px 14px;border-radius:99px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:7px}
+.tab{border:0;background:transparent;text-decoration:none;padding:7px 14px;border-radius:99px;font-weight:600;font-size:14px;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:7px}
 .tab[aria-current="page"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 .tab .live{width:7px;height:7px;border-radius:50%;background:var(--marker);box-shadow:0 0 0 3px var(--marker-soft)}
 

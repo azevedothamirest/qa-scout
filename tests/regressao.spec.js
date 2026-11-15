@@ -93,6 +93,7 @@ test.describe('Regressão · jornada da sessão', () => {
     await registrar(page, 'Google login falha no Safari');
     await encerrar(page);
     await page.reload();
+    await page.getByRole('link', { name: 'Sessões', exact: true }).click();
     await page.locator('.row', { hasText: 'Login social' }).click();
     await expect(page.getByRole('heading', { name: 'Login social' })).toBeVisible();
     await expect(page.locator('#md-out')).toHaveValue(/Google login falha no Safari/);
@@ -139,7 +140,7 @@ test.describe('Requisições externas', () => {
     const externas = [];
     page.on('request', (r) => { if (!r.url().startsWith('http://localhost') && /^https?:/.test(r.url())) externas.push(r.url()); });
     await page.reload();
-    for (const aba of ['Heurísticas', 'Método', 'MCP', 'Sessões']) await page.getByRole('button', { name: aba, exact: true }).click();
+    for (const aba of ['Heurísticas', 'Método', 'MCP', 'Sessões']) await page.getByRole('link', { name: aba, exact: true }).click();
     await page.goto('/privacidade.html');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     expect(externas).toEqual([]);
@@ -157,7 +158,7 @@ test.describe('Regressão · navegação e layout', () => {
     page.on('pageerror', (e) => erros.push(e.message));
     await page.reload();
     for (const aba of ['Heurísticas', 'Método', 'MCP', 'Sessões']) {
-      await page.getByRole('button', { name: aba, exact: true }).click();
+      await page.getByRole('link', { name: aba, exact: true }).click();
     }
     await iniciarSessao(page);
     await page.locator('#tema').click();
@@ -168,10 +169,10 @@ test.describe('Regressão · navegação e layout', () => {
     const semRolagem = async () => expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     await semRolagem();
     for (const aba of ['Heurísticas', 'Método', 'MCP']) {
-      await page.getByRole('button', { name: aba, exact: true }).click();
+      await page.getByRole('link', { name: aba, exact: true }).click();
       await semRolagem();
     }
-    await page.getByRole('button', { name: 'Sessões', exact: true }).click();
+    await page.getByRole('link', { name: 'Sessões', exact: true }).click();
     await iniciarSessao(page);
     await registrar(page, 'Nota curta');
     await semRolagem();
