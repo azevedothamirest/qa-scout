@@ -508,3 +508,76 @@ test.describe('Idioma da captura', () => {
     await expect(painel.locator('.note', { hasText: 'Opened the page “Loja fictícia · Checkout”' })).toHaveCount(1);
   });
 });
+
+test.describe('Painel fechado', () => {
+  test('Continuar registrando com o painel fechado e avisar na página o que está sendo gravado', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    const url = painel.url();
+    const indicador = loja.locator('qa-scout-indicador');
+    await expect(indicador).toHaveCount(0);
+    await painel.close();
+    await expect(indicador).toHaveCount(1);
+    await loja.getByRole('button', { name: 'Pagar com Pix' }).click();
+    const [sw] = context.serviceWorkers();
+    await expect.poll(() => sw.evaluate(() => chrome.storage.local.get('qascout.indicador').then(r => r['qascout.indicador'])))
+      .toMatchObject({ ativo: true, n: 1, ultimo: 'Clicou no botão “Pagar com Pix”' });
+    if (process.env.PRINT_IND) await loja.screenshot({ path: process.env.PRINT_IND });
+    // O clique no próprio aviso não vira nota.
+    await indicador.click({ position: { x: 5, y: 5 } }).catch(() => {});
+    const novo = await context.newPage();
+    await novo.goto(url);
+    await expect(novo.locator('.note', { hasText: 'Pagar com Pix' })).toHaveCount(1);
+    await expect(indicador).toHaveCount(0);
+  });
+});
+
+test.describe('Painel fechado · abrir pelo aviso', () => {
+  test('Abrir o painel lateral pelo botão do aviso flutuante', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await painel.close();
+    await loja.bringToFront();
+    const indicador = loja.locator('qa-scout-indicador');
+    await expect(indicador).toHaveCount(1);
+    await loja.waitForTimeout(300);
+    // O aviso fica num shadow root fechado: o clique vai na posição do botão "Abrir painel".
+    const box = await indicador.boundingBox();
+    await loja.mouse.click(box.x + box.width - 90, box.y + box.height / 2);
+    const [sw] = context.serviceWorkers();
+    await expect.poll(() => sw.evaluate(async () => (await chrome.runtime.getContexts({ contextTypes: ['SIDE_PANEL'] })).length)).toBe(1);
+    await expect(indicador).toHaveCount(0);
+  });
+});
+
+test.describe('Painel fechado · navegador de teste', () => {
+  test('Reabrir o painel em janela própria pelo aviso no navegador de teste', async ({ context, painel }) => {
+    await iniciarSessao(painel);
+    const [sw] = context.serviceWorkers();
+    await sw.evaluate(() => chrome.storage.local.set({ 'qascout.modo': 'navegador' }));
+    const loja = await context.newPage();
+    await loja.goto(LOJA);
+    await painel.close();
+    await loja.reload();
+    const indicador = loja.locator('qa-scout-indicador');
+    await expect(indicador).toHaveCount(1);
+    await loja.waitForTimeout(300);
+    const box = await indicador.boundingBox();
+    await loja.mouse.click(box.x + box.width - 90, box.y + box.height / 2);
+    await expect.poll(() => sw.evaluate(async () => (await chrome.windows.getAll()).some(w => w.type === 'popup'))).toBe(true);
+    await expect(indicador).toHaveCount(0);
+  });
+});
+
+test.describe('Painel estreito', () => {
+  test('Manter o painel sem rolagem lateral com título de aba longo', async ({ context, painel }) => {
+    await painel.setViewportSize({ width: 360, height: 800 });
+    await iniciarSessao(painel);
+    const loja = await acompanharLoja(context, painel);
+    await loja.evaluate(() => { document.title = 'azevedothamirest/qa-scout: Extensão do Chrome para teste exploratório baseado em sessões com captura'; });
+    await painel.bringToFront();
+    await painel.reload();
+    await expect(painel.locator('.captura .aba span')).toContainText('Extensão do Chrome');
+    expect(await painel.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+  });
+});

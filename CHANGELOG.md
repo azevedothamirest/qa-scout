@@ -4,11 +4,26 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.2.0](#120--captura-com-o-painel-fechado) | 15/11/2026 | Captura com o painel fechado |
 | [1.1.1](#111--correções-do-onboarding-e-da-captura) | 13/11/2026 | Correções do onboarding e da captura |
 | [1.1.0](#110--onboarding-interativo) | 03/11/2026 | Onboarding interativo |
 | [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
 | [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
+
+---
+
+## 1.2.0 · Captura com o painel fechado
+_15/11/2026_
+
+**✨ Novidades**
+- **Aviso flutuante com o painel fechado:** a captura sempre continuou com o painel lateral fechado, mas nada mostrava isso. Agora as abas acompanhadas exibem, no canto da página, "QA Scout registrando", quantos registros novos entraram, o último deles e um botão "Abrir painel". O aviso some antes de cada print e o clique nele não vira nota. ([#82](https://github.com/azevedothamirest/qa-scout/issues/82))
+
+**🐞 Correções**
+- **Painel lateral:**
+  - um título de aba longo não estica mais o card da captura por cima do diário nem cria rolagem lateral;
+  - no painel estreito, as abas do cabeçalho quebram em duas linhas em vez de ficarem cortadas;
+  - a tela de abertura aparece só na primeira vez, e não toda vez que o painel reabre. ([#81](https://github.com/azevedothamirest/qa-scout/issues/81))
 
 ---
 

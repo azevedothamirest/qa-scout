@@ -34,6 +34,7 @@
       campo: (tp, n) => n ? `Preencheu o campo${tp ? ` ${tp}` : ''} “${n}”` : `Preencheu um campo ${tp}`,
       marcas: { bug: 'Bug marcado neste momento', duv: 'Dúvida marcada neste momento', ide: 'Ideia marcada neste momento', ris: 'Risco marcado neste momento', obs: 'Observação marcada neste momento' },
       marcou: 'Marcou este momento', js: 'Erro de JavaScript', console: 'Erro no console',
+      ind: { gravando: 'QA Scout registrando', n: n => n === 1 ? '1 registro novo' : `${n} registros novos`, nada: 'Painel fechado, a captura continua', abrir: 'Abrir painel' },
     },
     'pt-PT': {
       papel: { botao: 'botão', link: 'link', aba: 'separador', caixa: 'caixa de verificação', menu: 'item de menu', opcao: 'opção', chave: 'interruptor', campo: 'campo', lista: 'lista', imagem: 'imagem' },
@@ -46,6 +47,7 @@
       campo: (tp, n) => n ? `Preencheu o campo${tp ? ` ${tp}` : ''} “${n}”` : `Preencheu um campo ${tp}`,
       marcas: { bug: 'Bug marcado neste momento', duv: 'Dúvida marcada neste momento', ide: 'Ideia marcada neste momento', ris: 'Risco marcado neste momento', obs: 'Observação marcada neste momento' },
       marcou: 'Marcou este momento', js: 'Erro de JavaScript', console: 'Erro na consola',
+      ind: { gravando: 'QA Scout a registar', n: n => n === 1 ? '1 registo novo' : `${n} registos novos`, nada: 'Painel fechado, a captura continua', abrir: 'Abrir painel' },
     },
     en: {
       papel: { botao: 'button', link: 'link', aba: 'tab', caixa: 'checkbox', menu: 'menu item', opcao: 'option', chave: 'switch', campo: 'field', lista: 'list', imagem: 'image' },
@@ -58,6 +60,7 @@
       campo: (tp, n) => n ? `Filled in the${tp ? ` ${tp}` : ''} field “${n}”` : `Filled in a ${tp} field`,
       marcas: { bug: 'Bug marked at this moment', duv: 'Question marked at this moment', ide: 'Idea marked at this moment', ris: 'Risk marked at this moment', obs: 'Observation marked at this moment' },
       marcou: 'Marked this moment', js: 'JavaScript error', console: 'Console error',
+      ind: { gravando: 'QA Scout recording', n: n => n === 1 ? '1 new entry' : `${n} new entries`, nada: 'Panel closed, capture keeps going', abrir: 'Open panel' },
     },
     es: {
       papel: { botao: 'botón', link: 'enlace', aba: 'pestaña', caixa: 'casilla', menu: 'elemento de menú', opcao: 'opción', chave: 'interruptor', campo: 'campo', lista: 'lista', imagem: 'imagen' },
@@ -70,6 +73,7 @@
       campo: (tp, n) => n ? `Rellenó el campo${tp ? ` ${tp}` : ''} “${n}”` : `Rellenó un campo ${tp}`,
       marcas: { bug: 'Bug marcado en este momento', duv: 'Duda marcada en este momento', ide: 'Idea marcada en este momento', ris: 'Riesgo marcado en este momento', obs: 'Observación marcada en este momento' },
       marcou: 'Marcó este momento', js: 'Error de JavaScript', console: 'Error en la consola',
+      ind: { gravando: 'QA Scout registrando', n: n => n === 1 ? '1 registro nuevo' : `${n} registros nuevos`, nada: 'Panel cerrado, la captura sigue', abrir: 'Abrir panel' },
     },
   };
   let F = FRASES['pt-BR'];
@@ -132,6 +136,7 @@
   // inventar cliques, campos e marcas com print (GHSA-vh88-r3m4-957w).
   document.addEventListener('click', e => {
     if (!e.isTrusted) return;
+    if (ind && e.composedPath && e.composedPath().includes(ind.host)) return;
     const t = alvoReal(e);
     if (!t || t.nodeType !== 1) return;
     const alvo = t.closest && t.closest(ALVO);
@@ -224,5 +229,57 @@
     const desc = `${det.tipo === 'js' ? F.js : F.console}: ${det.msg}`;
     envia({ tipo: 'erro', grave: det.tipo === 'js', desc, chave: det.chave, vezes: det.vezes, repete: det.repete });
   });
+  // Aviso flutuante: com o painel fechado a captura continua, e este cartão (só no quadro principal)
+  // mostra que está registrando, quantos registros esperam no painel e o último. Fica num shadow root
+  // fechado, fora do alcance do CSS e dos scripts da página, e some do print (o background pede).
+  let ind = null, indEstado = null;
+  const IND = 'qascout.indicador';
+  function montaIndicador() {
+    const host = document.createElement('qa-scout-indicador');
+    host.style.cssText = 'all:initial;position:fixed;right:16px;bottom:16px;z-index:2147483647';
+    const raiz = host.attachShadow({ mode: 'closed' });
+    raiz.innerHTML = `<style>
+      .c{box-sizing:border-box;display:flex;align-items:center;gap:10px;width:min(380px,calc(100vw - 32px));padding:10px 12px 10px 14px;border-radius:16px;background:#14141c;color:#F4F3FF;border:1px solid rgba(61,245,167,.45);box-shadow:0 12px 32px rgba(0,0,0,.35);font:500 13px/1.35 system-ui,-apple-system,"Segoe UI",sans-serif}
+      .p{flex:none;width:10px;height:10px;border-radius:50%;background:#3DF5A7;box-shadow:0 0 0 0 rgba(61,245,167,.6);animation:p 1.6s infinite}
+      @keyframes p{70%{box-shadow:0 0 0 8px rgba(61,245,167,0)}100%{box-shadow:0 0 0 0 rgba(61,245,167,0)}}
+      @media (prefers-reduced-motion:reduce){.p{animation:none}}
+      .t{min-width:0;flex:1}.t b{display:block;font-weight:700}.t span{display:block;color:#B9B7CC;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      button{flex:none;font:700 12.5px system-ui,sans-serif;border:0;border-radius:99px;padding:7px 11px;cursor:pointer;background:linear-gradient(90deg,#3DF5A7,#3BC9F5);color:#0B0B12}
+      .x{background:transparent;color:#B9B7CC;padding:4px 6px;font-size:15px;line-height:1}
+    </style><div class="c" role="status"><i class="p"></i><div class="t"><b></b><span class="n"></span><span class="u"></span></div><button class="a" type="button"></button><button class="x" type="button" aria-label="×">×</button></div>`;
+    raiz.querySelector('.a').addEventListener('click', e => { if (e.isTrusted) try { chrome.runtime.sendMessage({ cmd: 'abrirPainel' }); } catch (err) {} });
+    raiz.querySelector('.x').addEventListener('click', e => { if (e.isTrusted) { host.remove(); ind = null; fechadoAte = (indEstado && indEstado.desde) || 1; } });
+    return { host, raiz };
+  }
+  let fechadoAte = 0;
+  function mostraIndicador(st) {
+    indEstado = st;
+    const visivel = st && st.ativo && st.desde !== fechadoAte && !document.hidden;
+    if (!visivel) { if (ind) { ind.host.remove(); ind = null; } return; }
+    if (!ind) ind = montaIndicador();
+    if (!ind.host.isConnected) document.documentElement.appendChild(ind.host);
+    const r = ind.raiz;
+    r.querySelector('b').textContent = F.ind.gravando;
+    r.querySelector('.n').textContent = st.n ? F.ind.n(st.n) : F.ind.nada;
+    r.querySelector('.u').textContent = st.ultimo || '';
+    r.querySelector('.u').hidden = !st.ultimo;
+    r.querySelector('.a').textContent = F.ind.abrir;
+  }
+  if (!emQuadro) {
+    try {
+      chrome.storage.local.get(IND).then(r => mostraIndicador(r[IND])).catch(() => {});
+      chrome.storage.onChanged.addListener((m, area) => { if (area === 'local' && m[IND]) mostraIndicador(m[IND].newValue); });
+      chrome.runtime.onMessage.addListener((msg, sender, responder) => {
+        if (msg && msg.cmd === 'ocultarIndicador') {
+          if (ind) ind.host.style.visibility = msg.valor ? 'hidden' : '';
+          // Dois quadros de animação para o navegador pintar a página sem o cartão antes do print.
+          requestAnimationFrame(() => requestAnimationFrame(() => responder({ ok: true })));
+          return true;
+        }
+      });
+      document.addEventListener('visibilitychange', () => mostraIndicador(indEstado));
+    } catch (e) {}
+  }
+
   document.dispatchEvent(new CustomEvent('qascout:pronto'));
 })();
