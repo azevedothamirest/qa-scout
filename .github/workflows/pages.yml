@@ -23,7 +23,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Separar arquivos do site
-        run: mkdir _site && cp -r app/index.html app/app.css app/app.js app/i18n.js app/i18n app/icones app/fontes site/*.html _site/
+        # O app de sessão (app/index.html) não é publicado: ele roda só na extensão e no navegador
+        # de teste. O site é o institucional (site/inicio.html) em modo site, servido como index.html (#86).
+        run: |
+          mkdir _site
+          cp -r app/app.css app/app.js app/i18n.js app/i18n app/icones app/fontes _site/
+          cp site/*.html _site/
+          mv _site/inicio.html _site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
