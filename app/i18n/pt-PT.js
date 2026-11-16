@@ -182,4 +182,5 @@ window.QAS_I18N.dic["pt-PT"] = {
   "Travou no meio da exploração?": "Encravou a meio da exploração?",
   "Você passa a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.": "Você dá a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.",
   "Você tem {n} sessões salvas neste navegador. Baixe o backup e importe na extensão para não perder nada.": "Tem {n} sessões guardadas neste navegador. Descarregue a cópia de segurança e importe-a na extensão para não perder nada.",
+  "Adquira a extensão para continuar vendo.": "Instale a extensão para continuar a ver.",
 };

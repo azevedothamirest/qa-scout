@@ -24,10 +24,17 @@ test.describe('Site institucional', () => {
     await expect(page.locator('#c-exp')).toHaveCount(0);
   });
 
-  test('Mostrar o baralho sem o botão de começar sessão', async ({ page }) => {
+  test('Mostrar 2 cartas e convidar a instalar a extensão na terceira', async ({ page }) => {
     await page.getByRole('navigation').getByRole('link', { name: 'Heurísticas' }).click();
-    await expect(page.getByRole('button', { name: 'Puxar outra carta', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Começar sessão com esta carta' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Ver todas' })).toHaveCount(0);
+    const puxar = page.getByRole('button', { name: 'Puxar outra carta', exact: true });
+    await puxar.click();
+    await expect(page.locator('.carta h2')).not.toHaveText('Adquira a extensão para continuar vendo.');
+    await puxar.click();
+    await expect(page.locator('.carta h2')).toHaveText('Adquira a extensão para continuar vendo.');
+    await expect(page.locator('.carta').getByRole('link', { name: 'Instalar no Chrome ↗' })).toHaveAttribute('href', /chromewebstore/);
+    await expect(puxar).toHaveCount(0);
   });
 
   test('Levar o fim da demo para a instalação da extensão', async ({ page, context }) => {

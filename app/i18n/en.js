@@ -550,4 +550,7 @@ window.QAS_I18N.dic["en"] = {
   "Ver a demo": "Try the demo",
   "Você passa a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.": "You give the mission and Claude drives the session in the test browser, with the same capture and the same report.",
   "Você tem {n} sessões salvas neste navegador. Baixe o backup e importe na extensão para não perder nada.": "You have {n} sessions saved in this browser. Download the backup and import it in the extension so nothing is lost.",
+  "Baralho completo": "Full deck",
+  "Adquira a extensão para continuar vendo.": "Get the extension to keep drawing.",
+  "As {n} cartas ficam na extensão do Chrome, ao lado da sua sessão, com um desafio para fazer na hora.": "All {n} cards live in the Chrome extension, next to your session, each with a challenge to try right away.",
 };

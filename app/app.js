@@ -803,7 +803,17 @@ function puxarCarta(){
   let n; do{ n=l[Math.floor(Math.random()*l.length)].i; }while(n===deckIdx);
   deckIdx=n; deckGiro++;
 }
+// No site, o baralho mostra 2 cartas; a 3ª convida a instalar a extensão (o baralho completo fica nela).
+const SITE_CARTAS = 2;
+let siteVistas = 1;
+function puxarNoSite(){ if(SITE) siteVistas++; puxarCarta(); mostraCarta(); if(SITE && siteVistas>SITE_CARTAS) document.querySelector('[data-act="puxar"]')?.remove(); }
 function cartaHtml(){
+  if(SITE && siteVistas>SITE_CARTAS) return `<article class="carta carta-bloqueada" aria-live="polite">
+    <div class="carta-topo"><span class="cat">${t('Baralho completo')}</span><span class="carta-n">${SITE_CARTAS+1}/${HEUR.length}</span></div>
+    <h2>${t('Adquira a extensão para continuar vendo.')}</h2>
+    <p>${t('As {n} cartas ficam na extensão do Chrome, ao lado da sua sessão, com um desafio para fazer na hora.',{n:HEUR.length})}</p>
+    <a class="btn primary lg" href="${LOJA_URL}" target="_blank" rel="noopener">${t('Instalar no Chrome ↗')}</a>
+  </article>`;
   const h=HEUR[deckIdx];
   return `<article class="carta ${CAT_CLS[h.cat]}" data-giro="${deckGiro%2}" aria-live="polite">
     <div class="carta-topo"><span class="cat">${esc(t(h.cat))}</span><span class="carta-n">${deckIdx+1}/${HEUR.length}</span></div>
@@ -822,22 +832,23 @@ function viewDeck(){
         <div class="eyebrow">${t('Baralho de ideias · {n} cartas',{n:HEUR.length})}</div>
         <h1>${t('Travou?')} <em>${t('Puxa uma carta.')}</em></h1>
         <p class="hint">${t('Cada carta traz uma heurística e um desafio para fazer agora. Tours inspirados em James Whittaker, mais dados e contextos do dia a dia brasileiro.')}</p>
-        <div class="deck-filters" role="group" aria-label="${t('Categoria')}">${cats.map(c=>`<button data-cat="${c}" aria-pressed="${deckCat===c}">${t(c)}</button>`).join('')}</div>
+        ${SITE?'':`<div class="deck-filters" role="group" aria-label="${t('Categoria')}">${cats.map(c=>`<button data-cat="${c}" aria-pressed="${deckCat===c}">${t(c)}</button>`).join('')}</div>`}
       </div>
       <div class="mesa">
         <div class="monte" aria-hidden="true"><i></i><i></i></div>
         <div id="carta">${cartaHtml()}</div>
         <div class="mesa-acoes">
-          <button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>
+          ${SITE && siteVistas>SITE_CARTAS?'':`<button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>`}
           ${SITE?'':`<button class="btn lg" data-act="usar-carta">${active?t('Anotar como ideia na sessão'):t('Começar sessão com esta carta')}</button>`}
         </div>
       </div>
     </div>
-    <div class="section-head" style="margin-top:8px">
+    ${SITE?'':`    <div class="section-head" style="margin-top:8px">
       <h2 style="font-size:18px">${t('Todas as cartas')}${deckCat==='Todas'?'':` · ${esc(t(deckCat))}`}</h2>
       <button class="link-btn" data-act="ver-todas" aria-expanded="${deckAberto}">${deckAberto?t('Esconder'):t('Ver todas')}</button>
     </div>
     ${deckAberto?`<div class="deck">${deckLista().map(h=>`<button class="hcard ${CAT_CLS[h.cat]}${h.i===deckIdx?' atual':''}" data-carta="${h.i}"><span class="cat">${esc(t(h.cat))}</span><h3>${esc(t(h.t))}</h3><p>${esc(t(h.p))}</p></button>`).join('')}</div>`:''}
+`}
   </section>`;
 }
 function mostraCarta(){ const c=$('#carta'); if(c) c.innerHTML=cartaHtml(); document.querySelectorAll('[data-carta]').forEach(b=>b.classList.toggle('atual',+b.dataset.carta===deckIdx)); }
@@ -1072,7 +1083,7 @@ document.addEventListener('click',e=>{
   const s=getActive();
   if(act==='add-note') addNote();
   if(act==='acompanhar') acompanharAbaAtual();
-  if(act==='puxar'){ puxarCarta(); mostraCarta(); }
+  if(act==='puxar') puxarNoSite();
   if(act==='exemplo-charter'){
     const ex=EXEMPLOS_CHARTER[Math.floor(Math.random()*EXEMPLOS_CHARTER.length)];
     [['c-exp',ex.explorar],['c-com',ex.com],['c-des',ex.descobrir],['c-area',ex.area]].forEach(([id,v])=>{ const el=$('#'+id); if(el) el.value=t(v); });
@@ -1166,7 +1177,7 @@ document.addEventListener('input',e=>{
 
 document.addEventListener('keydown',e=>{
   if(e.target.classList?.contains('fc') && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); virarCarta(e.target); return; }
-  if(view==='deck' && e.key===' ' && !e.target.closest?.('input,textarea,button')){ e.preventDefault(); puxarCarta(); mostraCarta(); return; }
+  if(view==='deck' && e.key===' ' && !e.target.closest?.('input,textarea,button')){ e.preventDefault(); if(!(SITE && siteVistas>SITE_CARTAS)) puxarNoSite(); return; }
   if(view!=='active') return;
   if(e.altKey && !e.ctrlKey && !e.metaKey){ const k=TYPE_ORDER.find(x=>TYPES[x].key===e.key) || TYPE_ORDER[['Digit1','Digit2','Digit3','Digit4','Digit5'].indexOf(e.code)]; if(k){ e.preventDefault(); setType(k); return; } }
   if(e.target.id==='note-in' && e.key==='Enter' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); addNote(); }
