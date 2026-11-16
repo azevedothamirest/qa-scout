@@ -178,9 +178,14 @@ async function copy(text, okMsg, fallbackEl){
 
 /* ---------- roteamento ---------- */
 let view = 'home', viewArg = null;
+// Modo site (desde a 1.3): a página publicada no GitHub Pages (site/inicio.html) carrega este mesmo
+// app.js com <html data-modo="site">. Sem sessão: só o institucional, a demo e as heurísticas (#86).
+const SITE = document.documentElement.dataset.modo==='site';
+const LOJA_URL = 'https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin';
+const GUIA_MCP_URL = 'https://github.com/azevedothamirest/qa-scout/blob/main/docs/mcp.md';
 // Cada tela tem endereço próprio (#/heuristicas, #/relatorio/<id>...): Voltar do navegador, link
 // direto e troca de idioma voltam para a mesma tela (#48, #59).
-const ROTAS = {home:'sessoes',new:'nova',active:'sessao',deck:'heuristicas',metodo:'metodo',mcp:'mcp',report:'relatorio'};
+const ROTAS = SITE ? {home:'inicio',deck:'heuristicas',mcp:'mcp'} : {home:'sessoes',new:'nova',active:'sessao',deck:'heuristicas',metodo:'metodo',mcp:'mcp',report:'relatorio'};
 const rotaDe = (v,arg) => '#/'+ROTAS[v]+(arg?'/'+encodeURIComponent(arg):'');
 function lerRota(){
   const m=location.hash.match(/^#\/([a-z]+)(?:\/(.+))?$/); if(!m) return null;
@@ -212,17 +217,19 @@ function registrado(k){ return t(REGISTRADO[k]); }
 function minReais(s){ return s.elapsedMs>0 ? Math.max(1,Math.round(s.elapsedMs/MIN)) : 0; }
 
 function render(){
-  const active = getActive();
+  if(SITE && !ROTAS[view]){ view='home'; viewArg=null; }
+  const active = SITE ? null : getActive();
   ['home','active','deck','metodo','mcp'].forEach(k=>{
-    const b=$('#tab-'+k);
+    const b=$('#tab-'+k); if(!b) return;
     const cur = (k==='home' && (view==='home'||view==='report')) || (k==='active' && (view==='active'||view==='new')) || k===view;
     b.setAttribute('aria-current', cur ? 'page':'false');
   });
-  $('#tab-active').innerHTML = active ? `<span class="live"></span>${t('Sessão ativa')}` : t('Nova sessão');
+  if($('#tab-active')) $('#tab-active').innerHTML = active ? `<span class="live"></span>${t('Sessão ativa')}` : t('Nova sessão');
   stopTick();
   syncCaptura();
   const app = $('#app');
-  if(view==='home') app.innerHTML = viewHome();
+  if(SITE && view==='home') app.innerHTML = viewSite();
+  else if(view==='home') app.innerHTML = viewHome();
   else if(view==='new'){ app.innerHTML = viewNew(); if(charterTentado) validaCharter(); }
   else if(view==='active'){ if(!active){ view='new'; app.innerHTML = viewNew(); } else { app.innerHTML = viewSession(active); startTick(); } }
   else if(view==='report') app.innerHTML = viewReport(state.sessions.find(s=>s.id===viewArg));
@@ -234,6 +241,49 @@ function render(){
 
 /* ---------- tela: sessões ---------- */
 let query = '';
+function viewSite(){
+  // Sessões do app web antigo (antes da 1.3) ainda no navegador: oferece o backup para levar à extensão.
+  const antigas = state.sessions.filter(s=>!s.example);
+  return `<section class="view site">
+    ${antigas.length?`<div class="banner aviso-backup" role="note"><p><b>${t('O QA Scout agora roda na extensão do Chrome.')}</b> ${t('Você tem {n} sessões salvas neste navegador. Baixe o backup e importe na extensão para não perder nada.',{n:antigas.length})}</p><button class="btn primary" data-act="backup">${t('Baixar backup')}</button></div>`:''}
+    <div class="hero">
+      <div>
+        <div class="eyebrow">${t('Teste exploratório baseado em sessões')}</div>
+        <h1 style="margin-top:10px">${t('Explore com missão.')}<br><em>${t('Volte com evidência.')}</em></h1>
+        <p>${t('Extensão do Chrome para teste exploratório: cada clique, erro e falha de rede da aba que você acompanha vira nota com print. No fim, o relatório e o bug saem prontos para o time.')}</p>
+        <div class="hero-actions">
+          <a class="btn primary lg" href="${LOJA_URL}" target="_blank" rel="noopener">${t('Instalar no Chrome ↗')}</a>
+          <a class="btn lg ghost" href="#onboarding">${t('Ver a demo')}</a>
+        </div>
+        <p class="hint" style="margin-top:12px">${t('Grátis, sem conta e sem servidor: tudo fica no seu navegador.')}</p>
+      </div>
+      <ul class="site-destaques">
+        <li><b>${t('Captura automática')}</b><span>${t('Cliques, campos, páginas, erros de JavaScript e falhas de rede.')}</span></li>
+        <li><b>${t('Bug pronto em um clique')}</b><span>${t('Passos para reproduzir, ambiente e print, no formato do Jira e do GitHub.')}</span></li>
+        <li><b>${t('Sessão com tempo marcado')}</b><span>${t('Charter, cronômetro e pausa automática quando o tempo acaba.')}</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="section-head" style="margin-bottom:12px"><div><div class="eyebrow">${t('Como funciona')}</div><h2>${t('Uma sessão em 3 passos')}</h2></div></div>
+      <div class="passos">
+        <div class="passo"><h3>${t('Escreva o charter')}</h3><p>${t('Uma missão curta: o que explorar, com o quê e para descobrir o quê.')}</p><small>Elisabeth Hendrickson</small></div>
+        <div class="passo"><h3>${t('Explore com tempo marcado')}</h3><p>${t('Um bloco de tempo sem interrupção, do tamanho da missão. Anote bugs, dúvidas, ideias e riscos na hora.')}</p><small>${t('SBTM · James e Jon Bach')}</small></div>
+        <div class="passo"><h3>${t('Faça o debriefing')}</h3><p>${t('Revise as notas, divida o tempo entre teste, bug e setup e leve o relatório para o time.')}</p><small>${t('PROOF e métricas TBS')}</small></div>
+      </div>
+    </div>
+    <div>
+      <div class="section-head" style="margin-bottom:12px"><div><div class="eyebrow">${t('Onde usar')}</div><h2>${t('Dois jeitos de explorar')}</h2></div></div>
+      <div class="site-jeitos">
+        <div class="card"><h3>${t('Extensão do Chrome')}</h3><p>${t('No painel lateral, ao lado do sistema em teste. Você explora e o QA Scout anota.')}</p><a class="btn primary" href="${LOJA_URL}" target="_blank" rel="noopener">${t('Instalar no Chrome ↗')}</a></div>
+        <div class="card"><h3>${t('Em dupla com o Claude (MCP)')}</h3><p>${t('Você passa a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.')}</p><a class="btn" href="#/mcp" data-go="mcp">${t('Como usar o MCP')}</a></div>
+      </div>
+    </div>
+    <div class="captura-promo">
+      <div><h3>${t('Travou no meio da exploração?')}</h3><p>${t('Puxe uma carta do baralho de heurísticas: tours, dados, interação e contexto, com um desafio para fazer agora.')}</p></div>
+      <a class="btn" href="#/heuristicas" data-go="deck">${t('Ver heurísticas')}</a>
+    </div>
+  </section>`;
+}
 function viewHome(){
   const done = state.sessions.filter(s=>s.status==='done').sort((a,b)=>b.startedAt-a.startedAt);
   const active = getActive();
@@ -779,7 +829,7 @@ function viewDeck(){
         <div id="carta">${cartaHtml()}</div>
         <div class="mesa-acoes">
           <button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>
-          <button class="btn lg" data-act="usar-carta">${active?t('Anotar como ideia na sessão'):t('Começar sessão com esta carta')}</button>
+          ${SITE?'':`<button class="btn lg" data-act="usar-carta">${active?t('Anotar como ideia na sessão'):t('Começar sessão com esta carta')}</button>`}
         </div>
       </div>
     </div>
@@ -1254,6 +1304,11 @@ function onboarding(){
       // Com sessão em andamento, o caminho é voltar para ela (nunca abrir um charter novo por cima).
       const ativa=getActive();
       texto(t('Sua vez.'),ativa?t('Sua sessão continua de onde parou.'):t('Escreva a missão, ligue o cronômetro e explore.'));
+      if(SITE){
+        texto(t('Sua vez.'),t('Instale a extensão e faça isso no seu sistema.'));
+        acoes(`<a class="btn primary lg" href="${LOJA_URL}" target="_blank" rel="noopener">${t('Instalar no Chrome ↗')}</a><button type="button" class="btn lg" data-onb="fechar">${t('Fechar')}</button>`);
+        return;
+      }
       acoes(`<button type="button" class="btn primary lg" data-onb="sessao">${ativa?t('Voltar para a sessão'):(state.sessions.some(x=>!x.example)?t('Começar uma sessão'):t('Começar minha primeira sessão'))}</button><button type="button" class="btn lg" data-onb="fechar">${t('Explorar o app')}</button>`);
     }
   }

@@ -28,7 +28,8 @@ function chaves() {
   Object.values(bloco('SALVO')).forEach(add);
   ['Todas', 'Teste', 'Bug', 'Setup', 'o comando de instalação', 'o comando de conferência'].forEach(add);
   // Textos do index.html marcados com data-i18n.
-  const html = fs.readFileSync(path.join(__dirname, '..', 'app', 'index.html'), 'utf8');
+  // O site (site/inicio.html) usa os mesmos textos e alguns próprios, como "Início".
+  const html = ['app/index.html', 'site/inicio.html'].map(f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8')).join('\n');
   for (const m of html.matchAll(/data-i18n(?:-[a-z]+)?="([^"]+)"/g)) add(m[1]);
   return [...out].sort();
 }
