@@ -4,9 +4,9 @@
 
 **Explore com missão. Volte com evidência.**
 
-O QA Scout é um companheiro de teste exploratório baseado em sessões (SBTM). Escreve o charter, liga o cronómetro, anota o que encontra ao ritmo da exploração e, no fim, sai com um relatório pronto para a equipa.
+O QA Scout é uma extensão do Chrome e um servidor MCP para teste exploratório baseado em sessões (SBTM). Escreve o charter, liga o cronómetro e explora; ele regista cliques, erros e falhas de rede com captura e, no fim, entrega o relatório e o bug prontos para a equipa.
 
-🔗 **Aceda:** https://azevedothamirest.github.io/qa-scout/
+🧩 **Instale:** [Chrome Web Store](https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin) · 🔗 **Conheça (demonstração e heurísticas):** https://azevedothamirest.github.io/qa-scout/
 
 [![Tests](https://github.com/azevedothamirest/qa-scout/actions/workflows/ci.yml/badge.svg?event=pull_request)](https://github.com/azevedothamirest/qa-scout/actions/workflows/ci.yml?query=event%3Apull_request)
 
