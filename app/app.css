@@ -651,3 +651,12 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .cafe-aba:hover .cafe-aba-txt,.cafe-aba:focus-visible .cafe-aba-txt,.cafe-aba.aberta .cafe-aba-txt{opacity:1}
 @media (prefers-reduced-motion:reduce){.cafe-aba,.cafe-aba-txt{transition:none}}
 @media print{.cafe-aba{display:none}}
+.deck-site{grid-template-columns:repeat(3,minmax(0,1fr))}
+.deck-site .hcard{cursor:default;align-content:start}
+.deck-site .hcard h2{font-size:18px;margin:0}
+.deck-site .hcard:hover{transform:none}
+.hcard-mais{--cc:#0B0B12;background:linear-gradient(150deg,#3DF5A7,#3BC9F5 60%,#8B5CF6);border:0;color:#0B0B12}
+.hcard-mais .cat,.hcard-mais p{color:#0B0B12;opacity:.8}
+.hcard-mais .btn.primary{background:#0B0B12;color:#F4F3FF;justify-self:start}
+@media (max-width:760px){.deck-site{grid-template-columns:minmax(0,1fr)}}
+.deck-site-titulo em{font-style:normal;color:var(--accent)}

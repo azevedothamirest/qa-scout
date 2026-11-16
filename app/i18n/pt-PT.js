@@ -180,8 +180,8 @@ window.QAS_I18N.dic["pt-PT"] = {
   "Passos para reproduzir, ambiente e print, no formato do Jira e do GitHub.": "Passos para reproduzir, ambiente e captura, no formato do Jira e do GitHub.",
   "Você passa a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.": "Você dá a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.",
   "Você tem {n} sessões salvas neste navegador. Baixe o backup e importe na extensão para não perder nada.": "Tem {n} sessões guardadas neste navegador. Descarregue a cópia de segurança e importe-a na extensão para não perder nada.",
-  "Adquira a extensão para continuar vendo.": "Instale a extensão para continuar a ver.",
   "Ele é gratuito e continua gratuito. Se quiser apoiar, me pague um cafezinho. É opcional.": "É gratuito e continua gratuito. Se quiser apoiar, pague-me um café. É opcional.",
   "Pagar um café ↗": "Pagar-me um café ↗",
   "Pagar um café (opcional) ↗": "Pague-me um café (opcional) ↗",
+  "O baralho completo fica na extensão do Chrome, ao lado da sua sessão.": "O baralho completo fica na extensão do Chrome, ao lado da sua sessão.",
 };

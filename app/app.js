@@ -814,17 +814,7 @@ function puxarCarta(){
   let n; do{ n=l[Math.floor(Math.random()*l.length)].i; }while(n===deckIdx);
   deckIdx=n; deckGiro++;
 }
-// No site, o baralho mostra 2 cartas; a 3ª convida a instalar a extensão (o baralho completo fica nela).
-const SITE_CARTAS = 2;
-let siteVistas = 1;
-function puxarNoSite(){ if(SITE) siteVistas++; puxarCarta(); mostraCarta(); if(SITE && siteVistas>SITE_CARTAS) document.querySelector('[data-act="puxar"]')?.remove(); }
 function cartaHtml(){
-  if(SITE && siteVistas>SITE_CARTAS) return `<article class="carta carta-bloqueada" aria-live="polite">
-    <div class="carta-topo"><span class="cat">${t('Baralho completo')}</span><span class="carta-n">${SITE_CARTAS+1}/${HEUR.length}</span></div>
-    <h2>${t('Adquira a extensão para continuar vendo.')}</h2>
-    <p>${t('As {n} cartas ficam na extensão do Chrome, ao lado da sua sessão, com um desafio para fazer na hora.',{n:HEUR.length})}</p>
-    <a class="btn primary lg" href="${LOJA_URL}" target="_blank" rel="noopener">${t('Instalar no Chrome ↗')}</a>
-  </article>`;
   const h=HEUR[deckIdx];
   return `<article class="carta ${CAT_CLS[h.cat]}" data-giro="${deckGiro%2}" aria-live="polite">
     <div class="carta-topo"><span class="cat">${esc(t(h.cat))}</span><span class="carta-n">${deckIdx+1}/${HEUR.length}</span></div>
@@ -833,7 +823,21 @@ function cartaHtml(){
     <div class="desafio"><span>${t('Faz isso agora')}</span>${esc(t(DESAFIO[h.t]||''))}</div>
   </article>`;
 }
+// No site, o baralho é uma amostra fixa: 2 cartas e uma terceira, de outra cor, que leva à extensão.
+const SITE_CARTAS = [0, 1];
+function viewDeckSite(){
+  return `<section class="view">
+    <div class="section-head" style="margin-bottom:16px"><div><div class="eyebrow">${t('Baralho de ideias · {n} cartas',{n:HEUR.length})}</div>
+      <h1 class="deck-site-titulo" style="font-size:clamp(28px,4vw,40px);margin-top:8px">${t('Travou?')} <em>${t('Puxa uma carta.')}</em></h1>
+      <p class="hint" style="max-width:640px">${t('Cada carta traz uma heurística e um desafio para fazer agora. Tours inspirados em James Whittaker, mais dados e contextos do dia a dia brasileiro.')}</p></div></div>
+    <div class="deck deck-site">
+      ${SITE_CARTAS.map(i=>{ const h=HEUR[i]; return `<article class="hcard ${CAT_CLS[h.cat]}"><span class="cat">${esc(t(h.cat))}</span><h2>${esc(t(h.t))}</h2><p>${esc(t(h.p))}</p></article>`; }).join('')}
+      <article class="hcard hcard-mais"><span class="cat">${t('{n} cartas',{n:HEUR.length})}</span><h2>${t('Quer ver mais? Use a extensão.')}</h2><p>${t('O baralho completo fica na extensão do Chrome, ao lado da sua sessão.')}</p><a class="btn primary" href="${LOJA_URL}" target="_blank" rel="noopener">${t('Instalar no Chrome ↗')}</a></article>
+    </div>
+  </section>`;
+}
 function viewDeck(){
+  if(SITE) return viewDeckSite();
   const cats=['Todas',...new Set(HEUR.map(h=>h.cat))];
   if(!deckLista().some(h=>h.i===deckIdx)) puxarCarta();
   const active=getActive();
@@ -849,7 +853,7 @@ function viewDeck(){
         <div class="monte" aria-hidden="true"><i></i><i></i></div>
         <div id="carta">${cartaHtml()}</div>
         <div class="mesa-acoes">
-          ${SITE && siteVistas>SITE_CARTAS?'':`<button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>`}
+          ${SITE?'':`<button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>`}
           ${SITE?'':`<button class="btn lg" data-act="usar-carta">${active?t('Anotar como ideia na sessão'):t('Começar sessão com esta carta')}</button>`}
         </div>
       </div>
@@ -1094,7 +1098,7 @@ document.addEventListener('click',e=>{
   const s=getActive();
   if(act==='add-note') addNote();
   if(act==='acompanhar') acompanharAbaAtual();
-  if(act==='puxar') puxarNoSite();
+  if(act==='puxar'){ puxarCarta(); mostraCarta(); }
   if(act==='exemplo-charter'){
     const ex=EXEMPLOS_CHARTER[Math.floor(Math.random()*EXEMPLOS_CHARTER.length)];
     [['c-exp',ex.explorar],['c-com',ex.com],['c-des',ex.descobrir],['c-area',ex.area]].forEach(([id,v])=>{ const el=$('#'+id); if(el) el.value=t(v); });
@@ -1188,7 +1192,7 @@ document.addEventListener('input',e=>{
 
 document.addEventListener('keydown',e=>{
   if(e.target.classList?.contains('fc') && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); virarCarta(e.target); return; }
-  if(view==='deck' && e.key===' ' && !e.target.closest?.('input,textarea,button')){ e.preventDefault(); if(!(SITE && siteVistas>SITE_CARTAS)) puxarNoSite(); return; }
+  if(view==='deck' && e.key===' ' && !e.target.closest?.('input,textarea,button')){ e.preventDefault(); if(!SITE){ puxarCarta(); mostraCarta(); } return; }
   if(view!=='active') return;
   if(e.altKey && !e.ctrlKey && !e.metaKey){ const k=TYPE_ORDER.find(x=>TYPES[x].key===e.key) || TYPE_ORDER[['Digit1','Digit2','Digit3','Digit4','Digit5'].indexOf(e.code)]; if(k){ e.preventDefault(); setType(k); return; } }
   if(e.target.id==='note-in' && e.key==='Enter' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); addNote(); }
