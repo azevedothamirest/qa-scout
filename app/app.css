@@ -627,7 +627,8 @@ body.com-onb{overflow:hidden}
 
 /* ---------- modo site (site/inicio.html) ---------- */
 .site{display:grid;gap:28px}
-.site-destaques{list-style:none;margin:0;padding:0;display:grid;gap:10px;position:relative}
+.site .hero{align-items:center}
+.site-destaques{list-style:none;margin:0;padding:0;display:grid;gap:10px;position:relative;z-index:1}
 .site-destaques li{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:3px}
 .site-destaques b{font-size:15px}
 .site-destaques span{color:var(--muted);font-size:13.5px}
