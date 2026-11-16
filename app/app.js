@@ -288,10 +288,6 @@ function viewSite(){
         <div class="card"><h3>${t('Em dupla com o Claude (MCP)')}</h3><p>${t('Você passa a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.')}</p><a class="btn" href="#/mcp" data-go="mcp">${t('Como usar o MCP')}</a></div>
       </div>
     </div>
-    <div class="captura-promo">
-      <div><h3>${t('Travou no meio da exploração?')}</h3><p>${t('Puxe uma carta do baralho de heurísticas: tours, dados, interação e contexto, com um desafio para fazer agora.')}</p></div>
-      <a class="btn" href="#/heuristicas" data-go="deck">${t('Ver heurísticas')}</a>
-    </div>
     <div class="cafe">
       <span class="cafe-icone" aria-hidden="true">☕</span>
       <div><h3>${t('Gostou do QA Scout?')}</h3><p>${t('Ele é gratuito e continua gratuito. Se quiser apoiar, me pague um cafezinho. É opcional.')}</p></div>

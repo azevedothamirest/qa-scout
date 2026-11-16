@@ -178,8 +178,6 @@ window.QAS_I18N.dic["pt-PT"] = {
   "Instale a extensão e faça isso no seu sistema.": "Instale a extensão e faça isto no seu sistema.",
   "No painel lateral, ao lado do sistema em teste. Você explora e o QA Scout anota.": "No painel lateral, ao lado do sistema em teste. Você explora e o QA Scout anota.",
   "Passos para reproduzir, ambiente e print, no formato do Jira e do GitHub.": "Passos para reproduzir, ambiente e captura, no formato do Jira e do GitHub.",
-  "Puxe uma carta do baralho de heurísticas: tours, dados, interação e contexto, com um desafio para fazer agora.": "Tire uma carta do baralho de heurísticas: tours, dados, interação e contexto, com um desafio para fazer agora.",
-  "Travou no meio da exploração?": "Encravou a meio da exploração?",
   "Você passa a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.": "Você dá a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.",
   "Você tem {n} sessões salvas neste navegador. Baixe o backup e importe na extensão para não perder nada.": "Tem {n} sessões guardadas neste navegador. Descarregue a cópia de segurança e importe-a na extensão para não perder nada.",
   "Adquira a extensão para continuar vendo.": "Instale a extensão para continuar a ver.",

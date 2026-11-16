@@ -21,7 +21,7 @@ _16/11/2026_
 **✨ Mudanças**
 - **Apoio opcional no Ko-fi:** a extensão ganhou uma abinha ☕ discreta no canto, que abre ao passar o mouse e aparece aberta por alguns segundos uma vez por dia. Ela só abre a página do Ko-fi numa aba nova: nada é carregado nem enviado. Todas as funções continuam gratuitas.
 - **Fim do beta:** sai o selo "beta" e o aviso de beta aberto.
-- **Site institucional:** os destaques do topo ficam centralizados, o baralho mostra 2 cartas e convida a instalar a extensão, o rodapé fica enxuto e entra o card do café.
+- **Site institucional:** os destaques do topo ficam centralizados, o baralho mostra 2 cartas e convida a instalar a extensão, o rodapé fica enxuto, sai o bloco "Travou no meio da exploração?" e entra o card do café.
 - **Privacidade:** a política ganhou a seção "Apoio opcional (Ko-fi)".
 
 ---
