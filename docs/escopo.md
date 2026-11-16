@@ -24,7 +24,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - [x] Histórico com busca e duas sessões de exemplo removíveis
 - [x] Suíte Playwright, CI e deploy no Pages
 
-## Versão 0.2 (beta aberto)
+## Versão 0.2
 
 - [x] Navegador de teste com um comando (`npx github:azevedothamirest/qa-scout <url>`), perfil próprio que guarda logins
 - [x] Captura automática: cliques, campos preenchidos (sem ler o valor) e páginas abertas viram observações com print do ponto clicado
@@ -117,7 +117,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - Web app sem servidor e sem conta no início: custo zero e nenhuma preocupação com LGPD na largada.
 - Repositório público para hospedar de graça no GitHub Pages (diferente de QA Pulse e QA Sidekick, que são privados).
 - Licença MIT.
-- Captura automática só no navegador de teste (Chromium do Playwright com extensão interna). A extensão do Chrome avulsa foi retirada em outubro de 2026 para simplificar instalação e suporte no beta.
+- Captura automática só no navegador de teste (Chromium do Playwright com extensão interna). A extensão do Chrome avulsa foi retirada em outubro de 2026 para simplificar instalação e suporte no começo.
 - Novembro de 2026 (#86): o produto foca na extensão do Chrome e no MCP. O site deixa de ter sessão e vira institucional, com a demo interativa e o baralho de heurísticas. O código do app continua em `app/`, porque é a extensão e é o que o MCP carrega no navegador de teste.
 - A extensão voltou na 0.5 para ser publicada na Chrome Web Store, que é onde QAs procuram ferramentas. O navegador de teste continua como opção. Monetização futura: grátis o que roda no computador; pago só o que exigir servidor (sincronização, integração direta com Jira/Azure, IA, times).
 - Nome: QA Scout.
@@ -125,6 +125,6 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 ## Plano de validação
 
 - Usar o app em sessões reais em sites de prática e em crowdtesting.
-- Beta com seguidores do @qa.thami (meta: 20 pessoas usando mais de uma vez).
+- Primeiros usuários entre os seguidores do @qa.thami (meta: 20 pessoas usando mais de uma vez).
 - Sinais de sucesso: relatórios compartilhados de verdade em times e pedidos espontâneos por itens do "fora do MVP".
 - Construir em público: cada etapa vira post.

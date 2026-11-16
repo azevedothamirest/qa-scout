@@ -18,17 +18,35 @@ test.describe('Site institucional', () => {
     await expect(page.getByRole('navigation').getByRole('link')).toHaveText(['Início', 'Heurísticas', 'MCP']);
   });
 
+  test('Mostrar no rodapé Como instalar, Privacidade, Termos e o apoio opcional, sem falar em beta', async ({ page }) => {
+    await expect(page.locator('.rodape a')).toHaveText(['Como instalar ↗', 'Privacidade ↗', 'Termos ↗', '☕ Apoiar (opcional) ↗']);
+    await expect(page.locator('.rodape a').first()).toHaveAttribute('href', /chromewebstore/);
+    await expect(page.locator('body')).not.toContainText(/beta/i);
+  });
+
+  test('Oferecer o café do Ko-fi como apoio opcional', async ({ page }) => {
+    await expect(page.getByRole('link', { name: 'Pagar um café ↗' })).toHaveAttribute('href', 'https://ko-fi.com/tazevedo');
+    await expect(page.locator('.cafe')).toContainText('É opcional.');
+  });
+
   test('Cair no início quando o endereço pede uma tela de sessão', async ({ page }) => {
     await page.goto('/inicio.html#/nova');
     await expect(page.locator('#tab-home')).toHaveAttribute('aria-current', 'page');
     await expect(page.locator('#c-exp')).toHaveCount(0);
   });
 
-  test('Mostrar o baralho sem o botão de começar sessão', async ({ page }) => {
+  test('Mostrar 2 cartas fixas e uma terceira que leva à extensão', async ({ page }) => {
     await page.getByRole('navigation').getByRole('link', { name: 'Heurísticas' }).click();
-    await expect(page.getByRole('button', { name: 'Puxar outra carta', exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Começar sessão com esta carta' })).toHaveCount(0);
+    await expect(page.locator('.deck-site .hcard')).toHaveCount(3);
+    await expect(page.locator('.hcard-mais h2')).toHaveText('Quer ver mais? Use a extensão.');
+    await expect(page.locator('.hcard-mais').getByRole('link', { name: 'Instalar no Chrome ↗' })).toHaveAttribute('href', /chromewebstore/);
+    await expect(page.getByRole('button', { name: 'Puxar outra carta', exact: true })).toHaveCount(0);
+    await expect(page.getByText('Todas as cartas')).toHaveCount(0);
+    const primeiras = await page.locator('.deck-site .hcard h2').allTextContents();
+    await page.reload();
+    await expect(page.locator('.deck-site .hcard h2')).toHaveText(primeiras);
   });
+
 
   test('Levar o fim da demo para a instalação da extensão', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);

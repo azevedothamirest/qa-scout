@@ -35,7 +35,6 @@ h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;letter-spacing:
 .top-in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:19px;letter-spacing:-.02em;margin-right:auto}
 .brand svg{flex:none}
-.brand small{font-family:var(--f-body);font-weight:800;font-size:11px;color:#0B0B12;padding:3px 9px;border-radius:99px;background:var(--grad)}
 .tema{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 13px;border-radius:99px;border:1px solid var(--line);background:var(--surface-2);color:var(--muted);font-weight:600;font-size:13px;cursor:pointer;transition:color .15s,border-color .15s}
 .tema:hover{color:var(--ink);border-color:var(--muted)}
 .tema:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
@@ -209,7 +208,7 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 .pager{display:flex;align-items:center;justify-content:center;gap:12px;margin:12px 0 4px;font-size:12.5px;color:var(--muted)}
 .pager button:disabled,.lote button:disabled{opacity:.4;cursor:default}
 /* abertura: logo girando como moeda e o site revelado por um círculo que se abre */
-.abertura{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;text-align:center;background:var(--paper);cursor:pointer;clip-path:circle(150% at 50% 42%)}
+.abertura{position:fixed;inset:0;height:100vh;height:100lvh;bottom:auto;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;text-align:center;background:var(--paper);cursor:pointer;clip-path:circle(150% at 50% 42%)}
 .abertura::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 42%,transparent 0 23px,var(--contour) 23px 24px);opacity:0;animation:ab-curvas 1.6s .3s ease forwards;pointer-events:none}
 .abertura>*{position:relative}
 .abertura-moeda{width:132px;height:132px;perspective:700px;margin-bottom:22px}
@@ -627,7 +626,8 @@ body.com-onb{overflow:hidden}
 
 /* ---------- modo site (site/inicio.html) ---------- */
 .site{display:grid;gap:28px}
-.site-destaques{list-style:none;margin:0;padding:0;display:grid;gap:10px;position:relative}
+.site .hero{align-items:center}
+.site-destaques{list-style:none;margin:0;padding:0;display:grid;gap:10px;position:relative;z-index:1}
 .site-destaques li{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:3px}
 .site-destaques b{font-size:15px}
 .site-destaques span{color:var(--muted);font-size:13.5px}
@@ -638,3 +638,25 @@ body.com-onb{overflow:hidden}
 .aviso-backup{border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 @media (max-width:760px){.site-jeitos{grid-template-columns:minmax(0,1fr)}}
+.cafe{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px 18px;align-items:center;background:var(--surface);border:1px dashed color-mix(in srgb,var(--marker) 55%,var(--line));border-radius:var(--r);padding:16px 20px}
+.cafe-icone{font-size:30px;line-height:1}
+.cafe h3{margin:0 0 2px;font-size:16px}
+.cafe p{margin:0;color:var(--muted);font-size:14px}
+@media (max-width:560px){.cafe{grid-template-columns:auto minmax(0,1fr)}.cafe .btn{grid-column:1/-1;justify-self:start}}
+/* Abinha do café na extensão: recolhida no canto inferior esquerdo, abre no hover/foco. */
+.cafe-aba{position:fixed;left:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 10px;border-radius:0 99px 99px 0;background:var(--surface);border:1px solid var(--line);border-left:0;box-shadow:0 6px 18px rgba(0,0,0,.25);color:var(--ink);font-weight:700;font-size:13px;text-decoration:none;max-width:40px;overflow:hidden;white-space:nowrap;transition:max-width .35s ease,box-shadow .2s}
+.cafe-aba-xicara{font-size:17px;flex:none}
+.cafe-aba-txt{opacity:0;transition:opacity .2s}
+.cafe-aba:hover,.cafe-aba:focus-visible,.cafe-aba.aberta{max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.cafe-aba:hover .cafe-aba-txt,.cafe-aba:focus-visible .cafe-aba-txt,.cafe-aba.aberta .cafe-aba-txt{opacity:1}
+@media (prefers-reduced-motion:reduce){.cafe-aba,.cafe-aba-txt{transition:none}}
+@media print{.cafe-aba{display:none}}
+.deck-site{grid-template-columns:repeat(3,minmax(0,1fr))}
+.deck-site .hcard{cursor:default;align-content:start}
+.deck-site .hcard h2{font-size:18px;margin:0}
+.deck-site .hcard:hover{transform:none}
+.hcard-mais{--cc:#0B0B12;background:linear-gradient(150deg,#3DF5A7,#3BC9F5 60%,#8B5CF6);border:0;color:#0B0B12}
+.hcard-mais .cat,.hcard-mais p{color:#0B0B12;opacity:.8}
+.hcard-mais .btn.primary{background:#0B0B12;color:#F4F3FF;justify-self:start}
+@media (max-width:760px){.deck-site{grid-template-columns:minmax(0,1fr)}}
+.deck-site-titulo em{font-style:normal;color:var(--accent)}

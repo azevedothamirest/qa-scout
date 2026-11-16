@@ -166,6 +166,15 @@ function charterText(c){ return t('Explorar {explorar} com {com} para descobrir 
 function getActive(){ return state.sessions.find(s=>s.id===state.activeId && s.status!=='done') || null; }
 let toastT;
 let anuncioT;
+// Abinha do café (só na extensão): fica recolhida no canto e abre ao passar o mouse ou focar.
+// Uma vez por dia ela aparece aberta por 4 s e recolhe sozinha, para ser vista sem atrapalhar.
+(()=>{
+  const aba=document.getElementById('cafe-aba'); if(!aba) return;
+  const hoje=new Date().toDateString();
+  let vista=null; try{ vista=localStorage.getItem('qascout.cafe'); localStorage.setItem('qascout.cafe',hoje); }catch(e){}
+  if(vista===hoje || navigator.webdriver) return;
+  setTimeout(()=>{ aba.classList.add('aberta'); setTimeout(()=>aba.classList.remove('aberta'),4000); },2500);
+})();
 // "Pular para o conteúdo": leva o foco ao <main> sem mexer na URL.
 document.getElementById('pular')?.addEventListener('click',e=>{ e.preventDefault(); $('#app').focus(); });
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(limpaToast,2600); }
@@ -182,6 +191,7 @@ let view = 'home', viewArg = null;
 // app.js com <html data-modo="site">. Sem sessão: só o institucional, a demo e as heurísticas (#86).
 const SITE = document.documentElement.dataset.modo==='site';
 const LOJA_URL = 'https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin';
+const KOFI_URL = 'https://ko-fi.com/tazevedo';
 const GUIA_MCP_URL = 'https://github.com/azevedothamirest/qa-scout/blob/main/docs/mcp.md';
 // Cada tela tem endereço próprio (#/heuristicas, #/relatorio/<id>...): Voltar do navegador, link
 // direto e troca de idioma voltam para a mesma tela (#48, #59).
@@ -278,9 +288,10 @@ function viewSite(){
         <div class="card"><h3>${t('Em dupla com o Claude (MCP)')}</h3><p>${t('Você passa a missão e o Claude conduz a sessão no navegador de teste, com a mesma captura e o mesmo relatório.')}</p><a class="btn" href="#/mcp" data-go="mcp">${t('Como usar o MCP')}</a></div>
       </div>
     </div>
-    <div class="captura-promo">
-      <div><h3>${t('Travou no meio da exploração?')}</h3><p>${t('Puxe uma carta do baralho de heurísticas: tours, dados, interação e contexto, com um desafio para fazer agora.')}</p></div>
-      <a class="btn" href="#/heuristicas" data-go="deck">${t('Ver heurísticas')}</a>
+    <div class="cafe">
+      <span class="cafe-icone" aria-hidden="true">☕</span>
+      <div><h3>${t('Gostou do QA Scout?')}</h3><p>${t('Ele é gratuito e continua gratuito. Se quiser apoiar, me pague um cafezinho. É opcional.')}</p></div>
+      <a class="btn" href="${KOFI_URL}" target="_blank" rel="noopener">${t('Pagar um café ↗')}</a>
     </div>
   </section>`;
 }
@@ -812,7 +823,21 @@ function cartaHtml(){
     <div class="desafio"><span>${t('Faz isso agora')}</span>${esc(t(DESAFIO[h.t]||''))}</div>
   </article>`;
 }
+// No site, o baralho é uma amostra fixa: 2 cartas e uma terceira, de outra cor, que leva à extensão.
+const SITE_CARTAS = [0, 1];
+function viewDeckSite(){
+  return `<section class="view">
+    <div class="section-head" style="margin-bottom:16px"><div><div class="eyebrow">${t('Baralho de ideias · {n} cartas',{n:HEUR.length})}</div>
+      <h1 class="deck-site-titulo" style="font-size:clamp(28px,4vw,40px);margin-top:8px">${t('Travou?')} <em>${t('Puxa uma carta.')}</em></h1>
+      <p class="hint" style="max-width:640px">${t('Cada carta traz uma heurística e um desafio para fazer agora. Tours inspirados em James Whittaker, mais dados e contextos do dia a dia brasileiro.')}</p></div></div>
+    <div class="deck deck-site">
+      ${SITE_CARTAS.map(i=>{ const h=HEUR[i]; return `<article class="hcard ${CAT_CLS[h.cat]}"><span class="cat">${esc(t(h.cat))}</span><h2>${esc(t(h.t))}</h2><p>${esc(t(h.p))}</p></article>`; }).join('')}
+      <article class="hcard hcard-mais"><span class="cat">${t('{n} cartas',{n:HEUR.length})}</span><h2>${t('Quer ver mais? Use a extensão.')}</h2><p>${t('O baralho completo fica na extensão do Chrome, ao lado da sua sessão.')}</p><a class="btn primary" href="${LOJA_URL}" target="_blank" rel="noopener">${t('Instalar no Chrome ↗')}</a></article>
+    </div>
+  </section>`;
+}
 function viewDeck(){
+  if(SITE) return viewDeckSite();
   const cats=['Todas',...new Set(HEUR.map(h=>h.cat))];
   if(!deckLista().some(h=>h.i===deckIdx)) puxarCarta();
   const active=getActive();
@@ -822,22 +847,23 @@ function viewDeck(){
         <div class="eyebrow">${t('Baralho de ideias · {n} cartas',{n:HEUR.length})}</div>
         <h1>${t('Travou?')} <em>${t('Puxa uma carta.')}</em></h1>
         <p class="hint">${t('Cada carta traz uma heurística e um desafio para fazer agora. Tours inspirados em James Whittaker, mais dados e contextos do dia a dia brasileiro.')}</p>
-        <div class="deck-filters" role="group" aria-label="${t('Categoria')}">${cats.map(c=>`<button data-cat="${c}" aria-pressed="${deckCat===c}">${t(c)}</button>`).join('')}</div>
+        ${SITE?'':`<div class="deck-filters" role="group" aria-label="${t('Categoria')}">${cats.map(c=>`<button data-cat="${c}" aria-pressed="${deckCat===c}">${t(c)}</button>`).join('')}</div>`}
       </div>
       <div class="mesa">
         <div class="monte" aria-hidden="true"><i></i><i></i></div>
         <div id="carta">${cartaHtml()}</div>
         <div class="mesa-acoes">
-          <button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>
+          ${SITE?'':`<button class="btn primary lg" data-act="puxar" aria-keyshortcuts="Space">${t('Puxar outra carta')} <kbd aria-hidden="true">${t('Espaço')}</kbd></button>`}
           ${SITE?'':`<button class="btn lg" data-act="usar-carta">${active?t('Anotar como ideia na sessão'):t('Começar sessão com esta carta')}</button>`}
         </div>
       </div>
     </div>
-    <div class="section-head" style="margin-top:8px">
+    ${SITE?'':`    <div class="section-head" style="margin-top:8px">
       <h2 style="font-size:18px">${t('Todas as cartas')}${deckCat==='Todas'?'':` · ${esc(t(deckCat))}`}</h2>
       <button class="link-btn" data-act="ver-todas" aria-expanded="${deckAberto}">${deckAberto?t('Esconder'):t('Ver todas')}</button>
     </div>
     ${deckAberto?`<div class="deck">${deckLista().map(h=>`<button class="hcard ${CAT_CLS[h.cat]}${h.i===deckIdx?' atual':''}" data-carta="${h.i}"><span class="cat">${esc(t(h.cat))}</span><h3>${esc(t(h.t))}</h3><p>${esc(t(h.p))}</p></button>`).join('')}</div>`:''}
+`}
   </section>`;
 }
 function mostraCarta(){ const c=$('#carta'); if(c) c.innerHTML=cartaHtml(); document.querySelectorAll('[data-carta]').forEach(b=>b.classList.toggle('atual',+b.dataset.carta===deckIdx)); }
@@ -1166,7 +1192,7 @@ document.addEventListener('input',e=>{
 
 document.addEventListener('keydown',e=>{
   if(e.target.classList?.contains('fc') && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); virarCarta(e.target); return; }
-  if(view==='deck' && e.key===' ' && !e.target.closest?.('input,textarea,button')){ e.preventDefault(); puxarCarta(); mostraCarta(); return; }
+  if(view==='deck' && e.key===' ' && !e.target.closest?.('input,textarea,button')){ e.preventDefault(); if(!SITE){ puxarCarta(); mostraCarta(); } return; }
   if(view!=='active') return;
   if(e.altKey && !e.ctrlKey && !e.metaKey){ const k=TYPE_ORDER.find(x=>TYPES[x].key===e.key) || TYPE_ORDER[['Digit1','Digit2','Digit3','Digit4','Digit5'].indexOf(e.code)]; if(k){ e.preventDefault(); setType(k); return; } }
   if(e.target.id==='note-in' && e.key==='Enter' && (e.ctrlKey||e.metaKey)){ e.preventDefault(); addNote(); }

@@ -10,7 +10,7 @@ QA Scout is a companion for session-based exploratory testing (SBTM). You write 
 
 [![Tests](https://github.com/azevedothamirest/qa-scout/actions/workflows/ci.yml/badge.svg?event=pull_request)](https://github.com/azevedothamirest/qa-scout/actions/workflows/ci.yml?query=event%3Apull_request)
 
-> **Open beta.** First time? Follow the [tutorial](../tutorial.md) (about 10 minutes, in Portuguese). Tried it? [Tell us how it went](https://github.com/azevedothamirest/qa-scout/issues/new/choose): bugs, ideas and criticism are very welcome.
+> First time? Follow the [tutorial](../tutorial.md) (about 10 minutes, in Portuguese). Tried it? [Tell us how it went](https://github.com/azevedothamirest/qa-scout/issues/new/choose): bugs, ideas and criticism are very welcome.
 
 ## Why it exists
 

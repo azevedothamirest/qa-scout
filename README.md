@@ -10,7 +10,7 @@ QA Scout é um companheiro de teste exploratório baseado em sessões (SBTM). Vo
 
 [![Testes](https://github.com/azevedothamirest/qa-scout/actions/workflows/ci.yml/badge.svg?event=pull_request)](https://github.com/azevedothamirest/qa-scout/actions/workflows/ci.yml?query=event%3Apull_request)
 
-> **Beta aberto.** Primeira vez? Siga o [tutorial](docs/tutorial.md) (uns 10 minutos). Usou? [Conte como foi](https://github.com/azevedothamirest/qa-scout/issues/new/choose): bugs, ideias e críticas são muito bem-vindos.
+> Primeira vez? Siga o [tutorial](docs/tutorial.md) (uns 10 minutos). Usou? [Conte como foi](https://github.com/azevedothamirest/qa-scout/issues/new/choose): bugs, ideias e críticas são muito bem-vindos.
 
 ## Por que existe
 

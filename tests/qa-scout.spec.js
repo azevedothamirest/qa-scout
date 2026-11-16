@@ -584,3 +584,16 @@ test.describe('Sessão esquecida', () => {
     await expect(page.locator('#clock')).toHaveText('01:00');
   });
 });
+
+test.describe('Apoio opcional', () => {
+  test('Abrir a abinha do café ao passar o mouse e levar ao Ko-fi', async ({ page, isMobile }) => {
+    const aba = page.getByRole('link', { name: 'Pagar um café (opcional) ↗' });
+    await expect(aba).toHaveAttribute('href', 'https://ko-fi.com/tazevedo');
+    const fechada = (await aba.boundingBox()).width;
+    expect(fechada).toBeLessThanOrEqual(42);
+    if (!isMobile) {
+      await aba.hover();
+      await expect.poll(async () => (await aba.boundingBox()).width).toBeGreaterThan(120);
+    }
+  });
+});

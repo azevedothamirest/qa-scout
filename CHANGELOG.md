@@ -4,6 +4,7 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.2.2](#122--apoio-opcional-e-fim-do-beta) | 16/11/2026 | Apoio opcional e fim do beta |
 | [1.2.1](#121--acessibilidade-e-navegação) | 15/11/2026 | Acessibilidade e navegação |
 | [1.2.0](#120--captura-com-o-painel-fechado) | 15/11/2026 | Captura com o painel fechado |
 | [1.1.1](#111--correções-do-onboarding-e-da-captura) | 13/11/2026 | Correções do onboarding e da captura |
@@ -11,6 +12,17 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 | [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
 | [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
+
+---
+
+## 1.2.2 · Apoio opcional e fim do beta
+_16/11/2026_
+
+**✨ Mudanças**
+- **Apoio opcional no Ko-fi:** a extensão ganhou uma abinha ☕ discreta no canto, que abre ao passar o mouse e aparece aberta por alguns segundos uma vez por dia. Ela só abre a página do Ko-fi numa aba nova: nada é carregado nem enviado. Todas as funções continuam gratuitas.
+- **Fim do beta:** sai o selo "beta" e o aviso de beta aberto.
+- **Site institucional:** os destaques do topo ficam centralizados, o baralho mostra 2 cartas e convida a instalar a extensão, o rodapé fica enxuto, sai o bloco "Travou no meio da exploração?" e entra o card do café.
+- **Privacidade:** a política ganhou a seção "Apoio opcional (Ko-fi)".
 
 ---
 
