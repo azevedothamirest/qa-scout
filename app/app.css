@@ -638,3 +638,16 @@ body.com-onb{overflow:hidden}
 .aviso-backup{border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 @media (max-width:760px){.site-jeitos{grid-template-columns:minmax(0,1fr)}}
+.cafe{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px 18px;align-items:center;background:var(--surface);border:1px dashed color-mix(in srgb,var(--marker) 55%,var(--line));border-radius:var(--r);padding:16px 20px}
+.cafe-icone{font-size:30px;line-height:1}
+.cafe h3{margin:0 0 2px;font-size:16px}
+.cafe p{margin:0;color:var(--muted);font-size:14px}
+@media (max-width:560px){.cafe{grid-template-columns:auto minmax(0,1fr)}.cafe .btn{grid-column:1/-1;justify-self:start}}
+/* Abinha do café na extensão: recolhida no canto inferior esquerdo, abre no hover/foco. */
+.cafe-aba{position:fixed;left:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:8px;height:36px;padding:0 12px 0 10px;border-radius:0 99px 99px 0;background:var(--surface);border:1px solid var(--line);border-left:0;box-shadow:0 6px 18px rgba(0,0,0,.25);color:var(--ink);font-weight:700;font-size:13px;text-decoration:none;max-width:40px;overflow:hidden;white-space:nowrap;transition:max-width .35s ease,box-shadow .2s}
+.cafe-aba-xicara{font-size:17px;flex:none}
+.cafe-aba-txt{opacity:0;transition:opacity .2s}
+.cafe-aba:hover,.cafe-aba:focus-visible,.cafe-aba.aberta{max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.cafe-aba:hover .cafe-aba-txt,.cafe-aba:focus-visible .cafe-aba-txt,.cafe-aba.aberta .cafe-aba-txt{opacity:1}
+@media (prefers-reduced-motion:reduce){.cafe-aba,.cafe-aba-txt{transition:none}}
+@media print{.cafe-aba{display:none}}

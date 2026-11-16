@@ -166,6 +166,15 @@ function charterText(c){ return t('Explorar {explorar} com {com} para descobrir 
 function getActive(){ return state.sessions.find(s=>s.id===state.activeId && s.status!=='done') || null; }
 let toastT;
 let anuncioT;
+// Abinha do café (só na extensão): fica recolhida no canto e abre ao passar o mouse ou focar.
+// Uma vez por dia ela aparece aberta por 4 s e recolhe sozinha, para ser vista sem atrapalhar.
+(()=>{
+  const aba=document.getElementById('cafe-aba'); if(!aba) return;
+  const hoje=new Date().toDateString();
+  let vista=null; try{ vista=localStorage.getItem('qascout.cafe'); localStorage.setItem('qascout.cafe',hoje); }catch(e){}
+  if(vista===hoje || navigator.webdriver) return;
+  setTimeout(()=>{ aba.classList.add('aberta'); setTimeout(()=>aba.classList.remove('aberta'),4000); },2500);
+})();
 // "Pular para o conteúdo": leva o foco ao <main> sem mexer na URL.
 document.getElementById('pular')?.addEventListener('click',e=>{ e.preventDefault(); $('#app').focus(); });
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(limpaToast,2600); }
@@ -182,6 +191,7 @@ let view = 'home', viewArg = null;
 // app.js com <html data-modo="site">. Sem sessão: só o institucional, a demo e as heurísticas (#86).
 const SITE = document.documentElement.dataset.modo==='site';
 const LOJA_URL = 'https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin';
+const KOFI_URL = 'https://ko-fi.com/tazevedo';
 const GUIA_MCP_URL = 'https://github.com/azevedothamirest/qa-scout/blob/main/docs/mcp.md';
 // Cada tela tem endereço próprio (#/heuristicas, #/relatorio/<id>...): Voltar do navegador, link
 // direto e troca de idioma voltam para a mesma tela (#48, #59).
@@ -281,6 +291,11 @@ function viewSite(){
     <div class="captura-promo">
       <div><h3>${t('Travou no meio da exploração?')}</h3><p>${t('Puxe uma carta do baralho de heurísticas: tours, dados, interação e contexto, com um desafio para fazer agora.')}</p></div>
       <a class="btn" href="#/heuristicas" data-go="deck">${t('Ver heurísticas')}</a>
+    </div>
+    <div class="cafe">
+      <span class="cafe-icone" aria-hidden="true">☕</span>
+      <div><h3>${t('Gostou do QA Scout?')}</h3><p>${t('Ele é gratuito e continua gratuito. Se quiser apoiar, me pague um cafezinho. É opcional.')}</p></div>
+      <a class="btn" href="${KOFI_URL}" target="_blank" rel="noopener">${t('Pagar um café ↗')}</a>
     </div>
   </section>`;
 }

@@ -18,10 +18,15 @@ test.describe('Site institucional', () => {
     await expect(page.getByRole('navigation').getByRole('link')).toHaveText(['Início', 'Heurísticas', 'MCP']);
   });
 
-  test('Mostrar no rodapé só Como instalar, Privacidade e Termos, sem falar em beta', async ({ page }) => {
-    await expect(page.locator('.rodape a')).toHaveText(['Como instalar ↗', 'Privacidade ↗', 'Termos ↗']);
+  test('Mostrar no rodapé Como instalar, Privacidade, Termos e o apoio opcional, sem falar em beta', async ({ page }) => {
+    await expect(page.locator('.rodape a')).toHaveText(['Como instalar ↗', 'Privacidade ↗', 'Termos ↗', '☕ Apoiar (opcional) ↗']);
     await expect(page.locator('.rodape a').first()).toHaveAttribute('href', /chromewebstore/);
     await expect(page.locator('body')).not.toContainText(/beta/i);
+  });
+
+  test('Oferecer o café do Ko-fi como apoio opcional', async ({ page }) => {
+    await expect(page.getByRole('link', { name: 'Pagar um café ↗' })).toHaveAttribute('href', 'https://ko-fi.com/tazevedo');
+    await expect(page.locator('.cafe')).toContainText('É opcional.');
   });
 
   test('Cair no início quando o endereço pede uma tela de sessão', async ({ page }) => {

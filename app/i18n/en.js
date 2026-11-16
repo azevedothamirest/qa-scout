@@ -553,4 +553,9 @@ window.QAS_I18N.dic["en"] = {
   "Baralho completo": "Full deck",
   "Adquira a extensão para continuar vendo.": "Get the extension to keep drawing.",
   "As {n} cartas ficam na extensão do Chrome, ao lado da sua sessão, com um desafio para fazer na hora.": "All {n} cards live in the Chrome extension, next to your session, each with a challenge to try right away.",
+  "Gostou do QA Scout?": "Enjoying QA Scout?",
+  "Ele é gratuito e continua gratuito. Se quiser apoiar, me pague um cafezinho. É opcional.": "It's free and will stay free. If you'd like to support it, buy me a coffee. Totally optional.",
+  "Pagar um café ↗": "Buy me a coffee ↗",
+  "☕ Apoiar (opcional) ↗": "☕ Support (optional) ↗",
+  "Pagar um café (opcional) ↗": "Buy me a coffee (optional) ↗",
 };

@@ -553,4 +553,9 @@ window.QAS_I18N.dic["es"] = {
   "Baralho completo": "Mazo completo",
   "Adquira a extensão para continuar vendo.": "Instala la extensión para seguir viendo.",
   "As {n} cartas ficam na extensão do Chrome, ao lado da sua sessão, com um desafio para fazer na hora.": "Las {n} cartas están en la extensión de Chrome, junto a tu sesión, con un desafío para hacer al momento.",
+  "Gostou do QA Scout?": "¿Te gusta QA Scout?",
+  "Ele é gratuito e continua gratuito. Se quiser apoiar, me pague um cafezinho. É opcional.": "Es gratuito y seguirá siéndolo. Si quieres apoyarlo, invítame un café. Es opcional.",
+  "Pagar um café ↗": "Invitarme un café ↗",
+  "☕ Apoiar (opcional) ↗": "☕ Apoyar (opcional) ↗",
+  "Pagar um café (opcional) ↗": "Invítame un café (opcional) ↗",
 };

@@ -60,6 +60,8 @@ Para cada nova versão:
 >
 > Privacidade: não há servidor, conta nem envio de dados. Tudo fica no seu computador. O valor digitado nos campos nunca é lido, e nada é registrado fora de uma sessão em andamento ou fora das abas que você escolher acompanhar.
 >
+> Gratuito e continua gratuito. Se quiser apoiar o projeto, tem um link opcional para me pagar um café no Ko-fi: nenhuma função depende disso.
+>
 > Feito por uma QA, para QAs. Código aberto.
 
 ## Ficha da loja em outros idiomas
@@ -94,6 +96,8 @@ O nome e a descrição curta da extensão já vêm traduzidos de `_locales/` (o 
 >
 > Privacidade: não há servidor, conta nem envio de dados. Tudo fica no seu computador. O valor escrito nos campos nunca é lido, e nada é registado fora de uma sessão em curso ou dos separadores que escolher acompanhar.
 >
+> Gratuito e continua gratuito. Se quiser apoiar o projeto, há uma ligação opcional para me pagar um café no Ko-fi: nenhuma funcionalidade depende disso.
+>
 > Feito por uma QA, para QAs. Código aberto.
 
 ### English
@@ -124,6 +128,8 @@ O nome e a descrição curta da extensão já vêm traduzidos de `_locales/` (o 
 >
 > Privacy: no server, no account, no data sent. Everything stays on your computer. Values typed into fields are never read, and nothing is recorded outside a session in progress or outside the tabs you choose to follow.
 >
+> Free, and it will stay free. If you want to support the project, there's an optional link to buy me a coffee on Ko-fi: no feature depends on it.
+>
 > Made by a QA, for QAs. Open source.
 
 ### Español
@@ -153,6 +159,8 @@ O nome e a descrição curta da extensão já vêm traduzidos de `_locales/` (o 
 > • Portugués de Brasil, portugués de Portugal, inglés y español. Tema oscuro y claro.
 >
 > Privacidad: sin servidor, sin cuenta, sin envío de datos. Todo queda en tu ordenador. El valor escrito en los campos nunca se lee, y no se registra nada fuera de una sesión en curso ni fuera de las pestañas que elijas seguir.
+>
+> Gratis y seguirá siéndolo. Si quieres apoyar el proyecto, hay un enlace opcional para invitarme un café en Ko-fi: ninguna función depende de él.
 >
 > Hecho por una QA, para QAs. Código abierto.
 
