@@ -29,7 +29,7 @@ Este tutorial leva uns 10 minutos. Ao final, você terá feito uma sessão compl
 | **Extensão do Chrome** (recomendado) · [instalar](https://chromewebstore.google.com/detail/qa-scout/goffncpkhonlejcokjgiobomlpiefpin) | O dia a dia, no painel lateral do seu Chrome | Sim, na aba do sistema em teste e nas que você marcar |
 | **Navegador de teste** · [guia](navegador.md) | Quem tem Node e prefere um navegador separado, sem mexer no Chrome | Sim, em todas as abas desse navegador |
 | **Com o Claude (MCP)** · [guia](mcp.md) | Quem usa o Claude Code ou o Claude Desktop e quer um par de exploração | Sim, o Claude conduz o navegador de teste |
-| **Versão web** · [abrir](https://azevedothamirest.github.io/qa-scout/) | Quem só quer experimentar, ou não pode instalar nada | Não. As notas e os prints são manuais |
+| **Site** · [abrir](https://azevedothamirest.github.io/qa-scout/) | Quem quer conhecer antes de instalar: tem a demo interativa e as heurísticas | Não tem sessão. A sessão roda na extensão ou no navegador de teste |
 
 Este tutorial segue a **extensão**. As seções 3, 5 e 6 valem para todos os jeitos, e a 4 vale também para o navegador de teste.
 
@@ -167,7 +167,7 @@ Instale o Node pelo [nodejs.org](https://nodejs.org) e abra um terminal novo. Se
 ## Perguntas frequentes
 
 **Meus dados vão para algum servidor?**
-Não. O QA Scout não tem servidor nem conta. Sessões, notas e prints ficam só no seu computador: no armazenamento da extensão, no perfil do navegador de teste ou no `localStorage` da versão web. Veja a [política de privacidade](https://azevedothamirest.github.io/qa-scout/privacidade.html).
+Não. O QA Scout não tem servidor nem conta. Sessões, notas e prints ficam só no seu computador: no armazenamento da extensão, ou no perfil do navegador de teste. Veja a [política de privacidade](https://azevedothamirest.github.io/qa-scout/privacidade.html).
 
 **Ele grava o que eu digito?**
 Não. O QA Scout registra *que* você preencheu um campo e qual é o rótulo dele, nunca o valor. Os prints, porém, mostram o que está na tela no momento do clique: evite explorar com dados reais de clientes.

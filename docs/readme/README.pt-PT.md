@@ -32,7 +32,7 @@ Lista completa em [funcionalidades](../funcionalidades.md) (em português do Bra
 | **Extensão do Chrome** | o dia a dia, no painel lateral | [extensão](../extensao.md) |
 | **Navegador de teste** | um comando, sem mexer no seu Chrome | [navegador](../navegador.md) |
 | **Com o Claude (MCP)** | o Claude explora consigo | [MCP](../mcp.md) |
-| **Site** | sem instalar nada, sem captura automática | [abrir](https://azevedothamirest.github.io/qa-scout/) |
+| **Site** | conhecer, ver a demo e as heurísticas | [abrir](https://azevedothamirest.github.io/qa-scout/) |
 
 ## Privacidade
 

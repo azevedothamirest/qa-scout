@@ -32,7 +32,7 @@ Full list in [features](../funcionalidades.md) (in Portuguese).
 | **Chrome extension** | everyday use, in the side panel | [extension](../extensao.md) |
 | **Test browser** | one command, without touching your Chrome | [browser](../navegador.md) |
 | **With Claude (MCP)** | Claude explores with you | [MCP](../mcp.md) |
-| **Website** | nothing to install, no automatic capture | [open](https://azevedothamirest.github.io/qa-scout/) |
+| **Website** | learn about it, try the demo and the heuristics | [open](https://azevedothamirest.github.io/qa-scout/) |
 
 The guides are in Portuguese.
 
