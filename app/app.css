@@ -209,7 +209,7 @@ main{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
 .pager{display:flex;align-items:center;justify-content:center;gap:12px;margin:12px 0 4px;font-size:12.5px;color:var(--muted)}
 .pager button:disabled,.lote button:disabled{opacity:.4;cursor:default}
 /* abertura: logo girando como moeda e o site revelado por um círculo que se abre */
-.abertura{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;text-align:center;background:var(--paper);cursor:pointer;clip-path:circle(150% at 50% 42%)}
+.abertura{position:fixed;inset:0;height:100vh;height:100lvh;bottom:auto;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;text-align:center;background:var(--paper);cursor:pointer;clip-path:circle(150% at 50% 42%)}
 .abertura::before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 42%,transparent 0 23px,var(--contour) 23px 24px);opacity:0;animation:ab-curvas 1.6s .3s ease forwards;pointer-events:none}
 .abertura>*{position:relative}
 .abertura-moeda{width:132px;height:132px;perspective:700px;margin-bottom:22px}
