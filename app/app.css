@@ -624,3 +624,17 @@ body.com-onb{overflow:hidden}
 .pular{position:fixed;left:12px;top:-60px;z-index:300;background:var(--accent);color:#0B0B12;font-weight:700;padding:10px 16px;border-radius:99px;text-decoration:none;transition:top .15s}
 .pular:focus{top:12px}
 #app:focus{outline:none}
+
+/* ---------- modo site (site/inicio.html) ---------- */
+.site{display:grid;gap:28px}
+.site-destaques{list-style:none;margin:0;padding:0;display:grid;gap:10px;position:relative}
+.site-destaques li{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:3px}
+.site-destaques b{font-size:15px}
+.site-destaques span{color:var(--muted);font-size:13.5px}
+.site-jeitos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.site-jeitos .card{display:grid;gap:10px;align-content:start;justify-items:start}
+.site-jeitos h3{margin:0;font-size:18px}
+.site-jeitos p{margin:0;color:var(--muted)}
+.aviso-backup{border-color:color-mix(in srgb,var(--accent) 45%,transparent)}
+a.btn{text-decoration:none;display:inline-flex;align-items:center}
+@media (max-width:760px){.site-jeitos{grid-template-columns:minmax(0,1fr)}}

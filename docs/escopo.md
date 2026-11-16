@@ -118,6 +118,7 @@ Um app simples para QAs planejarem, executarem e documentarem sessões de teste 
 - Repositório público para hospedar de graça no GitHub Pages (diferente de QA Pulse e QA Sidekick, que são privados).
 - Licença MIT.
 - Captura automática só no navegador de teste (Chromium do Playwright com extensão interna). A extensão do Chrome avulsa foi retirada em outubro de 2026 para simplificar instalação e suporte no beta.
+- Novembro de 2026 (#86): o produto foca na extensão do Chrome e no MCP. O site deixa de ter sessão e vira institucional, com a demo interativa e o baralho de heurísticas. O código do app continua em `app/`, porque é a extensão e é o que o MCP carrega no navegador de teste.
 - A extensão voltou na 0.5 para ser publicada na Chrome Web Store, que é onde QAs procuram ferramentas. O navegador de teste continua como opção. Monetização futura: grátis o que roda no computador; pago só o que exigir servidor (sincronização, integração direta com Jira/Azure, IA, times).
 - Nome: QA Scout.
 
