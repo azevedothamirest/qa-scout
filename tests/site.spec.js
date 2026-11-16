@@ -18,6 +18,12 @@ test.describe('Site institucional', () => {
     await expect(page.getByRole('navigation').getByRole('link')).toHaveText(['Início', 'Heurísticas', 'MCP']);
   });
 
+  test('Mostrar no rodapé só Como instalar, Privacidade e Termos, sem falar em beta', async ({ page }) => {
+    await expect(page.locator('.rodape a')).toHaveText(['Como instalar ↗', 'Privacidade ↗', 'Termos ↗']);
+    await expect(page.locator('.rodape a').first()).toHaveAttribute('href', /chromewebstore/);
+    await expect(page.locator('body')).not.toContainText(/beta/i);
+  });
+
   test('Cair no início quando o endereço pede uma tela de sessão', async ({ page }) => {
     await page.goto('/inicio.html#/nova');
     await expect(page.locator('#tab-home')).toHaveAttribute('aria-current', 'page');

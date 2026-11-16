@@ -4,7 +4,7 @@ O QA Scout é um companheiro de **teste exploratório baseado em sessões** (SBT
 
 Este tutorial leva uns 10 minutos. Ao final, você terá feito uma sessão completa.
 
-> O QA Scout está em **beta aberto**. Se algo não funcionar como descrito aqui, isso já é um feedback valioso: veja [como dar feedback](#7-dê-seu-feedback).
+> Se algo não funcionar como descrito aqui, isso já é um feedback valioso: veja [como dar feedback](#7-dê-seu-feedback).
 
 ---
 
@@ -137,7 +137,7 @@ A sessão fica salva no histórico, com busca por área, charter ou texto das no
 
 ## 7. Dê seu feedback
 
-O QA Scout está em beta e o que você achar ajuda a decidir os próximos passos.
+O que você achar ajuda a decidir os próximos passos do QA Scout.
 
 - **[Contar como foi usar](https://github.com/azevedothamirest/qa-scout/issues/new?template=feedback.yml)**: o que ajudou, o que atrapalhou, o que faltou.
 - **[Reportar um bug](https://github.com/azevedothamirest/qa-scout/issues/new?template=bug.yml)**: de QA para QA, capriche nos passos para reproduzir 😉
