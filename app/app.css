@@ -644,7 +644,7 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .cafe p{margin:0;color:var(--muted);font-size:14px}
 @media (max-width:560px){.cafe{grid-template-columns:auto minmax(0,1fr)}.cafe .btn{grid-column:1/-1;justify-self:start}}
 /* Abinha do café na extensão: aberta no canto inferior esquerdo; ‹ minimiza (só a xícara), e minimizada abre no hover/foco. */
-.cafe-aba{position:fixed;left:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;height:40px;border-radius:0 99px 99px 0;background:linear-gradient(90deg,#FFD166,#FF8FB1);color:#0B0B12;box-shadow:0 6px 20px rgba(255,143,177,.45);max-width:320px;overflow:hidden;white-space:nowrap;transition:max-width .35s ease}
+.cafe-aba{position:fixed;left:0;bottom:calc(64px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;height:40px;border-radius:0 99px 99px 0;background:linear-gradient(90deg,#FFD166,#FF8FB1);color:#0B0B12;box-shadow:2px 3px 10px rgba(0,0,0,.35);max-width:320px;overflow:hidden;white-space:nowrap;transition:max-width .35s ease}
 .cafe-aba-link{display:flex;align-items:center;gap:8px;height:100%;padding:0 4px 0 12px;color:inherit;font-weight:700;font-size:13px;text-decoration:none}
 .cafe-aba-xicara{font-size:20px;flex:none}
 .cafe-aba-txt{transition:opacity .2s}
