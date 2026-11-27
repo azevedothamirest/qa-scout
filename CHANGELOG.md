@@ -4,6 +4,7 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.2.3](#123--pedidos-de-avaliação-e-café-e-pdf-corrigido) | 27/11/2026 | Pedidos de avaliação e café, PDF corrigido |
 | [1.2.2](#122--apoio-opcional-e-fim-do-beta) | 16/11/2026 | Apoio opcional e fim do beta |
 | [1.2.1](#121--acessibilidade-e-navegação) | 15/11/2026 | Acessibilidade e navegação |
 | [1.2.0](#120--captura-com-o-painel-fechado) | 15/11/2026 | Captura com o painel fechado |
@@ -12,6 +13,24 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 | [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
 | [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
+
+---
+
+## 1.2.3 · Pedidos de avaliação e café, PDF corrigido
+_27/11/2026_
+
+**✨ Mudanças**
+- **Pedido de avaliação:** desde a 1ª sessão concluída, aparece um convite para avaliar na Chrome Web Store.
+- **Pedido do cafezinho:** a partir da 2ª sessão, aparece um convite opcional para o Ko-fi.
+- **Como os pedidos funcionam:**
+  - aparecem ao encerrar a sessão ou ao abrir o app, nunca no meio de uma sessão, e no máximo um por vez;
+  - fecham com ×, Esc ou clique fora;
+  - "Agora não" volta a perguntar no dia seguinte;
+  - avaliar, pagar o café ou "Não mostrar de novo" encerram aquele pedido para sempre.
+- **Abinha do café:** fica aberta no canto, em degradê amarelo e rosa e com a xícara balançando de leve. O botão ‹ minimiza (fica só a xícara), e a escolha é lembrada.
+
+**🐞 Correções**
+- **PDF do relatório:** o link "Pular para o conteúdo" aparecia por cima do texto no PDF gerado pela extensão. Agora ele, o aviso de status e a região de anúncios ficam fora da impressão.
 
 ---
 

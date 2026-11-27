@@ -184,4 +184,8 @@ window.QAS_I18N.dic["pt-PT"] = {
   "Pagar um café ↗": "Pagar-me um café ↗",
   "Pagar um café (opcional) ↗": "Pague-me um café (opcional) ↗",
   "O baralho completo fica na extensão do Chrome, ao lado da sua sessão.": "O baralho completo fica na extensão do Chrome, ao lado da sua sessão.",
+  "Me paga um cafezinho?": "Paga-me um café?",
+  "Uma avaliação na Chrome Web Store leva 30 segundos e ajuda outras pessoas de QA a encontrarem a extensão.": "Uma avaliação na Chrome Web Store demora 30 segundos e ajuda outras pessoas de QA a encontrar a extensão.",
+  "O QA Scout é gratuito e continua gratuito. Se ele te poupou tempo, um café ajuda a manter o projeto. É opcional.": "O QA Scout é gratuito e continua gratuito. Se lhe poupou tempo, um café ajuda a manter o projeto. É opcional.",
+  "Não mostrar de novo": "Não mostrar outra vez",
 };

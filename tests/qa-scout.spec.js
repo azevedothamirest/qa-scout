@@ -586,14 +586,77 @@ test.describe('Sessão esquecida', () => {
 });
 
 test.describe('Apoio opcional', () => {
-  test('Abrir a abinha do café ao passar o mouse e levar ao Ko-fi', async ({ page, isMobile }) => {
-    const aba = page.getByRole('link', { name: 'Pagar um café (opcional) ↗' });
-    await expect(aba).toHaveAttribute('href', 'https://ko-fi.com/tazevedo');
-    const fechada = (await aba.boundingBox()).width;
-    expect(fechada).toBeLessThanOrEqual(42);
-    if (!isMobile) {
-      await aba.hover();
-      await expect.poll(async () => (await aba.boundingBox()).width).toBeGreaterThan(120);
+  test('Mostrar a abinha do café aberta, minimizar e lembrar a escolha', async ({ page }) => {
+    const link = page.getByRole('link', { name: 'Pagar um café (opcional) ↗' });
+    await expect(link).toHaveAttribute('href', 'https://ko-fi.com/tazevedo');
+    await expect.poll(async () => (await page.locator('#cafe-aba').boundingBox()).width).toBeGreaterThan(150);
+    await page.getByRole('button', { name: 'Minimizar' }).click();
+    await page.mouse.move(600, 10);
+    await expect.poll(async () => (await page.locator('#cafe-aba').boundingBox()).width).toBeLessThanOrEqual(46);
+    await page.reload();
+    await expect(page.getByRole('button', { name: 'Deixar aberto' })).toHaveCount(1);
+    await expect.poll(async () => (await page.locator('#cafe-aba').boundingBox()).width).toBeLessThanOrEqual(46);
+  });
+});
+
+test.describe('Relatório em PDF · elementos de tela', () => {
+  test('Esconder o "Pular para o conteúdo" na impressão mesmo com o foco nele', async ({ page }) => {
+    await page.locator('[data-open="ex-pix"]').click();
+    await page.locator('#pular').focus();
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('#pular')).toBeHidden();
+  });
+});
+
+test.describe('Pedidos depois da sessão', () => {
+  // Navegador automatizado não vê os pedidos; o teste liga com a chave "teste".
+  async function encerrarSessoes(page, n, pedidos = {}) {
+    await page.evaluate(p => localStorage.setItem('qascout.pedidos', JSON.stringify({ teste: true, ...p })), pedidos);
+    for (let i = 0; i < n; i++) {
+      await page.goto('/#/nova');
+      await page.locator('#c-exp').fill('o checkout');
+      await page.locator('#c-des').fill('falhas');
+      await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+      await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
+      await page.getByRole('button', { name: 'Sim, encerrar' }).click();
+      if (i < n - 1) await page.waitForTimeout(100);
     }
+  }
+
+  test('Pedir o cafezinho depois da segunda sessão e fechar com Esc', async ({ page }) => {
+    await encerrarSessoes(page, 2, { avaliar: 'nunca' });
+    const dialogo = page.getByRole('dialog', { name: 'Me paga um cafezinho?' });
+    await expect(dialogo).toBeVisible();
+    await expect(dialogo.getByRole('link', { name: 'Pagar um café ↗' })).toHaveAttribute('href', 'https://ko-fi.com/tazevedo');
+    await page.keyboard.press('Escape');
+    await expect(dialogo).toHaveCount(0);
+    expect(await page.evaluate(() => typeof JSON.parse(localStorage.getItem('qascout.pedidos')).cafe)).toBe('number');
+  });
+
+  test('Pedir a avaliação na loja já na primeira sessão e não perguntar de novo', async ({ page }) => {
+    await encerrarSessoes(page, 1);
+    const dialogo = page.getByRole('dialog', { name: 'O QA Scout está ajudando?' });
+    await expect(dialogo).toBeVisible();
+    await expect(dialogo.getByRole('link', { name: 'Avaliar na Chrome Web Store ↗' })).toHaveAttribute('href', /\/reviews$/);
+    await dialogo.getByRole('button', { name: 'Não mostrar de novo' }).click();
+    await expect(dialogo).toHaveCount(0);
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('qascout.pedidos')).avaliar)).toBe('nunca');
+  });
+
+  test('Voltar a pedir no dia seguinte depois do Agora não e nunca mais depois de avaliar', async ({ page, context }) => {
+    await encerrarSessoes(page, 1);
+    const dialogo = page.getByRole('dialog', { name: 'O QA Scout está ajudando?' });
+    await dialogo.getByRole('button', { name: 'Agora não' }).click();
+    await page.reload();
+    await page.waitForTimeout(3000);
+    await expect(dialogo).toHaveCount(0);
+    // "Agora não" de ontem: ao abrir hoje, o pedido volta.
+    await page.evaluate(() => { const p = JSON.parse(localStorage.getItem('qascout.pedidos')); p.avaliar -= 24 * 3600 * 1000; localStorage.setItem('qascout.pedidos', JSON.stringify(p)); });
+    await page.reload();
+    await expect(dialogo).toBeVisible({ timeout: 6000 });
+    const aba = context.waitForEvent('page');
+    await dialogo.getByRole('link', { name: 'Avaliar na Chrome Web Store ↗' }).click();
+    await (await aba).close();
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('qascout.pedidos')).avaliar)).toBe('feito');
   });
 });

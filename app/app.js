@@ -166,14 +166,19 @@ function charterText(c){ return t('Explorar {explorar} com {com} para descobrir 
 function getActive(){ return state.sessions.find(s=>s.id===state.activeId && s.status!=='done') || null; }
 let toastT;
 let anuncioT;
-// Abinha do café (só na extensão): fica recolhida no canto e abre ao passar o mouse ou focar.
-// Uma vez por dia ela aparece aberta por 4 s e recolhe sozinha, para ser vista sem atrapalhar.
+// Abinha do café (só na extensão): fica aberta no canto; o botão ‹ minimiza (só a xícara) e a
+// escolha fica guardada. Minimizada, abre de novo ao passar o mouse ou focar; › volta a fixar aberta.
 (()=>{
-  const aba=document.getElementById('cafe-aba'); if(!aba) return;
-  const hoje=new Date().toDateString();
-  let vista=null; try{ vista=localStorage.getItem('qascout.cafe'); localStorage.setItem('qascout.cafe',hoje); }catch(e){}
-  if(vista===hoje || navigator.webdriver) return;
-  setTimeout(()=>{ aba.classList.add('aberta'); setTimeout(()=>aba.classList.remove('aberta'),4000); },2500);
+  const aba=document.getElementById('cafe-aba'), bt=document.getElementById('cafe-aba-min'); if(!aba||!bt) return;
+  const aplica=min=>{
+    aba.classList.toggle('min',min);
+    bt.textContent=min?'›':'‹';
+    bt.setAttribute('aria-expanded',String(!min));
+    const rot=min?t('Deixar aberto'):t('Minimizar'); bt.setAttribute('aria-label',rot); bt.title=rot;
+  };
+  let min=false; try{ min=localStorage.getItem('qascout.cafe.min')==='1'; }catch(e){}
+  aplica(min);
+  bt.addEventListener('click',e=>{ min=!min; try{ localStorage.setItem('qascout.cafe.min',min?'1':'0'); }catch(err){} aplica(min); if(min && e.detail) bt.blur(); });
 })();
 // "Pular para o conteúdo": leva o foco ao <main> sem mexer na URL.
 document.getElementById('pular')?.addEventListener('click',e=>{ e.preventDefault(); $('#app').focus(); });
@@ -294,6 +299,53 @@ function viewSite(){
       <a class="btn" href="${KOFI_URL}" target="_blank" rel="noopener">${t('Pagar um café ↗')}</a>
     </div>
   </section>`;
+}
+// Pedidos depois de encerrar uma sessão (só na extensão, nunca no meio de uma sessão):
+// avaliar na loja a partir da 1ª sessão concluída e o cafezinho a partir da 2ª, no máximo um por vez.
+// Também ao abrir o app num dia seguinte ao "Agora não".
+const PEDIDOS_KEY='qascout.pedidos';
+const AVALIAR_URL=LOJA_URL+'/reviews';
+function lerPedidos(){ try{ return JSON.parse(localStorage.getItem(PEDIDOS_KEY))||{}; }catch(e){ return {}; } }
+function gravarPedidos(p){ try{ localStorage.setItem(PEDIDOS_KEY,JSON.stringify(p)); }catch(e){} }
+function pedidoAposSessao(){
+  if(SITE || getActive() || (navigator.webdriver && !lerPedidos().teste) || document.querySelector('.pedido')) return;
+  const n=state.sessions.filter(x=>x.status==='done' && !x.example).length, p=lerPedidos(), agora=Date.now();
+  // "Agora não" adia para o dia seguinte; avaliar, pagar o café ou "Não mostrar de novo" encerram o pedido.
+  const hoje=new Date().toDateString();
+  const pode=k=>p[k]!=='nunca' && p[k]!=='feito' && !(typeof p[k]==='number' && new Date(p[k]).toDateString()===hoje);
+  if(n>=1 && pode('avaliar')) return abrirPedido('avaliar');
+  if(n>=2 && pode('cafe')) return abrirPedido('cafe');
+}
+function abrirPedido(tipo){
+  const quemAbriu=document.activeElement;
+  const av=tipo==='avaliar';
+  const ov=document.createElement('div');
+  ov.className='pedido';
+  ov.innerHTML=`<div class="pedido-card${av?'':' pedido-cafe'}" role="dialog" aria-modal="true" aria-labelledby="pedido-titulo">
+    <button type="button" class="pedido-x" data-pedido="agora" aria-label="${t('Fechar')}">×</button>
+    <div class="pedido-icone" aria-hidden="true">${av?'⭐':'☕'}</div>
+    <h2 id="pedido-titulo">${av?t('O QA Scout está ajudando?'):t('Me paga um cafezinho?')}</h2>
+    <p>${av?t('Uma avaliação na Chrome Web Store leva 30 segundos e ajuda outras pessoas de QA a encontrarem a extensão.'):t('O QA Scout é gratuito e continua gratuito. Se ele te poupou tempo, um café ajuda a manter o projeto. É opcional.')}</p>
+    <div class="pedido-acoes">
+      <a class="btn primary lg" href="${av?AVALIAR_URL:KOFI_URL}" target="_blank" rel="noopener" data-pedido="feito">${av?t('Avaliar na Chrome Web Store ↗'):t('Pagar um café ↗')}</a>
+      <button type="button" class="btn lg" data-pedido="agora">${t('Agora não')}</button>
+    </div>
+    <button type="button" class="link-btn pedido-nunca" data-pedido="nunca">${t('Não mostrar de novo')}</button>
+  </div>`;
+  document.body.appendChild(ov);
+  const fechar=resp=>{
+    const p=lerPedidos(); p[tipo]=resp==='agora'?Date.now():resp; gravarPedidos(p);
+    ov.remove(); removeEventListener('keydown',tecla,true);
+    if(quemAbriu && document.contains(quemAbriu)) quemAbriu.focus();
+  };
+  const tecla=e=>{ if(e.key==='Escape'){ e.preventDefault(); fechar('agora'); } };
+  addEventListener('keydown',tecla,true);
+  ov.addEventListener('click',e=>{
+    const b=e.target.closest('[data-pedido]');
+    if(b) fechar(b.dataset.pedido);
+    else if(e.target===ov) fechar('agora');
+  });
+  ov.querySelector('.btn.primary').focus();
 }
 function viewHome(){
   const done = state.sessions.filter(s=>s.status==='done').sort((a,b)=>b.startedAt-a.startedAt);
@@ -1122,6 +1174,7 @@ document.addEventListener('click',e=>{
     if(s.status==='running'){ s.elapsedMs+=Date.now()-s.runStartedAt; }
     s.runStartedAt=null; s.status='done'; s.endedAt=Date.now(); state.activeId=null; save();
     pendingImgs=[]; go('report',s.id); toast(t('Sessão encerrada. Faça o debriefing enquanto está fresco.'));
+    setTimeout(pedidoAposSessao,1800);
   }
   if(act==='print') salvarPdf();
   if(act==='backup') baixarBackup();
@@ -1461,6 +1514,8 @@ async function init(){
   if(!/^#(onboarding|apresentacao)$/.test(location.hash)) marcaRota(true);
   if(deveMostrarOnboarding()) onboarding();
   if(esgotou) toast(t('Tempo planejado esgotado: sessão pausada.'));
+  // Pedido adiado com "Agora não" volta no dia seguinte, ao abrir o app (nunca com sessão em andamento).
+  if(!/^#imprimir=/.test(location.hash)) setTimeout(pedidoAposSessao,2500);
   if(corrompido) toast(t('Não foi possível ler as sessões salvas. Guardamos uma cópia e começamos do zero; importe um backup se tiver.'));
   if(EXT){ atualizaAbas(); drenar(); }
 }
