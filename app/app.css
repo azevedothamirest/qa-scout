@@ -660,3 +660,4 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .hcard-mais .btn.primary{background:#0B0B12;color:#F4F3FF;justify-self:start}
 @media (max-width:760px){.deck-site{grid-template-columns:minmax(0,1fr)}}
 .deck-site-titulo em{font-style:normal;color:var(--accent)}
+@media print{.pular,#anuncio,.toast{display:none!important}}

@@ -4,6 +4,7 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
+| [1.2.3](#123--pdf-sem-o-pular-para-o-conteúdo) | 27/11/2026 | PDF sem o "Pular para o conteúdo" |
 | [1.2.2](#122--apoio-opcional-e-fim-do-beta) | 16/11/2026 | Apoio opcional e fim do beta |
 | [1.2.1](#121--acessibilidade-e-navegação) | 15/11/2026 | Acessibilidade e navegação |
 | [1.2.0](#120--captura-com-o-painel-fechado) | 15/11/2026 | Captura com o painel fechado |
@@ -12,6 +13,14 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 | [1.0.3](#103--formulário-captura-e-mcp-mais-claros) | 30/10/2026 | Formulário, captura e MCP mais claros |
 | [1.0.2](#102--tokens-fora-das-notas) | 30/10/2026 | Tokens fora das notas |
 | [1.0.1](#101--correções-de-segurança) | 30/10/2026 | Correções de segurança |
+
+---
+
+## 1.2.3 · PDF sem o "Pular para o conteúdo"
+_27/11/2026_
+
+**🐞 Correções**
+- **PDF do relatório:** o link "Pular para o conteúdo" aparecia por cima do texto no PDF gerado pela extensão. Agora ele, o aviso de status e a região de anúncios ficam fora da impressão.
 
 ---
 

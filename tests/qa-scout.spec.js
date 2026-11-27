@@ -597,3 +597,12 @@ test.describe('Apoio opcional', () => {
     }
   });
 });
+
+test.describe('Relatório em PDF · elementos de tela', () => {
+  test('Esconder o "Pular para o conteúdo" na impressão mesmo com o foco nele', async ({ page }) => {
+    await page.locator('[data-open="ex-pix"]').click();
+    await page.locator('#pular').focus();
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('#pular')).toBeHidden();
+  });
+});
