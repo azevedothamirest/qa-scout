@@ -563,4 +563,6 @@ window.QAS_I18N.dic["es"] = {
   "Avaliar na Chrome Web Store ↗": "Reseñar en Chrome Web Store ↗",
   "Agora não": "Ahora no",
   "Não mostrar de novo": "No mostrar de nuevo",
+  "Minimizar": "Minimizar",
+  "Deixar aberto": "Dejar abierto",
 };

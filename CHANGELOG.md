@@ -20,10 +20,14 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 _27/11/2026_
 
 **✨ Mudanças**
-- **Pedido de avaliação:** a partir da 3ª sessão concluída, ao encerrar, aparece um convite para avaliar na Chrome Web Store.
+- **Pedido de avaliação:** desde a 1ª sessão concluída, aparece um convite para avaliar na Chrome Web Store.
 - **Pedido do cafezinho:** a partir da 2ª sessão, aparece um convite opcional para o Ko-fi.
-- **Como os pedidos funcionam:** nunca aparecem no meio de uma sessão e no máximo um por vez. Fecham com ×, Esc ou clique fora. "Agora não" volta a perguntar depois de 14 dias (avaliação) ou 30 dias (café), e "Não mostrar de novo" encerra o pedido.
-- **Abinha do café** mais chamativa: degradê amarelo e rosa, com a xícara balançando de leve.
+- **Como os pedidos funcionam:**
+  - aparecem ao encerrar a sessão ou ao abrir o app, nunca no meio de uma sessão, e no máximo um por vez;
+  - fecham com ×, Esc ou clique fora;
+  - "Agora não" volta a perguntar no dia seguinte;
+  - avaliar, pagar o café ou "Não mostrar de novo" encerram aquele pedido para sempre.
+- **Abinha do café:** fica aberta no canto, em degradê amarelo e rosa e com a xícara balançando de leve. O botão ‹ minimiza (fica só a xícara), e a escolha é lembrada.
 
 **🐞 Correções**
 - **PDF do relatório:** o link "Pular para o conteúdo" aparecia por cima do texto no PDF gerado pela extensão. Agora ele, o aviso de status e a região de anúncios ficam fora da impressão.

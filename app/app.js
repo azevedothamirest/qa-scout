@@ -166,14 +166,19 @@ function charterText(c){ return t('Explorar {explorar} com {com} para descobrir 
 function getActive(){ return state.sessions.find(s=>s.id===state.activeId && s.status!=='done') || null; }
 let toastT;
 let anuncioT;
-// Abinha do café (só na extensão): fica recolhida no canto e abre ao passar o mouse ou focar.
-// Uma vez por dia ela aparece aberta por 4 s e recolhe sozinha, para ser vista sem atrapalhar.
+// Abinha do café (só na extensão): fica aberta no canto; o botão ‹ minimiza (só a xícara) e a
+// escolha fica guardada. Minimizada, abre de novo ao passar o mouse ou focar; › volta a fixar aberta.
 (()=>{
-  const aba=document.getElementById('cafe-aba'); if(!aba) return;
-  const hoje=new Date().toDateString();
-  let vista=null; try{ vista=localStorage.getItem('qascout.cafe'); localStorage.setItem('qascout.cafe',hoje); }catch(e){}
-  if(vista===hoje || navigator.webdriver) return;
-  setTimeout(()=>{ aba.classList.add('aberta'); setTimeout(()=>aba.classList.remove('aberta'),4000); },2500);
+  const aba=document.getElementById('cafe-aba'), bt=document.getElementById('cafe-aba-min'); if(!aba||!bt) return;
+  const aplica=min=>{
+    aba.classList.toggle('min',min);
+    bt.textContent=min?'›':'‹';
+    bt.setAttribute('aria-expanded',String(!min));
+    const rot=min?t('Deixar aberto'):t('Minimizar'); bt.setAttribute('aria-label',rot); bt.title=rot;
+  };
+  let min=false; try{ min=localStorage.getItem('qascout.cafe.min')==='1'; }catch(e){}
+  aplica(min);
+  bt.addEventListener('click',e=>{ min=!min; try{ localStorage.setItem('qascout.cafe.min',min?'1':'0'); }catch(err){} aplica(min); if(min && e.detail) bt.blur(); });
 })();
 // "Pular para o conteúdo": leva o foco ao <main> sem mexer na URL.
 document.getElementById('pular')?.addEventListener('click',e=>{ e.preventDefault(); $('#app').focus(); });
@@ -296,19 +301,20 @@ function viewSite(){
   </section>`;
 }
 // Pedidos depois de encerrar uma sessão (só na extensão, nunca no meio de uma sessão):
-// avaliar na loja a partir da 3ª sessão concluída e o cafezinho a partir da 2ª, no máximo um por vez,
-// com "Agora não" (volta a perguntar depois de um tempo) e "Não mostrar de novo".
+// avaliar na loja a partir da 1ª sessão concluída e o cafezinho a partir da 2ª, no máximo um por vez.
+// Também ao abrir o app num dia seguinte ao "Agora não".
 const PEDIDOS_KEY='qascout.pedidos';
 const AVALIAR_URL=LOJA_URL+'/reviews';
-const DIA=24*3600*1000;
 function lerPedidos(){ try{ return JSON.parse(localStorage.getItem(PEDIDOS_KEY))||{}; }catch(e){ return {}; } }
 function gravarPedidos(p){ try{ localStorage.setItem(PEDIDOS_KEY,JSON.stringify(p)); }catch(e){} }
 function pedidoAposSessao(){
-  if(SITE || (navigator.webdriver && !lerPedidos().teste) || document.querySelector('.pedido')) return;
+  if(SITE || getActive() || (navigator.webdriver && !lerPedidos().teste) || document.querySelector('.pedido')) return;
   const n=state.sessions.filter(x=>x.status==='done' && !x.example).length, p=lerPedidos(), agora=Date.now();
-  const pode=(k,dias)=>p[k]!=='nunca' && p[k]!=='feito' && !(typeof p[k]==='number' && agora-p[k]<dias*DIA);
-  if(n>=3 && pode('avaliar',14)) return abrirPedido('avaliar');
-  if(n>=2 && pode('cafe',30)) return abrirPedido('cafe');
+  // "Agora não" adia para o dia seguinte; avaliar, pagar o café ou "Não mostrar de novo" encerram o pedido.
+  const hoje=new Date().toDateString();
+  const pode=k=>p[k]!=='nunca' && p[k]!=='feito' && !(typeof p[k]==='number' && new Date(p[k]).toDateString()===hoje);
+  if(n>=1 && pode('avaliar')) return abrirPedido('avaliar');
+  if(n>=2 && pode('cafe')) return abrirPedido('cafe');
 }
 function abrirPedido(tipo){
   const quemAbriu=document.activeElement;
@@ -1508,6 +1514,8 @@ async function init(){
   if(!/^#(onboarding|apresentacao)$/.test(location.hash)) marcaRota(true);
   if(deveMostrarOnboarding()) onboarding();
   if(esgotou) toast(t('Tempo planejado esgotado: sessão pausada.'));
+  // Pedido adiado com "Agora não" volta no dia seguinte, ao abrir o app (nunca com sessão em andamento).
+  if(!/^#imprimir=/.test(location.hash)) setTimeout(pedidoAposSessao,2500);
   if(corrompido) toast(t('Não foi possível ler as sessões salvas. Guardamos uma cópia e começamos do zero; importe um backup se tiver.'));
   if(EXT){ atualizaAbas(); drenar(); }
 }
