@@ -295,6 +295,52 @@ function viewSite(){
     </div>
   </section>`;
 }
+// Pedidos depois de encerrar uma sessão (só na extensão, nunca no meio de uma sessão):
+// avaliar na loja a partir da 3ª sessão concluída e o cafezinho a partir da 2ª, no máximo um por vez,
+// com "Agora não" (volta a perguntar depois de um tempo) e "Não mostrar de novo".
+const PEDIDOS_KEY='qascout.pedidos';
+const AVALIAR_URL=LOJA_URL+'/reviews';
+const DIA=24*3600*1000;
+function lerPedidos(){ try{ return JSON.parse(localStorage.getItem(PEDIDOS_KEY))||{}; }catch(e){ return {}; } }
+function gravarPedidos(p){ try{ localStorage.setItem(PEDIDOS_KEY,JSON.stringify(p)); }catch(e){} }
+function pedidoAposSessao(){
+  if(SITE || (navigator.webdriver && !lerPedidos().teste) || document.querySelector('.pedido')) return;
+  const n=state.sessions.filter(x=>x.status==='done' && !x.example).length, p=lerPedidos(), agora=Date.now();
+  const pode=(k,dias)=>p[k]!=='nunca' && p[k]!=='feito' && !(typeof p[k]==='number' && agora-p[k]<dias*DIA);
+  if(n>=3 && pode('avaliar',14)) return abrirPedido('avaliar');
+  if(n>=2 && pode('cafe',30)) return abrirPedido('cafe');
+}
+function abrirPedido(tipo){
+  const quemAbriu=document.activeElement;
+  const av=tipo==='avaliar';
+  const ov=document.createElement('div');
+  ov.className='pedido';
+  ov.innerHTML=`<div class="pedido-card${av?'':' pedido-cafe'}" role="dialog" aria-modal="true" aria-labelledby="pedido-titulo">
+    <button type="button" class="pedido-x" data-pedido="agora" aria-label="${t('Fechar')}">×</button>
+    <div class="pedido-icone" aria-hidden="true">${av?'⭐':'☕'}</div>
+    <h2 id="pedido-titulo">${av?t('O QA Scout está ajudando?'):t('Me paga um cafezinho?')}</h2>
+    <p>${av?t('Uma avaliação na Chrome Web Store leva 30 segundos e ajuda outras pessoas de QA a encontrarem a extensão.'):t('O QA Scout é gratuito e continua gratuito. Se ele te poupou tempo, um café ajuda a manter o projeto. É opcional.')}</p>
+    <div class="pedido-acoes">
+      <a class="btn primary lg" href="${av?AVALIAR_URL:KOFI_URL}" target="_blank" rel="noopener" data-pedido="feito">${av?t('Avaliar na Chrome Web Store ↗'):t('Pagar um café ↗')}</a>
+      <button type="button" class="btn lg" data-pedido="agora">${t('Agora não')}</button>
+    </div>
+    <button type="button" class="link-btn pedido-nunca" data-pedido="nunca">${t('Não mostrar de novo')}</button>
+  </div>`;
+  document.body.appendChild(ov);
+  const fechar=resp=>{
+    const p=lerPedidos(); p[tipo]=resp==='agora'?Date.now():resp; gravarPedidos(p);
+    ov.remove(); removeEventListener('keydown',tecla,true);
+    if(quemAbriu && document.contains(quemAbriu)) quemAbriu.focus();
+  };
+  const tecla=e=>{ if(e.key==='Escape'){ e.preventDefault(); fechar('agora'); } };
+  addEventListener('keydown',tecla,true);
+  ov.addEventListener('click',e=>{
+    const b=e.target.closest('[data-pedido]');
+    if(b) fechar(b.dataset.pedido);
+    else if(e.target===ov) fechar('agora');
+  });
+  ov.querySelector('.btn.primary').focus();
+}
 function viewHome(){
   const done = state.sessions.filter(s=>s.status==='done').sort((a,b)=>b.startedAt-a.startedAt);
   const active = getActive();
@@ -1122,6 +1168,7 @@ document.addEventListener('click',e=>{
     if(s.status==='running'){ s.elapsedMs+=Date.now()-s.runStartedAt; }
     s.runStartedAt=null; s.status='done'; s.endedAt=Date.now(); state.activeId=null; save();
     pendingImgs=[]; go('report',s.id); toast(t('Sessão encerrada. Faça o debriefing enquanto está fresco.'));
+    setTimeout(pedidoAposSessao,1800);
   }
   if(act==='print') salvarPdf();
   if(act==='backup') baixarBackup();

@@ -590,7 +590,7 @@ test.describe('Apoio opcional', () => {
     const aba = page.getByRole('link', { name: 'Pagar um café (opcional) ↗' });
     await expect(aba).toHaveAttribute('href', 'https://ko-fi.com/tazevedo');
     const fechada = (await aba.boundingBox()).width;
-    expect(fechada).toBeLessThanOrEqual(42);
+    expect(fechada).toBeLessThanOrEqual(46);
     if (!isMobile) {
       await aba.hover();
       await expect.poll(async () => (await aba.boundingBox()).width).toBeGreaterThan(120);
@@ -604,5 +604,41 @@ test.describe('Relatório em PDF · elementos de tela', () => {
     await page.locator('#pular').focus();
     await page.emulateMedia({ media: 'print' });
     await expect(page.locator('#pular')).toBeHidden();
+  });
+});
+
+test.describe('Pedidos depois da sessão', () => {
+  // Navegador automatizado não vê os pedidos; o teste liga com a chave "teste".
+  async function encerrarSessoes(page, n) {
+    await page.evaluate(() => localStorage.setItem('qascout.pedidos', JSON.stringify({ teste: true })));
+    for (let i = 0; i < n; i++) {
+      await page.goto('/#/nova');
+      await page.locator('#c-exp').fill('o checkout');
+      await page.locator('#c-des').fill('falhas');
+      await page.getByRole('button', { name: 'Iniciar sessão' }).click();
+      await page.getByRole('button', { name: 'Encerrar', exact: true }).click();
+      await page.getByRole('button', { name: 'Sim, encerrar' }).click();
+      if (i < n - 1) await page.waitForTimeout(100);
+    }
+  }
+
+  test('Pedir o cafezinho depois da segunda sessão e fechar com Esc', async ({ page }) => {
+    await encerrarSessoes(page, 2);
+    const dialogo = page.getByRole('dialog', { name: 'Me paga um cafezinho?' });
+    await expect(dialogo).toBeVisible();
+    await expect(dialogo.getByRole('link', { name: 'Pagar um café ↗' })).toHaveAttribute('href', 'https://ko-fi.com/tazevedo');
+    await page.keyboard.press('Escape');
+    await expect(dialogo).toHaveCount(0);
+    expect(await page.evaluate(() => typeof JSON.parse(localStorage.getItem('qascout.pedidos')).cafe)).toBe('number');
+  });
+
+  test('Pedir a avaliação na loja depois da terceira sessão e não perguntar de novo', async ({ page }) => {
+    await encerrarSessoes(page, 3);
+    const dialogo = page.getByRole('dialog', { name: 'O QA Scout está ajudando?' });
+    await expect(dialogo).toBeVisible();
+    await expect(dialogo.getByRole('link', { name: 'Avaliar na Chrome Web Store ↗' })).toHaveAttribute('href', /\/reviews$/);
+    await dialogo.getByRole('button', { name: 'Não mostrar de novo' }).click();
+    await expect(dialogo).toHaveCount(0);
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem('qascout.pedidos')).avaliar)).toBe('nunca');
   });
 });

@@ -4,7 +4,7 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 | Versão | Data | Destaque |
 |---|---|---|
-| [1.2.3](#123--pdf-sem-o-pular-para-o-conteúdo) | 27/11/2026 | PDF sem o "Pular para o conteúdo" |
+| [1.2.3](#123--pedidos-de-avaliação-e-café-e-pdf-corrigido) | 27/11/2026 | Pedidos de avaliação e café, PDF corrigido |
 | [1.2.2](#122--apoio-opcional-e-fim-do-beta) | 16/11/2026 | Apoio opcional e fim do beta |
 | [1.2.1](#121--acessibilidade-e-navegação) | 15/11/2026 | Acessibilidade e navegação |
 | [1.2.0](#120--captura-com-o-painel-fechado) | 15/11/2026 | Captura com o painel fechado |
@@ -16,8 +16,14 @@ O que mudou em cada versão do QA Scout. As três mais recentes estão completas
 
 ---
 
-## 1.2.3 · PDF sem o "Pular para o conteúdo"
+## 1.2.3 · Pedidos de avaliação e café, PDF corrigido
 _27/11/2026_
+
+**✨ Mudanças**
+- **Pedido de avaliação:** a partir da 3ª sessão concluída, ao encerrar, aparece um convite para avaliar na Chrome Web Store.
+- **Pedido do cafezinho:** a partir da 2ª sessão, aparece um convite opcional para o Ko-fi.
+- **Como os pedidos funcionam:** nunca aparecem no meio de uma sessão e no máximo um por vez. Fecham com ×, Esc ou clique fora. "Agora não" volta a perguntar depois de 14 dias (avaliação) ou 30 dias (café), e "Não mostrar de novo" encerra o pedido.
+- **Abinha do café** mais chamativa: degradê amarelo e rosa, com a xícara balançando de leve.
 
 **🐞 Correções**
 - **PDF do relatório:** o link "Pular para o conteúdo" aparecia por cima do texto no PDF gerado pela extensão. Agora ele, o aviso de status e a região de anúncios ficam fora da impressão.

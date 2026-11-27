@@ -661,3 +661,22 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
 @media (max-width:760px){.deck-site{grid-template-columns:minmax(0,1fr)}}
 .deck-site-titulo em{font-style:normal;color:var(--accent)}
 @media print{.pular,#anuncio,.toast{display:none!important}}
+/* Pedidos depois de encerrar a sessão (avaliar e cafezinho): cobrem a tela, mas fecham com ×, Esc ou clique fora. */
+.pedido{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:16px;background:rgba(6,6,12,.72);backdrop-filter:blur(4px);animation:pedido-entra .25s ease}
+.pedido-card{position:relative;width:min(420px,100%);background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:28px 24px 18px;text-align:center;display:grid;gap:12px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+.pedido-cafe{border-color:color-mix(in srgb,var(--marker) 60%,var(--line))}
+.pedido-icone{font-size:44px;line-height:1}
+.pedido-card h2{margin:0;font-size:22px}
+.pedido-card p{margin:0;color:var(--muted)}
+.pedido-acoes{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:6px}
+.pedido-x{position:absolute;top:10px;right:12px;width:32px;height:32px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:22px;cursor:pointer}
+.pedido-x:hover{background:var(--surface-2);color:var(--ink)}
+.pedido-nunca{justify-self:center;font-size:13px;color:var(--muted)}
+@keyframes pedido-entra{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.pedido{animation:none}}
+@media print{.pedido{display:none}}
+/* Abinha do café mais chamativa: degradê, xícara balançando de leve. */
+.cafe-aba{background:linear-gradient(90deg,#FFD166,#FF8FB1);color:#0B0B12;border:0;max-width:44px;height:40px;box-shadow:0 6px 20px rgba(255,143,177,.45)}
+.cafe-aba-xicara{font-size:20px;animation:cafe-balanca 2.4s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes cafe-balanca{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-12deg)}90%{transform:rotate(10deg)}95%{transform:rotate(-6deg)}}
+@media (prefers-reduced-motion:reduce){.cafe-aba-xicara{animation:none}}

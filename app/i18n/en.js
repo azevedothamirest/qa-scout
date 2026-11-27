@@ -556,4 +556,11 @@ window.QAS_I18N.dic["en"] = {
   "Quer ver mais? Use a extensão.": "Want more? Use the extension.",
   "O baralho completo fica na extensão do Chrome, ao lado da sua sessão.": "The full deck lives in the Chrome extension, next to your session.",
   "{n} cartas": "{n} cards",
+  "O QA Scout está ajudando?": "Is QA Scout helping?",
+  "Me paga um cafezinho?": "Buy me a coffee?",
+  "Uma avaliação na Chrome Web Store leva 30 segundos e ajuda outras pessoas de QA a encontrarem a extensão.": "A Chrome Web Store review takes 30 seconds and helps other QA folks find the extension.",
+  "O QA Scout é gratuito e continua gratuito. Se ele te poupou tempo, um café ajuda a manter o projeto. É opcional.": "QA Scout is free and will stay free. If it saved you time, a coffee helps keep the project going. Totally optional.",
+  "Avaliar na Chrome Web Store ↗": "Review on the Chrome Web Store ↗",
+  "Agora não": "Not now",
+  "Não mostrar de novo": "Don't show again",
 };
